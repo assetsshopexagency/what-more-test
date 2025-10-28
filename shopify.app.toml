@@ -2,7 +2,7 @@
 
 client_id = "9eed658576b691e3cb3aa51c5c23546a"
 name = "EE-App"
-application_url = "https://available-injured-authorization-addressing.trycloudflare.com"
+application_url = "https://what-more-test.onrender.com"
 embedded = true
 
 [build]
@@ -25,10 +25,9 @@ scopes = "read_files,read_products,write_app_proxy,write_files,write_products"
 
 [auth]
 redirect_urls = [
-  "https://available-injured-authorization-addressing.trycloudflare.com/api/auth"
-]
+  "https://what-more-test.onrender.com/auth/callback","https://what-more-test.onrender.com/auth/shopify/callback","https://what-more-test.onrender.com/api/auth/callback"]
 
 [app_proxy]
-url = "https://available-injured-authorization-addressing.trycloudflare.com/api/carousel-videos"
+url = "https://what-more-test.onrender.com/api/carousel-videos"
 subpath = "carousel-videos"
 prefix = "a"
