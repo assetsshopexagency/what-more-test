@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id            String      @id
+  shop          String
+  state         String
+  isOnline      Boolean     @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        String?
+  mediaFiles      MediaFile[]
+  products        Product[]
+  collections     Collection[]
+  videoEngagements VideoEngagement[]
+  videoComments   VideoComment[]
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean     @default(false)
+  locale        String?
+  collaborator  Boolean?    @default(false)
+  emailVerified Boolean?    @default(false)
+  @@map("sessions")
+}
+
+model MediaFile {
+  id               Int        @id @default(autoincrement())
+  sessionId        String
+  shopify_file_url String
+  title            String
+  description      String?
+  thumbnail_url    String?
+  shopify_file_id  String?
+  duration         Int?       @default(0)
+  download_count   Int        @default(0)
+  created_at       DateTime   @default(now())
+  updated_at       DateTime   @updatedAt
+  session         Session        @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  videoProducts   VideoProduct[]
+  videoCollections VideoCollection[]
+  videoEngagements VideoEngagement[]
+  videoComments   VideoComment[]
+  collectionProducts CollectionProduct[]
+  @@map("media_files")
+}
+
+model VideoEngagement {
+  id          Int      @id @default(autoincrement())
+  sessionId   String
+  mediaFileId Int
+  userId      String
+  liked       Boolean  @default(false)
+  shared      Boolean  @default(false)
+  saved       Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  session   Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  mediaFile MediaFile @relation(fields: [mediaFileId], references: [id], onDelete: Cascade)
+  @@unique([userId, mediaFileId])
+  @@map("video_engagements")
+}
+
+model VideoComment {
+  id          Int      @id @default(autoincrement())
+  sessionId   String
+  mediaFileId Int
+  userId      String
+  userEmail   String?
+  userName    String?
+  comment     String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  session   Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  mediaFile MediaFile @relation(fields: [mediaFileId], references: [id], onDelete: Cascade)
+  @@map("video_comments")
+}
+
+model Product {
+  id                 Int        @id @default(autoincrement())
+  sessionId          String
+  shopify_product_id String
+  shopify_variant_id String?
+  title              String
+  price              Float
+  image_url          String?
+  created_at         DateTime   @default(now())
+  updated_at       DateTime   @updatedAt
+  session       Session        @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  videoProducts VideoProduct[]
+  collectionProducts CollectionProduct[]
+  @@map("products")
+}
+
+model Collection {
+  id                    Int        @id @default(autoincrement())
+  sessionId             String
+  shopify_collection_id String
+  shopify_collection_products_variant_ids String[]
+  title                 String
+  description           String?
+  image_url             String?
+  created_at            DateTime   @default(now())
+  updated_at            DateTime   @updatedAt
+  session         Session          @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  videoCollections VideoCollection[]
+  collectionProducts CollectionProduct[]
+  @@map("collections")
+}
+
+model VideoProduct {
+  id         Int       @id @default(autoincrement())
+  video_id   Int
+  product_id Int
+  mediaFile MediaFile @relation(fields: [video_id], references: [id], onDelete: Cascade)
+  product   Product   @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  @@unique([video_id, product_id])
+  @@map("video_products")
+}
+
+model VideoCollection {
+  id            Int       @id @default(autoincrement())
+  video_id      Int
+  collection_id Int
+  mediaFile  MediaFile  @relation(fields: [video_id], references: [id], onDelete: Cascade)
+  collection Collection @relation(fields: [collection_id], references: [id], onDelete: Cascade)
+  @@unique([video_id, collection_id])
+  @@map("video_collections")
+}
+
+model CollectionProduct {
+  id            Int       @id @default(autoincrement())
+  video_id      Int
+  collection_id Int
+  product_id    Int
+  mediaFile     MediaFile @relation(fields: [video_id], references: [id], onDelete: Cascade)
+  collection    Collection @relation(fields: [collection_id], references: [id], onDelete: Cascade)
+  product       Product    @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  @@unique([video_id, collection_id, product_id])
+  @@map("collection_products")
+}
