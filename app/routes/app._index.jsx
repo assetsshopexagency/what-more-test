@@ -5394,23 +5394,401 @@
 
 
 
+// import { useState, useEffect } from "react";
+// import {
+//   Page,
+//   Card,
+//   Banner,
+//   BlockStack,
+//   Text,
+//   InlineStack,
+//   Badge,
+//   Layout,
+//   Box,
+//   Spinner,
+//   EmptyState,
+//   Button,
+//   Icon,
+//   Checkbox,
+// } from "@shopify/polaris";
+// import VideoPlayer from "../components/VideoPlayer";
+// import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
+// import VideoDetailsModal from "../components/VideoDetailsModal";
+
+// export const loader = async () => null;
+
+// export default function Home() {
+//   const [videos, setVideos] = useState([]);
+//   const [videoProductsMap, setVideoProductsMap] = useState(new Map());
+//   const [videoCollectionsMap, setVideoCollectionsMap] = useState(new Map());
+//   const [collectionProducts, setCollectionProducts] = useState(new Map());
+//   const [excludedMap, setExcludedMap] = useState(new Map());
+//   const [loading, setLoading] = useState(true);
+//   const [message, setMessage] = useState({ text: "", status: "" });
+//   const [selectedVideos, setSelectedVideos] = useState([]);
+//   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+//   const [deleting, setDeleting] = useState(false);
+
+//   // New modal state
+//   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+//   const [selectedVideoForDetails, setSelectedVideoForDetails] = useState(null);
+
+//   useEffect(() => {
+//     loadVideos();
+//     loadVideoProducts();
+//     loadVideoCollections();
+//     loadExcludedProducts();
+//   }, []);
+
+//   useEffect(() => {
+//     const fetchMissingCollectionProducts = async () => {
+//       const uniqueShopifyIds = new Set();
+//       videoCollectionsMap.forEach(colls => {
+//         colls.forEach(c => uniqueShopifyIds.add(c.shopify_collection_id));
+//       });
+
+//       for (const shopifyId of uniqueShopifyIds) {
+//         if (!collectionProducts.has(shopifyId)) {
+//           try {
+//             const response = await fetch(`/api/collection-products?collectionId=${encodeURIComponent(shopifyId)}`);
+//             const data = await response.json();
+//             if (data.success) {
+//               setCollectionProducts(prev => new Map(prev).set(shopifyId, data.products));
+//             }
+//           } catch (error) {
+//             console.error(`Failed to load products for collection ${shopifyId}:`, error);
+//           }
+//         }
+//       }
+//     };
+
+//     if (videoCollectionsMap.size > 0) {
+//       fetchMissingCollectionProducts();
+//     }
+//   }, [videoCollectionsMap, collectionProducts]);
+
+//   const loadVideos = async () => {
+//     try {
+//       setLoading(true);
+//       const response = await fetch("/api/videos");
+//       const data = await response.json();
+//       if (data.success) {
+//         setVideos(data.videos || []);
+//         setSelectedVideos([]);
+//       } else {
+//         setMessage({ text: `❌ Failed to load videos: ${data.error || "Unknown error"}`, status: "critical" });
+//       }
+//     } catch (error) {
+//       console.error("Failed to load videos:", error);
+//       setMessage({ text: `❌ Failed to load videos: ${error.message}`, status: "critical" });
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const loadVideoProducts = async () => {
+//     try {
+//       const response = await fetch("/api/showproducts-onvideos");
+//       const data = await response.json();
+//       if (data.success) {
+//         const map = data.videoProducts.reduce((m, vp) => m.set(vp.video.id, vp.products), new Map());
+//         setVideoProductsMap(map);
+//       } else {
+//         setMessage({ text: `❌ Failed to load video products: ${data.error}`, status: "critical" });
+//       }
+//     } catch (error) {
+//       console.error("Failed to load video products:", error);
+//       setMessage({ text: "❌ Failed to load products for videos", status: "critical" });
+//     }
+//   };
+
+//   const loadVideoCollections = async () => {
+//     try {
+//       const response = await fetch("/api/showcollections-onvideos");
+//       const data = await response.json();
+//       if (data.success) {
+//         const map = data.videoCollections.reduce((m, vc) => m.set(vc.video.id, vc.collections), new Map());
+//         setVideoCollectionsMap(map);
+//       } else {
+//         setMessage({ text: `❌ Failed to load video collections: ${data.error}`, status: "critical" });
+//       }
+//     } catch (error) {
+//       console.error("Failed to load video collections:", error);
+//       setMessage({ text: "❌ Failed to load collections for videos", status: "critical" });
+//     }
+//   };
+
+//   const loadExcludedProducts = async () => {
+//     try {
+//       const response = await fetch("/api/show-excluded-products");
+//       const data = await response.json();
+//       if (data.success) {
+//         const map = data.videoExcludeds.reduce(
+//           (m, ve) => m.set(ve.video.id, new Set(ve.excluded.map(p => p.shopify_product_id))),
+//           new Map()
+//         );
+//         setExcludedMap(map);
+//       } else {
+//         setMessage({ text: `❌ Failed to load excluded products: ${data.error}`, status: "critical" });
+//       }
+//     } catch (error) {
+//       console.error("Failed to load excluded products:", error);
+//       setMessage({ text: "❌ Failed to load excluded products", status: "critical" });
+//     }
+//   };
+
+//   const getEffectiveProducts = (videoId) => {
+//     const direct = videoProductsMap.get(videoId) || [];
+//     const colls = videoCollectionsMap.get(videoId) || [];
+//     const collProds = colls.flatMap(c => {
+//       const prods = collectionProducts.get(c.shopify_collection_id) || [];
+//       return prods.filter(p => !(excludedMap.get(videoId)?.has(p.id) || false));
+//     });
+//     const allProds = [...direct, ...collProds];
+//     const unique = new Map(allProds.map(p => [p.id, p]));
+//     return Array.from(unique.values());
+//   };
+
+//   const handleSelectAll = () => {
+//     if (selectedVideos.length === videos.length) {
+//       setSelectedVideos([]);
+//     } else {
+//       setSelectedVideos(videos.map(v => v.id));
+//     }
+//   };
+
+//   const handleVideoSelect = (videoId, checked) => {
+//     setSelectedVideos(prev =>
+//       checked ? [...prev, videoId] : prev.filter(id => id !== videoId)
+//     );
+//   };
+
+//   const openDeleteModal = () => {
+//     if (selectedVideos.length === 0) {
+//       setMessage({ text: "⚠️ Please select at least one video to delete", status: "warning" });
+//       return;
+//     }
+//     setDeleteModalOpen(true);
+//   };
+
+//   const closeDeleteModal = () => setDeleteModalOpen(false);
+
+//   const deleteSelectedVideos = async () => {
+//     setDeleting(true);
+//     try {
+//       const response = await fetch("/api/delete-videos", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ videoIds: selectedVideos }),
+//       });
+//       const data = await response.json();
+//       if (data.success) {
+//         setVideos(prev => prev.filter(v => !selectedVideos.includes(v.id)));
+//         setSelectedVideos([]);
+//         setMessage({ text: `✅ Deleted ${data.deletedCount} video(s)`, status: "success" });
+//         closeDeleteModal();
+//       } else {
+//         setMessage({ text: `❌ Failed to delete videos: ${data.error}`, status: "critical" });
+//       }
+//     } catch (error) {
+//       console.error("Delete error:", error);
+//       setMessage({ text: `❌ Failed to delete videos: ${error.message}`, status: "critical" });
+//     } finally {
+//       setDeleting(false);
+//     }
+//   };
+
+//   // Handle video details modal
+//   const handleOpenDetails = (video) => {
+//     setSelectedVideoForDetails(video);
+//     setDetailsModalOpen(true);
+//   };
+
+//   const handleCloseDetails = () => {
+//     setDetailsModalOpen(false);
+//     setSelectedVideoForDetails(null);
+//   };
+
+//   return (
+//     <Page
+//       title="Dashboard"
+//       primaryAction={{
+//         content: "Refresh",
+//         onAction: () => {
+//           loadVideos();
+//           loadVideoProducts();
+//           loadVideoCollections();
+//           loadExcludedProducts();
+//         },
+//         disabled: loading,
+//       }}
+//     >
+//       {/* Delete Confirmation Modal */}
+//       <DeleteConfirmationModal
+//         open={deleteModalOpen}
+//         onClose={closeDeleteModal}
+//         title="Delete Videos"
+//         primaryAction={{
+//           content: "Delete Videos",
+//           onAction: deleteSelectedVideos,
+//           loading: deleting,
+//           destructive: true,
+//         }}
+//         secondaryActions={[{ content: "Cancel", onAction: closeDeleteModal }]}
+//         selectedCount={selectedVideos.length}
+//       />
+
+//       {/* Video Details Modal */}
+//       {selectedVideoForDetails && (
+//         <VideoDetailsModal
+//           open={detailsModalOpen}
+//           onClose={handleCloseDetails}
+//           video={selectedVideoForDetails}
+//           products={getEffectiveProducts(selectedVideoForDetails.id)}
+//           collections={videoCollectionsMap.get(selectedVideoForDetails.id) || []}
+//         />
+//       )}
+
+//       {message.text && (
+//         <Banner status={message.status} onDismiss={() => setMessage({ text: "", status: "" })}>
+//           {message.text}
+//         </Banner>
+//       )}
+
+//       <Layout>
+//         <Layout.Section>
+//           <Card>
+//             <BlockStack gap="400">
+//               <InlineStack align="space-between" blockAlign="center">
+//                 <Text variant="headingLg" as="h2">
+//                   Your Videos ({videos.length})
+//                 </Text>
+//                 <InlineStack gap="200">
+//                   {selectedVideos.length > 0 && (
+//                     <Button destructive onClick={openDeleteModal} disabled={loading}>
+//                       Delete Selected ({selectedVideos.length})
+//                     </Button>
+//                   )}
+//                   <Button
+//                     onClick={() => {
+//                       loadVideos();
+//                       loadVideoProducts();
+//                       loadVideoCollections();
+//                       loadExcludedProducts();
+//                     }}
+//                     disabled={loading}
+//                   >
+//                     Refresh
+//                   </Button>
+//                 </InlineStack>
+//               </InlineStack>
+
+//               {loading ? (
+//                 <Box padding="800" alignment="center">
+//                   <Spinner accessibilityLabel="Loading videos" size="large" />
+//                   <Text alignment="center" tone="subdued" variant="bodyMd">
+//                     Loading your videos...
+//                   </Text>
+//                 </Box>
+//               ) : videos.length === 0 ? (
+//                 <EmptyState
+//                   heading="No videos yet"
+//                   image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
+//                 >
+//                   <Text>Upload your first video to get started.</Text>
+//                 </EmptyState>
+//               ) : (
+//                 <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+//                   <div
+//                     style={{
+//                       width: "100%",
+//                       padding: "12px 16px",
+//                       background: "var(--p-surface-subdued)",
+//                       borderRadius: "8px",
+//                       border: "1px solid var(--p-border-subdued)",
+//                     }}
+//                   >
+//                     <Checkbox
+//                       label={`Select all ${videos.length} videos`}
+//                       checked={selectedVideos.length === videos.length && videos.length > 0}
+//                       onChange={handleSelectAll}
+//                     />
+//                   </div>
+
+//                   {videos.map((video) => (
+//                     <div key={video.id} style={{ flex: "0 0 calc(33.333% - 13.33px)" }}>
+//                       <Card padding="300">
+//                         <BlockStack gap="300">
+//                           <Box position="absolute" top="12px" left="12px">
+//                             <Checkbox
+//                               label=""
+//                               labelHidden
+//                               checked={selectedVideos.includes(video.id)}
+//                               onChange={(checked) => handleVideoSelect(video.id, checked)}
+//                             />
+//                           </Box>
+
+//                           <VideoPlayer video={video} />
+
+//                           <BlockStack gap="200">
+//                             <Text variant="bodyMd" fontWeight="bold" alignment="center" truncate>
+//                               {video.title}
+//                             </Text>
+
+//                             <InlineStack gap="100" align="center" blockAlign="center">
+//                               <Badge tone="success" size="small">
+//                                 {getEffectiveProducts(video.id).length} products
+//                               </Badge>
+//                               <Badge tone="info" size="small">
+//                                 {(videoCollectionsMap.get(video.id) || []).length} collections
+//                               </Badge>
+//                             </InlineStack>
+
+//                             <InlineStack gap="100" align="center">
+//                               <Button
+//                                 fullWidth
+//                                 variant="primary"
+//                                 size="slim"
+//                                 onClick={() => handleOpenDetails(video)}
+//                               >
+//                                 View Products
+//                               </Button>
+//                               <Button
+//                                 size="slim"
+//                                 variant="plain"
+//                                 destructive
+//                                 onClick={() => {
+//                                   setSelectedVideos([video.id]);
+//                                   setDeleteModalOpen(true);
+//                                 }}
+//                                 icon={<Icon source="DeleteMinor" />}
+//                               />
+//                             </InlineStack>
+//                           </BlockStack>
+//                         </BlockStack>
+//                       </Card>
+//                     </div>
+//                   ))}
+//                 </div>
+//               )}
+//             </BlockStack>
+//           </Card>
+//         </Layout.Section>
+//       </Layout>
+//     </Page>
+//   );
+// }
+
+
+
+
+
+
+
+
+
 import { useState, useEffect } from "react";
-import {
-  Page,
-  Card,
-  Banner,
-  BlockStack,
-  Text,
-  InlineStack,
-  Badge,
-  Layout,
-  Box,
-  Spinner,
-  EmptyState,
-  Button,
-  Icon,
-  Checkbox,
-} from "@shopify/polaris";
+import { Link } from "@remix-run/react"; // Keep for navigation if needed
 import VideoPlayer from "../components/VideoPlayer";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 import VideoDetailsModal from "../components/VideoDetailsModal";
@@ -5610,19 +5988,7 @@ export default function Home() {
   };
 
   return (
-    <Page
-      title="Dashboard"
-      primaryAction={{
-        content: "Refresh",
-        onAction: () => {
-          loadVideos();
-          loadVideoProducts();
-          loadVideoCollections();
-          loadExcludedProducts();
-        },
-        disabled: loading,
-      }}
-    >
+    <div className="container mx-auto p-4">
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal
         open={deleteModalOpen}
@@ -5650,131 +6016,107 @@ export default function Home() {
       )}
 
       {message.text && (
-        <Banner status={message.status} onDismiss={() => setMessage({ text: "", status: "" })}>
+        <div className={`p-4 rounded ${message.status === 'critical' ? 'bg-red-100 text-red-700' : message.status === 'success' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
           {message.text}
-        </Banner>
+          <button onClick={() => setMessage({ text: "", status: "" })} className="ml-2">Dismiss</button>
+        </div>
       )}
 
-      <Layout>
-        <Layout.Section>
-          <Card>
-            <BlockStack gap="400">
-              <InlineStack align="space-between" blockAlign="center">
-                <Text variant="headingLg" as="h2">
-                  Your Videos ({videos.length})
-                </Text>
-                <InlineStack gap="200">
-                  {selectedVideos.length > 0 && (
-                    <Button destructive onClick={openDeleteModal} disabled={loading}>
-                      Delete Selected ({selectedVideos.length})
-                    </Button>
-                  )}
-                  <Button
-                    onClick={() => {
-                      loadVideos();
-                      loadVideoProducts();
-                      loadVideoCollections();
-                      loadExcludedProducts();
-                    }}
-                    disabled={loading}
-                  >
-                    Refresh
-                  </Button>
-                </InlineStack>
-              </InlineStack>
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold">Your Videos ({videos.length})</h2>
+          <div className="flex gap-2">
+            {selectedVideos.length > 0 && (
+              <button onClick={openDeleteModal} disabled={loading} className="bg-red-500 text-white px-4 py-2 rounded disabled:opacity-50">
+                Delete Selected ({selectedVideos.length})
+              </button>
+            )}
+            <button
+              onClick={() => {
+                loadVideos();
+                loadVideoProducts();
+                loadVideoCollections();
+                loadExcludedProducts();
+              }}
+              disabled={loading}
+              className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
+            >
+              Refresh
+            </button>
+          </div>
+        </div>
 
-              {loading ? (
-                <Box padding="800" alignment="center">
-                  <Spinner accessibilityLabel="Loading videos" size="large" />
-                  <Text alignment="center" tone="subdued" variant="bodyMd">
-                    Loading your videos...
-                  </Text>
-                </Box>
-              ) : videos.length === 0 ? (
-                <EmptyState
-                  heading="No videos yet"
-                  image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
-                >
-                  <Text>Upload your first video to get started.</Text>
-                </EmptyState>
-              ) : (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-                  <div
-                    style={{
-                      width: "100%",
-                      padding: "12px 16px",
-                      background: "var(--p-surface-subdued)",
-                      borderRadius: "8px",
-                      border: "1px solid var(--p-border-subdued)",
-                    }}
-                  >
-                    <Checkbox
-                      label={`Select all ${videos.length} videos`}
-                      checked={selectedVideos.length === videos.length && videos.length > 0}
-                      onChange={handleSelectAll}
-                    />
-                  </div>
+        {loading ? (
+          <div className="flex justify-center items-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+            <p className="ml-2">Loading your videos...</p>
+          </div>
+        ) : videos.length === 0 ? (
+          <div className="text-center p-8 bg-gray-100 rounded">
+            <h3 className="text-xl font-semibold">No videos yet</h3>
+            <p>Upload your first video to get started.</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-5">
+            <div className="w-full p-3 bg-gray-100 rounded border border-gray-300">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={selectedVideos.length === videos.length && videos.length > 0}
+                  onChange={handleSelectAll}
+                  className="mr-2"
+                />
+                Select all {videos.length} videos
+              </label>
+            </div>
 
-                  {videos.map((video) => (
-                    <div key={video.id} style={{ flex: "0 0 calc(33.333% - 13.33px)" }}>
-                      <Card padding="300">
-                        <BlockStack gap="300">
-                          <Box position="absolute" top="12px" left="12px">
-                            <Checkbox
-                              label=""
-                              labelHidden
-                              checked={selectedVideos.includes(video.id)}
-                              onChange={(checked) => handleVideoSelect(video.id, checked)}
-                            />
-                          </Box>
-
-                          <VideoPlayer video={video} />
-
-                          <BlockStack gap="200">
-                            <Text variant="bodyMd" fontWeight="bold" alignment="center" truncate>
-                              {video.title}
-                            </Text>
-
-                            <InlineStack gap="100" align="center" blockAlign="center">
-                              <Badge tone="success" size="small">
-                                {getEffectiveProducts(video.id).length} products
-                              </Badge>
-                              <Badge tone="info" size="small">
-                                {(videoCollectionsMap.get(video.id) || []).length} collections
-                              </Badge>
-                            </InlineStack>
-
-                            <InlineStack gap="100" align="center">
-                              <Button
-                                fullWidth
-                                variant="primary"
-                                size="slim"
-                                onClick={() => handleOpenDetails(video)}
-                              >
-                                View Products
-                              </Button>
-                              <Button
-                                size="slim"
-                                variant="plain"
-                                destructive
-                                onClick={() => {
-                                  setSelectedVideos([video.id]);
-                                  setDeleteModalOpen(true);
-                                }}
-                                icon={<Icon source="DeleteMinor" />}
-                              />
-                            </InlineStack>
-                          </BlockStack>
-                        </BlockStack>
-                      </Card>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {videos.map((video) => (
+                <div key={video.id} className="border border-gray-300 rounded overflow-hidden shadow-md">
+                  <div className="relative">
+                    <div className="absolute top-3 left-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedVideos.includes(video.id)}
+                        onChange={(e) => handleVideoSelect(video.id, e.target.checked)}
+                      />
                     </div>
-                  ))}
+                    <VideoPlayer video={video} />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-center font-bold truncate">{video.title}</h3>
+                    <div className="flex justify-center gap-2 mt-2">
+                      <span className="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">
+                        {getEffectiveProducts(video.id).length} products
+                      </span>
+                      <span className="bg-blue-200 text-blue-800 px-2 py-1 rounded text-sm">
+                        {(videoCollectionsMap.get(video.id) || []).length} collections
+                      </span>
+                    </div>
+                    <div className="flex justify-center gap-2 mt-4">
+                      <button
+                        onClick={() => handleOpenDetails(video)}
+                        className="bg-blue-500 text-white px-4 py-2 rounded w-full text-sm"
+                      >
+                        View Products
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedVideos([video.id]);
+                          setDeleteModalOpen(true);
+                        }}
+                        className="bg-red-500 text-white px-2 py-2 rounded"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </BlockStack>
-          </Card>
-        </Layout.Section>
-      </Layout>
-    </Page>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
