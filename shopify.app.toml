@@ -1,22 +1,23 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
-
 client_id = "9eed658576b691e3cb3aa51c5c23546a"
 name = "EE-App"
-application_url = "https://what-more-test.onrender.com"
-embedded = true
+application_url = "https://9938e20cc7e9.ngrok-free.app"
+embedded = false
 
 [build]
+# This flag ensures that Shopify CLI automatically updates your URLs
+# whenever you run `shopify app dev` or `npm run dev`.
 automatically_update_urls_on_dev = true
 
 [webhooks]
 api_version = "2025-10"
 
   [[webhooks.subscriptions]]
-  topics = [ "app/scopes_update" ]
+  topics = ["app/scopes_update"]
   uri = "/webhooks/app/scopes_update"
 
   [[webhooks.subscriptions]]
-  topics = [ "app/uninstalled" ]
+  topics = ["app/uninstalled"]
   uri = "/webhooks/app/uninstalled"
 
 [access_scopes]
@@ -25,9 +26,12 @@ scopes = "read_files,read_products,write_app_proxy,write_files,write_products"
 
 [auth]
 redirect_urls = [
-  "https://what-more-test.onrender.com/auth/callback","https://what-more-test.onrender.com/auth/shopify/callback","https://what-more-test.onrender.com/api/auth/callback"]
+  "https://9938e20cc7e9.ngrok-free.app/auth/callback",
+  "https://9938e20cc7e9.ngrok-free.app/auth/shopify/callback",
+  "https://9938e20cc7e9.ngrok-free.app/api/auth/callback"
+]
 
 [app_proxy]
-url = "https://what-more-test.onrender.com/api/carousel-videos"
+url = "https://9938e20cc7e9.ngrok-free.app/api/carousel-videos"
 subpath = "carousel-videos"
 prefix = "a"
