@@ -1,4 +1,3 @@
-
 // // // // // THis code is for Standalone App
 
 // // // // import {
@@ -31,7 +30,6 @@
 // // // //     </html>
 // // // //   );
 // // // // }
-
 
 // // // // // This code is for Embedded App
 
@@ -85,8 +83,6 @@
 // // // //   );
 // // // // }
 
-
-
 // // // // This code is for Standalone App
 
 // // // // import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
@@ -110,8 +106,6 @@
 // // // //     </html>
 // // // //   );
 // // // // }
-
-
 
 // // // import {
 // // //   Links,
@@ -154,8 +148,6 @@
 // // // export default function App() {
 // // //   return <Outlet />;
 // // // }
-
-
 
 // // // app/root.jsx
 // // import {
@@ -293,10 +285,6 @@
 // //   );
 // // }
 
-
-
-
-
 // // app/root.jsx
 // import {
 //   Links,
@@ -392,7 +380,7 @@
 //               <div className="hidden md:block">
 //                 <clerk-user-button />
 //               </div>
-              
+
 //               {/* Mobile Menu Button */}
 //               <div className="md:hidden flex items-center space-x-2">
 //                 <clerk-user-button />
@@ -469,10 +457,6 @@
 //   publishableKey: "pk_test_ZmVhc2libGUtZ3JvdXBlci0xMi5jbGVyay5hY2NvdW50cy5kZXYk",
 // });
 
-
-
-
-
 // app/root.jsx
 import {
   Links,
@@ -493,9 +477,7 @@ import { useState } from "react";
 // Import UserButton for proper Clerk user management
 import { UserButton } from "@clerk/remix";
 
-export const links = () => [
-  { rel: "stylesheet", href: "/output.css" },
-];
+export const links = () => [{ rel: "stylesheet", href: "/output.css" }];
 
 export const loader = (args) => rootAuthLoader(args);
 
@@ -512,7 +494,7 @@ export function Layout({ children }) {
         <AppProvider i18n={enTranslations}>{children}</AppProvider>
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
+        {/* <LiveReload /> */}
       </body>
     </html>
   );
@@ -542,7 +524,9 @@ function App() {
               <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md">
                 EE
               </div>
-              <span className="ml-3 text-xl font-bold text-gray-800">EE App</span>
+              <span className="ml-3 text-xl font-bold text-gray-800">
+                EE App
+              </span>
             </div>
 
             <div className="hidden md:flex items-center space-x-1">
@@ -552,9 +536,10 @@ function App() {
                   href={link.href}
                   className={`
                     relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300
-                    ${isActive(link.href)
-                      ? "text-indigo-600 bg-indigo-50 shadow-sm"
-                      : "text-gray-600 hover:text-indigo-600 hover:bg-indigo-50"
+                    ${
+                      isActive(link.href)
+                        ? "text-indigo-600 bg-indigo-50 shadow-sm"
+                        : "text-gray-600 hover:text-indigo-600 hover:bg-indigo-50"
                     }
                   `}
                 >
@@ -571,7 +556,7 @@ function App() {
               <div className="hidden md:block">
                 <UserButton />
               </div>
-              
+
               {/* Mobile Menu Button */}
               <div className="md:hidden flex items-center space-x-2">
                 <UserButton />
@@ -579,12 +564,21 @@ function App() {
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                   className="p-2 rounded-lg text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d={mobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
+                      d={
+                        mobileMenuOpen
+                          ? "M6 18L18 6M6 6l12 12"
+                          : "M4 6h16M4 12h16M4 18h16"
+                      }
                     />
                   </svg>
                 </button>
@@ -603,9 +597,10 @@ function App() {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`
                     block px-4 py-3 rounded-lg text-base font-medium transition-all
-                    ${isActive(link.href)
-                      ? "text-indigo-600 bg-indigo-50"
-                      : "text-gray-700 hover:text-indigo-600 hover:bg-indigo-50"
+                    ${
+                      isActive(link.href)
+                        ? "text-indigo-600 bg-indigo-50"
+                        : "text-gray-700 hover:text-indigo-600 hover:bg-indigo-50"
                     }
                   `}
                 >
@@ -632,5 +627,5 @@ function App() {
 }
 
 export default ClerkApp(App, {
-  publishableKey: "pk_test_ZmVhc2libGUtZ3JvdXBlci0xMi5jbGVyay5hY2NvdW50cy5kZXYk",
+  publishableKey: "pk_test_aG9uZXN0LXNjdWxwaW4tNTcuY2xlcmsuYWNjb3VudHMuZGV2JA",
 });
