@@ -1,4 +1,5 @@
 // app/routes/api.video-products.$videoId.delete.jsx
+//test comment
 import { getShopifyContext } from "../shopify.server.js";
 
 export async function action({ request, params }) {
