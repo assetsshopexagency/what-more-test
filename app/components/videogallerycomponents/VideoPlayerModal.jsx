@@ -5,7 +5,7 @@ export default function VideoPlayerModal({
   showVideoPlayer,
   onHide,
   videoData,
-  isDarkTheme
+  isDarkTheme,
 }) {
   // ADD THIS SAFETY CHECK AT THE TOP
   if (!showVideoPlayer || !showVideoPlayer.show || !videoData) {
@@ -51,71 +51,75 @@ export default function VideoPlayerModal({
   };
 
   return (
-    <div 
+    <div
       style={{
-        position: 'fixed',
+        position: "fixed",
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        background: 'rgba(0, 0, 0, 0.8)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        background: "rgba(0, 0, 0, 0.8)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         zIndex: 10000,
-        padding: '2rem'
+        padding: "2rem",
       }}
       onClick={handleBackdropClick}
     >
-      <div style={{
-        background: isDarkTheme ? '#1f2937' : 'white',
-        borderRadius: '12px',
-        padding: '2rem',
-        maxWidth: '90vw',
-        maxHeight: '90vh',
-        width: 'auto',
-        position: 'relative'
-      }}>
+      <div
+        style={{
+          background: isDarkTheme ? "#1f2937" : "white",
+          borderRadius: "12px",
+          padding: "2rem",
+          maxWidth: "90vw",
+          maxHeight: "90vh",
+          width: "auto",
+          position: "relative",
+        }}
+      >
         {/* Close Button */}
         <button
           onClick={onHide}
           style={{
-            position: 'absolute',
-            top: '1rem',
-            right: '1rem',
-            background: isDarkTheme ? '#374151' : 'white',
-            border: `1px solid ${isDarkTheme ? '#4b5563' : '#e5e7eb'}`,
-            borderRadius: '50%',
-            width: '40px',
-            height: '40px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            color: isDarkTheme ? '#9ca3af' : '#6b7280',
-            fontSize: '1.2rem',
-            fontWeight: 'bold',
-            zIndex: 10001
+            position: "absolute",
+            top: "1rem",
+            right: "1rem",
+            background: isDarkTheme ? "#374151" : "white",
+            border: `1px solid ${isDarkTheme ? "#4b5563" : "#e5e7eb"}`,
+            borderRadius: "50%",
+            width: "40px",
+            height: "40px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            color: isDarkTheme ? "#9ca3af" : "#6b7280",
+            fontSize: "1.2rem",
+            fontWeight: "bold",
+            zIndex: 10001,
           }}
         >
           ✕
         </button>
 
         {/* Video Player */}
-        <div style={{
-          width: '100%',
-          maxWidth: '800px',
-          marginBottom: '1rem'
-        }}>
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "800px",
+            marginBottom: "1rem",
+          }}
+        >
           <video
             ref={videoRef}
             src={videoSrc}
             style={{
-              width: '100%',
-              height: 'auto',
-              maxHeight: '70vh',
-              borderRadius: '8px',
-              background: '#000'
+              width: "100%",
+              height: "auto",
+              maxHeight: "70vh",
+              borderRadius: "8px",
+              background: "#000",
             }}
             controls
             autoPlay
@@ -123,18 +127,19 @@ export default function VideoPlayerModal({
         </div>
 
         {/* Video Info */}
-        <div style={{
-          color: isDarkTheme ? '#f9fafb' : '#1f2937',
-          textAlign: 'center'
-        }}>
-          <h3 style={{ margin: '0 0 0.5rem 0' }}>
-            {videoData.title}
-          </h3>
-          <p style={{ 
-            color: isDarkTheme ? '#9ca3af' : '#6b7280',
-            margin: 0,
-            fontSize: '0.875rem'
-          }}>
+        <div
+          style={{
+            color: isDarkTheme ? "#f9fafb" : "#1f2937",
+            textAlign: "center",
+          }}
+        >
+          <p
+            style={{
+              color: isDarkTheme ? "#9ca3af" : "#6b7280",
+              margin: 0,
+              fontSize: "0.875rem",
+            }}
+          >
             Click the video controls to play/pause
           </p>
         </div>

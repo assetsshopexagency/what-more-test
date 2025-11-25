@@ -149,11 +149,11 @@ model Collection {
   @@index([shopify_collection_id])
   @@map("collections")
 }
-
 model VideoProduct {
   id         Int @id @default(autoincrement())
   video_id   Int
   product_id Int
+  position   Int @default(0)  // 🔥 ADD THIS LINE if not there
 
   mediaFile MediaFile @relation(fields: [video_id], references: [id], onDelete: Cascade)
   product   Product   @relation(fields: [product_id], references: [id], onDelete: Cascade)
@@ -163,6 +163,8 @@ model VideoProduct {
   @@index([product_id])
   @@map("video_products")
 }
+
+
 
 model VideoCollection {
   id            Int @id @default(autoincrement())
