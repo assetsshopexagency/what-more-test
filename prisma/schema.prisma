@@ -59,9 +59,10 @@ model MediaFile {
   session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   videoProducts VideoProduct[]
   videoCollections VideoCollection[]
-  videoEngagements VideoEngagement[]
+  videoEngagements VideoEngagement[]  
   videoComments VideoComment[]
   collectionProducts CollectionProduct[]
+  enableProducts EnableProduct[] // ← ADDED THIS LINE
 
   @@index([sessionId])
   @@index([shopify_file_id])
@@ -124,6 +125,7 @@ model Product {
   session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   videoProducts VideoProduct[]
   collectionProducts CollectionProduct[]
+  enableProducts EnableProduct[] // ← ADDED THIS LINE
 
   @@index([sessionId])
   @@index([shopify_product_id])
@@ -154,6 +156,7 @@ model VideoProduct {
   id         Int @id @default(autoincrement())
   video_id   Int
   product_id Int
+  enabled    Boolean @default(false) // NEW: Store checkbox state
 
   mediaFile MediaFile @relation(fields: [video_id], references: [id], onDelete: Cascade)
   product   Product   @relation(fields: [product_id], references: [id], onDelete: Cascade)
@@ -193,4 +196,20 @@ model CollectionProduct {
   @@index([collection_id])
   @@index([product_id])
   @@map("collection_products")
+}
+
+// NEW: Enable Products Table
+model EnableProduct {
+  id         Int     @id @default(autoincrement())
+  video_id   Int
+  product_id Int
+  status     Boolean @default(false) // true = enabled, false = disabled
+
+  mediaFile MediaFile @relation(fields: [video_id], references: [id], onDelete: Cascade)
+  product   Product   @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@unique([video_id, product_id])
+  @@index([video_id])
+  @@index([product_id])
+  @@map("enable_products")
 }
