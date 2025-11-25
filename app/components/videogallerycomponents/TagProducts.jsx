@@ -411,7 +411,7 @@
 // // // //       setIsLoadingSavedProducts(true);
 // // // //       const response = await fetch(`/api/video-products/${showTagProducts.video.id}`);
 // // // //       const result = await response.json();
-      
+
 // // // //       if (result.success) {
 // // // //         setSavedProducts(result.products);
 // // // //       } else {
@@ -436,12 +436,12 @@
 // // // //   const handleSubmitProducts = async () => {
 // // // //     try {
 // // // //       setIsLoadingProducts(true);
-      
+
 // // // //       // Use the main onLoadProducts function to ensure consistency
 // // // //       if (onLoadProducts) {
 // // // //         await onLoadProducts(showTagProducts.video);
 // // // //       }
-      
+
 // // // //       // ProductsModal will be shown by the parent through showProductsModal state
 // // // //       // We don't need to setShowProductsModal here anymore
 // // // //     } catch (error) {
@@ -497,7 +497,7 @@
 
 // // // //   return (
 // // // //     <>
-// // // //       <div 
+// // // //       <div
 // // // //         style={{
 // // // //           position: 'fixed',
 // // // //           top: 0,
@@ -512,7 +512,7 @@
 // // // //         }}
 // // // //         onClick={handleBackdropClick}
 // // // //       >
-// // // //         <div 
+// // // //         <div
 // // // //           style={{
 // // // //             background: currentTheme.background,
 // // // //             borderRadius: '12px',
@@ -586,7 +586,7 @@
 // // // //               }}>
 // // // //                 Tag Products to Video
 // // // //               </h3>
-              
+
 // // // //               <button
 // // // //                 onClick={handleSubmitProducts}
 // // // //                 disabled={isLoadingProducts || productsModalOpened}
@@ -632,7 +632,7 @@
 // // // //                 }}>
 // // // //                   Saved Products {savedProducts.length > 0 && `(${savedProducts.length})`}
 // // // //                 </div>
-                
+
 // // // //                 {isLoadingSavedProducts ? (
 // // // //                   <div style={{
 // // // //                     textAlign: 'center',
@@ -670,8 +670,8 @@
 // // // //                         }}
 // // // //                       >
 // // // //                         {product.image_url ? (
-// // // //                           <img 
-// // // //                             src={product.image_url} 
+// // // //                           <img
+// // // //                             src={product.image_url}
 // // // //                             alt={product.title}
 // // // //                             style={{
 // // // //                               width: '28px', // Increased from 18px
@@ -754,9 +754,6 @@
 // // // //   );
 // // // // }
 
-
-
-
 // // // // components/videogallerycomponents/TagProductsModal.jsx
 // // // import { useState, useEffect } from "react";
 // // // import ProductsModal from "./ProductsModal";
@@ -791,7 +788,7 @@
 // // //       setIsLoadingSavedProducts(true);
 // // //       const response = await fetch(`/api/video-products/${showTagProducts.video.id}`);
 // // //       const result = await response.json();
-      
+
 // // //       if (result.success) {
 // // //         setSavedProducts(result.products);
 // // //       } else {
@@ -843,12 +840,12 @@
 // // //   const handleSubmitProducts = async () => {
 // // //     try {
 // // //       setIsLoadingProducts(true);
-      
+
 // // //       // Use the main onLoadProducts function to ensure consistency
 // // //       if (onLoadProducts) {
 // // //         await onLoadProducts(showTagProducts.video);
 // // //       }
-      
+
 // // //       // ProductsModal will be shown by the parent through showProductsModal state
 // // //       // We don't need to setShowProductsModal here anymore
 // // //     } catch (error) {
@@ -904,7 +901,7 @@
 
 // // //   return (
 // // //     <>
-// // //       <div 
+// // //       <div
 // // //         style={{
 // // //           position: 'fixed',
 // // //           top: 0,
@@ -919,7 +916,7 @@
 // // //         }}
 // // //         onClick={handleBackdropClick}
 // // //       >
-// // //         <div 
+// // //         <div
 // // //           style={{
 // // //             background: currentTheme.background,
 // // //             borderRadius: '12px',
@@ -993,7 +990,7 @@
 // // //               }}>
 // // //                 Tag Products to Video
 // // //               </h3>
-              
+
 // // //               <button
 // // //                 onClick={handleSubmitProducts}
 // // //                 disabled={isLoadingProducts || productsModalOpened}
@@ -1039,7 +1036,7 @@
 // // //                 }}>
 // // //                   Saved Products {savedProducts.length > 0 && `(${savedProducts.length})`}
 // // //                 </div>
-                
+
 // // //                 {isLoadingSavedProducts ? (
 // // //                   <div style={{
 // // //                     textAlign: 'center',
@@ -1078,8 +1075,8 @@
 // // //                         }}
 // // //                       >
 // // //                         {product.image_url ? (
-// // //                           <img 
-// // //                             src={product.image_url} 
+// // //                           <img
+// // //                             src={product.image_url}
 // // //                             alt={product.title}
 // // //                             style={{
 // // //                               width: '28px', // Increased from 18px
@@ -1191,12 +1188,6 @@
 // // //   );
 // // // }
 
-
-
-
-
-
-
 // // // components/videogallerycomponents/TagProductsModal.jsx
 // // import { useState, useEffect } from "react";
 // // import ProductsModal from "./ProductsModal";
@@ -1230,7 +1221,7 @@
 // //       setIsLoadingSavedProducts(true);
 // //       const response = await fetch(`/api/video-products/${showTagProducts.video.id}`);
 // //       const result = await response.json();
-     
+
 // //       if (result.success) {
 // //         setSavedProducts(result.products);
 // //       } else {
@@ -1286,12 +1277,12 @@
 // //   const handleSubmitProducts = async () => {
 // //     try {
 // //       setIsLoadingProducts(true);
-     
+
 // //       // Use the main onLoadProducts function to ensure consistency
 // //       if (onLoadProducts) {
 // //         await onLoadProducts(showTagProducts.video);
 // //       }
-     
+
 // //       // ProductsModal will be shown by the parent through showProductsModal state
 // //       // We don't need to setShowProductsModal here anymore
 // //     } catch (error) {
@@ -1428,7 +1419,7 @@
 // //               }}>
 // //                 Tag Products to Video
 // //               </h3>
-             
+
 // //               <button
 // //                 onClick={handleSubmitProducts}
 // //                 disabled={isLoadingProducts || productsModalOpened}
@@ -1474,7 +1465,7 @@
 // //                 }}>
 // //                   Saved Products {savedProducts.length > 0 && `(${savedProducts.length})`}
 // //                 </div>
-               
+
 // //                 {isLoadingSavedProducts ? (
 // //                   <div style={{
 // //                     textAlign: 'center',
@@ -1623,10 +1614,6 @@
 // //   );
 // // }
 
-
-
-
-
 // // components/videogallerycomponents/TagProductsModal.jsx
 // import { useState, useEffect } from "react";
 // import ProductsModal from "./ProductsModal";
@@ -1660,7 +1647,7 @@
 //       setIsLoadingSavedProducts(true);
 //       const response = await fetch(`/api/video-products/${showTagProducts.video.id}`);
 //       const result = await response.json();
-     
+
 //       if (result.success) {
 //         setSavedProducts(result.products);
 //       } else {
@@ -1717,12 +1704,12 @@
 //   const handleSubmitProducts = async () => {
 //     try {
 //       setIsLoadingProducts(true);
-     
+
 //       // Use the main onLoadProducts function to ensure consistency
 //       if (onLoadProducts) {
 //         await onLoadProducts(showTagProducts.video);
 //       }
-     
+
 //       // ProductsModal will be shown by the parent through showProductsModal state
 //       // We don't need to setShowProductsModal here anymore
 //     } catch (error) {
@@ -1859,7 +1846,7 @@
 //               }}>
 //                 Tag Products to Video
 //               </h3>
-             
+
 //               <button
 //                 onClick={handleSubmitProducts}
 //                 disabled={isLoadingProducts || productsModalOpened}
@@ -1905,7 +1892,7 @@
 //                 }}>
 //                   Saved Products {savedProducts.length > 0 && `(${savedProducts.length})`}
 //                 </div>
-               
+
 //                 {isLoadingSavedProducts ? (
 //                   <div style={{
 //                     textAlign: 'center',
@@ -2054,39 +2041,251 @@
 //   );
 // }
 
-
-
-
+//working code above
 
 
 
 
 // components/videogallerycomponents/TagProductsModal.jsx
 import { useState, useEffect } from "react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+
+import {
+  restrictToVerticalAxis,
+  restrictToParentElement,
+} from "@dnd-kit/modifiers";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable, // Only import once
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import ProductsModal from "./ProductsModal";
+import VideoPlayerWithHover from "./VideoPlayerWithHover";
 
 export default function TagProductsModal({
   showTagProducts,
   onHide,
   onLoadProducts,
   isDarkTheme,
-  selectedProducts, // Use the main selectedProducts from props
-  products, // Use the main products from props
-  onToggleProduct, // Use the main toggle function from props
-  onSaveProducts, // Use the main save function from props
-  productsModalOpened, // Get modal opened state from parent
-  closeProductsModal // Get close function from parent
+  selectedProducts,
+  products,
+  onToggleProduct,
+  onSaveProducts,
+  productsModalOpened,
+  closeProductsModal,
+  onProductsReordered,
 }) {
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [savedProducts, setSavedProducts] = useState([]);
   const [isLoadingSavedProducts, setIsLoadingSavedProducts] = useState(false);
+  const [items, setItems] = useState([]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor),
+  );
+
+  // Fixed SortableProductCard with theme props
+  const SortableProductCard = ({
+    product,
+    onRemove,
+    isDarkTheme,
+    currentTheme,
+  }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: product.video_product_id || product.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={{
+          ...style,
+          display: "flex",
+          alignItems: "center",
+          gap: "0.8rem",
+          padding: "0.8rem",
+          marginBottom: "0.5rem",
+          background: isDarkTheme ? "#374151" : "#ffffff",
+          borderRadius: "8px",
+          fontSize: "0.8rem",
+          position: "relative",
+          opacity: isDragging ? 0.5 : 1,
+          cursor: isDragging ? "grabbing" : "grab",
+        }}
+        {...attributes}
+        {...listeners}
+      >
+        {product.image_url ? (
+          <img
+            src={product.image_url}
+            alt={product.title}
+            style={{
+              width: "28px",
+              height: "28px",
+              borderRadius: "6px",
+              objectFit: "cover",
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: "28px",
+              height: "28px",
+              background: "#3b82f6",
+              borderRadius: "6px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              fontSize: "0.75rem",
+              fontWeight: "bold",
+            }}
+          >
+            P
+          </div>
+        )}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            style={{
+              color: currentTheme.text,
+              fontWeight: "500",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {product.title}
+          </div>
+          <div
+            style={{
+              color: "#10b981",
+              fontSize: "0.75rem",
+            }}
+          >
+            ${product.price}
+          </div>
+        </div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(product.shopify_product_id || product.id);
+          }}
+          style={{
+            background: "transparent",
+            border: "none",
+            color: "#ef4444",
+            cursor: "pointer",
+            padding: "4px",
+            borderRadius: "4px",
+            fontSize: "0.7rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "20px",
+            height: "20px",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = "#ef4444";
+            e.target.style.color = "white";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = "transparent";
+            e.target.style.color = "#ef4444";
+          }}
+          title="Remove product"
+        >
+          ✕
+        </button>
+      </div>
+    );
+  };
+
+  // Add this function to save product order
+  const saveProductOrder = async (newItems) => {
+    try {
+      const response = await fetch(
+        `/api/video-products/${showTagProducts.video.id}/reorder`,
+        {
+          method: "PUT", // CHANGE FROM POST TO PUT
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            productOrder: newItems.map((item, index) => ({
+              // CHANGE: products → productOrder
+              productId: item.shopify_product_id || item.id, // CHANGE: product_id → productId
+              position: index, // CHANGE: order → position
+            })),
+          }),
+        },
+      );
+
+      const result = await response.json();
+      if (result.success) {
+        console.log("✅ Product order saved successfully");
+        if (onProductsReordered) {
+          onProductsReordered(newItems);
+        }
+      } else {
+        console.error("Failed to save product order:", result.error);
+      }
+    } catch (error) {
+      console.error("Error saving product order:", error);
+    }
+  };
+  function handleDragEnd(event) {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setItems((items) => {
+        const oldIndex = items.findIndex(
+          (item) => (item.video_product_id || item.id) === active.id,
+        );
+        const newIndex = items.findIndex(
+          (item) => (item.video_product_id || item.id) === over.id,
+        );
+
+        const newItems = arrayMove(items, oldIndex, newIndex);
+
+        // Save the new order to backend
+        saveProductOrder(newItems);
+
+        return newItems;
+      });
+    }
+  }
   const [enableStatuses, setEnableStatuses] = useState({}); // Store enable status for each product
 
   // Fetch saved products when THIS modal opens
   useEffect(() => {
     if (showTagProducts.show && showTagProducts.video?.id) {
-      console.log('TagProductsModal: Fetching saved products for video:', showTagProducts.video.id);
+      console.log(
+        "TagProductsModal: Fetching saved products for video:",
+        showTagProducts.video.id,
+      );
       fetchSavedProducts();
+    } else {
+      setItems([]); // Reset when modal closes
       fetchEnableStatuses();
     }
   }, [showTagProducts.show, showTagProducts.video?.id]);
@@ -2094,23 +2293,29 @@ export default function TagProductsModal({
   const fetchSavedProducts = async () => {
     try {
       setIsLoadingSavedProducts(true);
-      const response = await fetch(`/api/video-products/${showTagProducts.video.id}`);
+      const response = await fetch(
+        `/api/video-products/${showTagProducts.video.id}`,
+      );
       const result = await response.json();
-     
+
       if (result.success) {
         setSavedProducts(result.products);
+        setItems(result.products); // ADD THIS: Initialize items state
       } else {
-        console.error('Failed to fetch saved products:', result.error);
+        console.error("Failed to fetch saved products:", result.error);
         setSavedProducts([]);
+        setItems([]); // ADD THIS
       }
     } catch (error) {
-      console.error('Error fetching saved products:', error);
+      console.error("Error fetching saved products:", error);
       setSavedProducts([]);
+      setItems([]); // ADD THIS
     } finally {
       setIsLoadingSavedProducts(false);
     }
   };
 
+  // Remove product from video - UPDATE to handle both states
   // NEW: Fetch enable statuses for all products in this video
   const fetchEnableStatuses = async () => {
     try {
@@ -2172,35 +2377,53 @@ export default function TagProductsModal({
   };
 
   // Remove product from video
-  const handleRemoveProduct = async (productId) => {
-    try {
-      const response = await fetch(`/api/video-products/${showTagProducts.video.id}/delete`, {
-        method: 'DELETE',
+ const handleRemoveProduct = async (productId) => {
+  try {
+    const response = await fetch(
+      `/api/video-products/${showTagProducts.video.id}/delete`,
+      {
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ productId }),
+      },
+    );
+    const result = await response.json();
+    if (result.success) {
+      // Remove the product from BOTH local states
+      setSavedProducts((prev) =>
+        prev.filter(
+          (product) =>
+            product.shopify_product_id !== productId &&
+            product.id !== productId,
+        ),
+      );
+      
+      // Also remove from items state (from abd-dev branch)
+      setItems((prev) =>
+        prev.filter(
+          (product) =>
+            product.shopify_product_id !== productId &&
+            product.id !== productId,
+        ),
+      );
+      
+      // Also remove from enable statuses (from staging branch)
+      setEnableStatuses((prev) => {
+        const newStatuses = { ...prev };
+        delete newStatuses[productId];
+        return newStatuses;
       });
-      const result = await response.json();
-      if (result.success) {
-        // Remove the product from local state immediately
-        setSavedProducts(prev => prev.filter(product =>
-          product.shopify_product_id !== productId && product.id !== productId
-        ));
-        // Also remove from enable statuses
-        setEnableStatuses(prev => {
-          const newStatuses = { ...prev };
-          delete newStatuses[productId];
-          return newStatuses;
-        });
-        console.log('✅ Product removed successfully');
-      } else {
-        console.error('Failed to remove product:', result.error);
-      }
-    } catch (error) {
-      console.error('Error removing product:', error);
+      
+      console.log("✅ Product removed successfully");
+    } else {
+      console.error("Failed to remove product:", result.error);
     }
-  };
+  } catch (error) {
+    console.error("Error removing product:", error);
+  }
+};
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -2208,27 +2431,21 @@ export default function TagProductsModal({
     }
   };
 
-  // UPDATED: This function closes the modal WITHOUT refreshing entire page
   const handleCloseModal = () => {
-    console.log('🔄 Closing TagProductsModal WITHOUT refreshing entire page...');
-    onHide(); // Close this modal
-    // The parent's onHide function will NOT call loadMediaFiles() anymore
-    // Only the specific VideoPlayer component will refresh its own products
+    console.log(
+      "🔄 Closing TagProductsModal WITHOUT refreshing entire page...",
+    );
+    onHide();
   };
 
   const handleSubmitProducts = async () => {
     try {
       setIsLoadingProducts(true);
-     
-      // Use the main onLoadProducts function to ensure consistency
       if (onLoadProducts) {
         await onLoadProducts(showTagProducts.video);
       }
-     
-      // ProductsModal will be shown by the parent through showProductsModal state
-      // We don't need to setShowProductsModal here anymore
     } catch (error) {
-      console.error('Error loading products:', error);
+      console.error("Error loading products:", error);
     } finally {
       setIsLoadingProducts(false);
     }
@@ -2238,7 +2455,6 @@ export default function TagProductsModal({
     if (onSaveProducts) {
       await onSaveProducts();
     }
-    // Don't setShowProductsModal here - let the parent handle it
     if (closeProductsModal) {
       closeProductsModal();
     }
@@ -2254,21 +2470,21 @@ export default function TagProductsModal({
 
   const themeStyles = {
     light: {
-      background: '#ffffff',
-      text: '#1f2937',
-      border: '#e5e7eb',
-      shadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
-      hoverBackground: '#f3f4f6',
-      sectionBackground: '#f8fafc'
+      background: "#ffffff",
+      text: "#1f2937",
+      border: "#e5e7eb",
+      shadow: "0 10px 25px rgba(0, 0, 0, 0.15)",
+      hoverBackground: "#f3f4f6",
+      sectionBackground: "#f8fafc",
     },
     dark: {
-      background: '#374151',
-      text: '#f9fafb',
-      border: '#4b5563',
-      shadow: '0 10px 25px rgba(0, 0, 0, 0.4)',
-      hoverBackground: '#4b5563',
-      sectionBackground: '#4b5563'
-    }
+      background: "#374151",
+      text: "#f9fafb",
+      border: "#4b5563",
+      shadow: "0 10px 25px rgba(0, 0, 0, 0.4)",
+      hoverBackground: "#4b5563",
+      sectionBackground: "#4b5563",
+    },
   };
   const currentTheme = isDarkTheme ? themeStyles.dark : themeStyles.light;
 
@@ -2276,203 +2492,214 @@ export default function TagProductsModal({
     <>
       <div
         style={{
-          position: 'fixed',
+          position: "fixed",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
           zIndex: 10000,
-          background: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center'
+          background: "rgba(0, 0, 0, 0.5)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
         }}
         onClick={handleBackdropClick}
       >
         <div
           style={{
             background: currentTheme.background,
-            borderRadius: '12px',
+            borderRadius: "12px",
             border: `1px solid ${currentTheme.border}`,
             boxShadow: currentTheme.shadow,
-            padding: '2.5rem',
-            maxWidth: '650px',
-            minWidth: '600px',
-            maxHeight: '100vh',
+            padding: "2.5rem",
+            maxWidth: "650px",
+            minWidth: "600px",
+            maxHeight: "100vh",
             zIndex: 10001,
-            animation: 'scaleIn 0.2s ease-out',
-            overflow: 'hidden',
-            position: 'relative',
-            height: 'auto',
-            minHeight: '350px'
+            animation: "scaleIn 0.2s ease-out",
+            overflow: "hidden",
+            position: "relative",
+            height: "auto",
+            minHeight: "350px",
           }}
         >
-          {/* CLOSE BUTTON - This calls handleCloseModal which doesn't refresh page */}
+          {/* CLOSE BUTTON */}
           <button
             onClick={handleCloseModal}
             style={{
-              position: 'absolute',
-              top: '1.5rem',
-              right: '1.5rem',
-              background: isDarkTheme ? '#374151' : 'white',
-              border: `1px solid ${isDarkTheme ? '#4b5563' : '#e5e7eb'}`,
-              borderRadius: '50%',
-              width: '40px',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              color: isDarkTheme ? '#9ca3af' : '#6b7280',
-              fontSize: '1.2rem',
-              fontWeight: 'bold',
+              position: "absolute",
+              top: "1.5rem",
+              right: "1.5rem",
+              background: isDarkTheme ? "#374151" : "white",
+              border: `1px solid ${isDarkTheme ? "#4b5563" : "#e5e7eb"}`,
+              borderRadius: "50%",
+              width: "40px",
+              height: "40px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              color: isDarkTheme ? "#9ca3af" : "#6b7280",
+              fontSize: "1.2rem",
+              fontWeight: "bold",
               zIndex: 10002,
-              transition: 'all 0.3s ease'
+              transition: "all 0.3s ease",
             }}
             onMouseEnter={(e) => {
-              e.target.style.background = isDarkTheme ? '#4b5563' : '#f3f4f6';
-              e.target.style.color = isDarkTheme ? '#f9fafb' : '#1f2937';
+              e.target.style.background = isDarkTheme ? "#4b5563" : "#f3f4f6";
+              e.target.style.color = isDarkTheme ? "#f9fafb" : "#1f2937";
             }}
             onMouseLeave={(e) => {
-              e.target.style.background = isDarkTheme ? '#374151' : 'white';
-              e.target.style.color = isDarkTheme ? '#9ca3af' : '#6b7280';
+              e.target.style.background = isDarkTheme ? "#374151" : "white";
+              e.target.style.color = isDarkTheme ? "#9ca3af" : "#6b7280";
             }}
           >
             ✕
           </button>
 
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1.5rem',
-            height: '100%',
-            overflow: 'hidden'
-          }}>
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
-              gap: '1.2rem'
-            }}>
-              <h3 style={{
-                fontSize: '1.2rem',
-                fontWeight: '600',
-                color: currentTheme.text,
-                margin: 0
-              }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1.5rem",
+              height: "100%",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                height: "100%",
+                gap: "1.2rem",
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: "1.2rem",
+                  fontWeight: "600",
+                  color: currentTheme.text,
+                  margin: 0,
+                }}
+              >
                 Tag Products to Video
               </h3>
-             
+
               <button
                 onClick={handleSubmitProducts}
                 disabled={isLoadingProducts || productsModalOpened}
                 style={{
-                  width: '100%',
-                  background: '#10b981',
-                  color: 'white',
-                  border: 'none',
-                  padding: '0.8rem',
-                  borderRadius: '8px',
-                  fontSize: '1rem',
-                  fontWeight: '500',
-                  cursor: (isLoadingProducts || productsModalOpened) ? 'not-allowed' : 'pointer',
-                  transition: 'background-color 0.2s',
-                  opacity: (isLoadingProducts || productsModalOpened) ? 0.6 : 1
+                  width: "100%",
+                  background: "#10b981",
+                  color: "white",
+                  border: "none",
+                  padding: "0.8rem",
+                  borderRadius: "8px",
+                  fontSize: "1rem",
+                  fontWeight: "500",
+                  cursor:
+                    isLoadingProducts || productsModalOpened
+                      ? "not-allowed"
+                      : "pointer",
+                  transition: "background-color 0.2s",
+                  opacity: isLoadingProducts || productsModalOpened ? 0.6 : 1,
                 }}
                 onMouseEnter={(e) => {
                   if (!isLoadingProducts && !productsModalOpened) {
-                    e.target.style.background = '#059669';
+                    e.target.style.background = "#059669";
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!isLoadingProducts && !productsModalOpened) {
-                    e.target.style.background = '#10b981';
+                    e.target.style.background = "#10b981";
                   }
                 }}
               >
-                {isLoadingProducts ? 'Loading Products...' : productsModalOpened ? 'Opening...' : 'Add Products'}
+                {isLoadingProducts
+                  ? "Loading Products..."
+                  : productsModalOpened
+                    ? "Opening..."
+                    : "Add Products"}
               </button>
 
-              {/* Saved Products Section */}
-              <div style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden'
-              }}>
-                <div style={{
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  color: currentTheme.text,
-                  marginBottom: '0.8rem'
-                }}>
-                  Saved Products {savedProducts.length > 0 && `(${savedProducts.length})`}
-                </div>
-               
-                {isLoadingSavedProducts ? (
-                  <div style={{
-                    textAlign: 'center',
-                    padding: '1.2rem',
+              {/* Saved Products Section - UPDATED for drag and drop */}
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "1rem",
+                    fontWeight: "600",
                     color: currentTheme.text,
-                    fontSize: '0.9rem',
-                    border: `1px solid ${currentTheme.border}`,
-                    borderRadius: '8px',
-                    background: isDarkTheme ? '#1f2937' : '#f8fafc'
-                  }}>
+                    marginBottom: "0.8rem",
+                  }}
+                >
+                  Saved Products {items.length > 0 && `(${items.length})`}{" "}
+                  {/* CHANGED: savedProducts → items */}
+                </div>
+
+                {isLoadingSavedProducts ? (
+                  <div
+                    style={{
+                      textAlign: "center",
+                      padding: "1.2rem",
+                      color: currentTheme.text,
+                      fontSize: "0.9rem",
+                      border: `1px solid ${currentTheme.border}`,
+                      borderRadius: "8px",
+                      background: isDarkTheme ? "#1f2937" : "#f8fafc",
+                    }}
+                  >
                     Loading saved products...
                   </div>
-                ) : savedProducts.length > 0 ? (
-                  <div style={{
-                    flex: 1,
-                    overflowY: 'auto',
-                    border: `1px solid ${currentTheme.border}`,
-                    borderRadius: '8px',
-                    padding: '0.8rem',
-                    background: isDarkTheme ? '#1f2937' : '#f8fafc',
-                    maxHeight: '280px'
-                  }}>
-                    {savedProducts.map((product) => (
-                      <div
-                        key={product.video_product_id || product.id}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.8rem',
-                          padding: '0.8rem',
-                          marginBottom: '0.4rem',
-                          background: isDarkTheme ? '#374151' : '#ffffff',
-                          borderRadius: '6px',
-                          fontSize: '0.9rem',
-                          position: 'relative'
-                        }}
-                      >
-                        {product.image_url ? (
-                          <img
-                            src={product.image_url}
-                            alt={product.title}
-                            style={{
-                              width: '28px',
-                              height: '28px',
-                              borderRadius: '4px',
-                              objectFit: 'cover'
-                            }}
-                          />
-                        ) : (
-                          <div style={{
-                            width: '28px',
-                            height: '28px',
-                            background: '#3b82f6',
-                            borderRadius: '4px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'white',
-                            fontSize: '0.8rem',
-                            fontWeight: 'bold'
-                          }}>
-                            P
-                          </div>
+                ) : items.length > 0 ? ( // CHANGED: savedProducts → items
+                  <div
+                    style={{
+                      flex: 1,
+                      overflowY: "auto",
+                      border: `1px solid ${currentTheme.border}`,
+                      borderRadius: "8px",
+                      padding: "0.8rem",
+                      background: isDarkTheme ? "#1f2937" : "#f8fafc",
+                      maxHeight: "280px",
+                    }}
+                  >
+                    {/* ADD DndContext wrapper */}
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                      modifiers={[
+                        restrictToVerticalAxis,
+                        restrictToParentElement,
+                      ]}
+                    >
+                      <SortableContext
+                        items={items.map(
+                          (item) => item.video_product_id || item.id,
                         )}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        {items.map(
+                          (
+                            product, // CHANGED: savedProducts → items
+                          ) => (
+                            <SortableProductCard
+                              key={product.video_product_id || product.id}
+                              product={product}
+                              onRemove={handleRemoveProduct}
+                              isDarkTheme={isDarkTheme} // ADD THIS
+                              currentTheme={currentTheme} // ADD THIS
+                            />
+                          ),
+                        )}
+                      </SortableContext>
+                    </DndContext>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{
                             color: currentTheme.text,
@@ -2557,16 +2784,18 @@ export default function TagProductsModal({
                     ))}
                   </div>
                 ) : (
-                  <div style={{
-                    textAlign: 'center',
-                    padding: '1.2rem',
-                    color: isDarkTheme ? '#9ca3af' : '#6b7280',
-                    fontSize: '0.9rem',
-                    fontStyle: 'italic',
-                    border: `1px dashed ${currentTheme.border}`,
-                    borderRadius: '8px',
-                    background: isDarkTheme ? '#1f2937' : '#f8fafc'
-                  }}>
+                  <div
+                    style={{
+                      textAlign: "center",
+                      padding: "1.2rem",
+                      color: isDarkTheme ? "#9ca3af" : "#6b7280",
+                      fontSize: "0.9rem",
+                      fontStyle: "italic",
+                      border: `1px dashed ${currentTheme.border}`,
+                      borderRadius: "8px",
+                      background: isDarkTheme ? "#1f2937" : "#f8fafc",
+                    }}
+                  >
                     No products saved for this video
                   </div>
                 )}

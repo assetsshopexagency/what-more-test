@@ -6198,6 +6198,27 @@
 
 
 // components/videogallerycomponents/VideoOptionsModal.jsx
+
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+
+import {
+  restrictToVerticalAxis,
+  restrictToParentElement,
+} from "@dnd-kit/modifiers";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { useState, useEffect, useRef } from "react";
 import ProductsModal from "./ProductsModal";
 import VideoPlayerWithHover from "./VideoPlayerWithHover";
@@ -6217,20 +6238,249 @@ export default function VideoOptionsModal({
   showVideoPlayerModal,
   productsModalOpened,
   closeProductsModal,
+  onProductsReordered,
 }) {
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [savedProducts, setSavedProducts] = useState([]);
   const [isLoadingSavedProducts, setIsLoadingSavedProducts] = useState(false);
+  const [items, setItems] = useState([]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor),
+  );
+
+  // Fix 1: Complete SortableProductCard Component
+  const SortableProductCard = ({ product, onRemove }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: product.video_product_id || product.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={{
+          ...style,
+          display: "flex",
+          alignItems: "center",
+          gap: "0.8rem",
+          padding: "0.8rem",
+          marginBottom: "0.5rem",
+          background: isDarkTheme ? "#374151" : "#ffffff",
+          borderRadius: "8px",
+          fontSize: "0.8rem",
+          position: "relative",
+          opacity: isDragging ? 0.5 : 1,
+          cursor: isDragging ? "grabbing" : "grab",
+        }}
+        {...attributes}
+        {...listeners}
+      >
+        {product.image_url ? (
+          <img
+            src={product.image_url}
+            alt={product.title}
+            style={{
+              width: "28px",
+              height: "28px",
+              borderRadius: "6px",
+              objectFit: "cover",
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: "28px",
+              height: "28px",
+              background: "#3b82f6",
+              borderRadius: "6px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              fontSize: "0.75rem",
+              fontWeight: "bold",
+            }}
+          >
+            P
+          </div>
+        )}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            style={{
+              color: currentTheme.text,
+              fontWeight: "500",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {product.title}
+          </div>
+          <div
+            style={{
+              color: "#10b981",
+              fontSize: "0.75rem",
+            }}
+          >
+            ${product.price}
+          </div>
+        </div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(product.shopify_product_id || product.id);
+          }}
+          style={{
+            background: "transparent",
+            border: "none",
+            color: "#ef4444",
+            cursor: "pointer",
+            padding: "4px",
+            borderRadius: "4px",
+            fontSize: "0.7rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "20px",
+            height: "20px",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = "#ef4444";
+            e.target.style.color = "white";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = "transparent";
+            e.target.style.color = "#ef4444";
+          }}
+          title="Remove product"
+        >
+          ✕
+        </button>
+      </div>
+    );
+  };
+
+  // MODIFIED: Call parent callback when modal closes
+  const handleHideProductsModal = () => {
+    if (closeProductsModal) {
+      closeProductsModal();
+    }
+    productsModalOpenedRef.current = false;
   const [enableStatuses, setEnableStatuses] = useState({}); // Store enable status for each product
   const [showFullScreenVideo, setShowFullScreenVideo] = useState(false);
 
-  // Fetch saved products when modal opens or video changes
-  useEffect(() => {
-    if (showVideoOptions.show && showVideoOptions.video?.id) {
+    // Refresh saved products AND notify parent to refresh all videos
+    setTimeout(() => {
       fetchSavedProducts();
-      fetchEnableStatuses();
+      if (onProductsReordered) {
+        onProductsReordered(); // Trigger refresh in parent
+      }
+    }, 300);
+  };
+
+  // Fix 2: Update handleRemoveProduct to update both states
+  const handleRemoveProduct = async (productId) => {
+    try {
+      const response = await fetch(
+        `/api/video-products/${showVideoOptions.video.id}/delete`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ productId }),
+        },
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Remove from both states
+        setSavedProducts((prev) =>
+          prev.filter(
+            (product) =>
+              product.shopify_product_id !== productId &&
+              product.id !== productId,
+          ),
+        );
+        setItems(
+          (
+            prev, // ADD THIS
+          ) =>
+            prev.filter(
+              (product) =>
+                product.shopify_product_id !== productId &&
+                product.id !== productId,
+            ),
+        );
+        console.log("✅ Product removed successfully");
+      } else {
+        console.error("Failed to remove product:", result.error);
+      }
+    } catch (error) {
+      console.error("Error removing product:", error);
     }
-  }, [showVideoOptions.show, showVideoOptions.video?.id]);
+  };
+
+  // function handleDragEnd(event) {
+  //   const { active, over } = event;
+
+  //   if (over && active.id !== over.id) {
+  //     setItems((items) => {
+  //       const oldIndex = items.findIndex(
+  //         (item) => (item.video_product_id || item.id) === active.id,
+  //       );
+  //       const newIndex = items.findIndex(
+  //         (item) => (item.video_product_id || item.id) === over.id,
+  //       );
+
+  //       const newItems = arrayMove(items, oldIndex, newIndex);
+  //       return newItems;
+  //     });
+  //   }
+  // }
+
+  function handleDragEnd(event) {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setItems((items) => {
+        const oldIndex = items.findIndex(
+          (item) => (item.video_product_id || item.id) === active.id,
+        );
+        const newIndex = items.findIndex(
+          (item) => (item.video_product_id || item.id) === over.id,
+        );
+
+        const newItems = arrayMove(items, oldIndex, newIndex);
+
+        // 🔥 ADD THIS LINE: Save the new order to backend
+        saveProductOrder(newItems);
+
+        return newItems;
+      });
+    }
+  }
+  // Fetch saved products when modal opens or video changes
+useEffect(() => {
+  if (showVideoOptions.show && showVideoOptions.video?.id) {
+    fetchSavedProducts();
+    fetchEnableStatuses();
+  } else {
+    setItems([]);
+  }
+}, [showVideoOptions.show, showVideoOptions.video?.id]);
 
   // FIX: Auto-refresh when productsModalOpened becomes false (modal closes)
   useEffect(() => {
@@ -6254,6 +6504,7 @@ export default function VideoOptionsModal({
 
       if (result.success) {
         setSavedProducts(result.products);
+        setItems(result.products);
         console.log(
           "✅ Loaded saved products for display:",
           result.products.length,
@@ -6261,15 +6512,34 @@ export default function VideoOptionsModal({
       } else {
         console.error("Failed to fetch saved products:", result.error);
         setSavedProducts([]);
+        setItems([]);
       }
     } catch (error) {
       console.error("Error fetching saved products:", error);
       setSavedProducts([]);
+      setItems([]);
     } finally {
       setIsLoadingSavedProducts(false);
     }
   };
 
+  const saveProductOrder = async (orderedProducts) => {
+    try {
+      const productOrder = orderedProducts.map((product, index) => ({
+        productId: product.shopify_product_id || product.id,
+        position: index + 1, // 1-based indexing
+      }));
+
+      const response = await fetch(
+        `/api/video-products/${showVideoOptions.video.id}/reorder`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ productOrder }),
+        },
+      );
   // NEW: Fetch enable statuses for all products in this video
   const fetchEnableStatuses = async () => {
     try {
@@ -6316,6 +6586,14 @@ export default function VideoOptionsModal({
       const result = await response.json();
 
       if (result.success) {
+        console.log("✅ Product order saved successfully");
+      } else {
+        console.error("Failed to save product order:", result.error);
+      }
+    } catch (error) {
+      console.error("Error saving product order:", error);
+    }
+  };
         // Update local state immediately
         setEnableStatuses(prev => ({
           ...prev,
@@ -7099,7 +7377,8 @@ export default function VideoOptionsModal({
                   }}
                 >
                   Saved Products{" "}
-                  {savedProducts.length > 0 && `(${savedProducts.length})`}
+                  {/* {savedProducts.length > 0 && `(${savedProducts.length})`} */}
+                  {items.length > 0 && `(${items.length})`}
                 </div>
 
                 {isLoadingSavedProducts ? (
@@ -7120,7 +7399,7 @@ export default function VideoOptionsModal({
                   >
                     Loading saved products...
                   </div>
-                ) : savedProducts.length > 0 ? (
+                ) : items.length > 0 ? (
                   <div
                     style={{
                       flex: 1,
@@ -7132,32 +7411,30 @@ export default function VideoOptionsModal({
                       maxHeight: "250px",
                     }}
                   >
-                    {savedProducts.map((product) => (
-                      <div
-                        key={product.video_product_id || product.id}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.8rem",
-                          padding: "0.8rem",
-                          marginBottom: "0.5rem",
-                          background: isDarkTheme ? "#374151" : "#ffffff",
-                          borderRadius: "8px",
-                          fontSize: "0.8rem",
-                          position: "relative",
-                        }}
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                      modifiers={[
+                        restrictToVerticalAxis,
+                        restrictToParentElement,
+                      ]}
+                    >
+                      <SortableContext
+                        items={items.map(
+                          (item) => item.video_product_id || item.id,
+                        )}
+                        strategy={verticalListSortingStrategy}
                       >
-                        {product.image_url ? (
-                          <img
-                            src={product.image_url}
-                            alt={product.title}
-                            style={{
-                              width: "28px",
-                              height: "28px",
-                              borderRadius: "6px",
-                              objectFit: "cover",
-                            }}
+                        {items.map((product) => (
+                          <SortableProductCard
+                            key={product.video_product_id || product.id}
+                            product={product}
+                            onRemove={handleRemoveProduct}
                           />
+                        ))}
+                      </SortableContext>
+                    </DndContext>
                         ) : (
                           <div
                             style={{

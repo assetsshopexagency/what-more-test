@@ -1129,7 +1129,7 @@
 
 // // // // Loader function required by React Router
 // // // export async function loader({ request }) {
-// // //   return { 
+// // //   return {
 // // //     message: "Video Gallery Loaded",
 // // //     timestamp: new Date().toISOString()
 // // //   };
@@ -1154,7 +1154,7 @@
 // // //     selectedProducts,
 // // //     loadingProducts,
 // // //     showVideoPlayer,
-    
+
 // // //     // Setters
 // // //     setIsDarkTheme,
 // // //     setShowHomepageMedia,
@@ -1165,7 +1165,7 @@
 // // //     setShowBulkDeleteModal,
 // // //     setShowProductsModal,
 // // //     setSelectedProducts,
-    
+
 // // //     // Actions
 // // //     showToast,
 // // //     loadMediaFiles,
@@ -1293,7 +1293,7 @@
 // // //     };
 
 // // //     checkTheme();
-    
+
 // // //     const observer = new MutationObserver(checkTheme);
 // // //     observer.observe(document.documentElement, {
 // // //       attributes: true,
@@ -1316,7 +1316,7 @@
 // // //   }, [showHomepageMedia]);
 
 // // //   return (
-// // //     <VideoGalleryLayout 
+// // //     <VideoGalleryLayout
 // // //       isDarkTheme={isDarkTheme}
 // // //       toast={toast}
 // // //     >
@@ -1699,7 +1699,7 @@
 
 // // // Loader function required by React Router
 // // export async function loader({ request }) {
-// //   return { 
+// //   return {
 // //     message: "Video Gallery Loaded",
 // //     timestamp: new Date().toISOString()
 // //   };
@@ -1724,7 +1724,7 @@
 // //     selectedProducts,
 // //     loadingProducts,
 // //     showVideoPlayer,
-    
+
 // //     // Setters
 // //     setIsDarkTheme,
 // //     setShowHomepageMedia,
@@ -1735,7 +1735,7 @@
 // //     setShowBulkDeleteModal,
 // //     setShowProductsModal,
 // //     setSelectedProducts,
-    
+
 // //     // Actions
 // //     showToast,
 // //     loadMediaFiles,
@@ -1869,7 +1869,7 @@
 // //     };
 
 // //     checkTheme();
-    
+
 // //     const observer = new MutationObserver(checkTheme);
 // //     observer.observe(document.documentElement, {
 // //       attributes: true,
@@ -1892,7 +1892,7 @@
 // //   }, [showHomepageMedia]);
 
 // //   return (
-// //     <VideoGalleryLayout 
+// //     <VideoGalleryLayout
 // //       isDarkTheme={isDarkTheme}
 // //       toast={toast}
 // //     >
@@ -2256,8 +2256,6 @@
 // //   );
 // // }
 
-
-
 // // app/routes/app.video-gallery.jsx
 // import { useState, useEffect } from "react";
 // import VideoGalleryLayout from "../components/videogallerycomponents/VideoGalleryLayout";
@@ -2295,6 +2293,7 @@
 //     loadingProducts,
 //     showVideoPlayer,
 
+//     // Setters
 //     setIsDarkTheme,
 //     setShowHomepageMedia,
 //     setBulkDeleteMode,
@@ -2305,6 +2304,7 @@
 //     setShowProductsModal,
 //     setSelectedProducts,
 
+//     // Actions
 //     showToast,
 //     loadMediaFiles,
 //     toggleVideoSelection,
@@ -2340,6 +2340,16 @@
 //     setSelectedProducts(new Set());
 //   };
 
+//   // UPDATED: Handle closing TagProducts modal with refresh
+//   const handleHideTagProducts = () => {
+//     console.log('🔄 TagProductsModal closing, refreshing products...');
+//     setShowTagProductsModal({
+//       show: false,
+//       video: null
+//     });
+
+//     // Force a refresh of media files to update the tag products button
+//     loadMediaFiles();
 //   const showVideoOptionsMenu = (video) => {
 //     setShowVideoOptions({ show: true, video });
 //   };
@@ -2374,6 +2384,7 @@
 //   useEffect(() => {
 //     const checkTheme = () => setIsDarkTheme(document.documentElement.classList.contains('dark'));
 //     checkTheme();
+
 //     const observer = new MutationObserver(checkTheme);
 //     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 //     return () => observer.disconnect();
@@ -2389,7 +2400,11 @@
 //   const currentTheme = isDarkTheme ? themeStyles.dark : themeStyles.light;
 
 //   return (
-//     <VideoGalleryLayout isDarkTheme={isDarkTheme} toast={toast}>
+//     <VideoGalleryLayout
+//       isDarkTheme={isDarkTheme}
+//       toast={toast}
+//     >
+//       {/* Bulk Delete Controls */}
 //       {bulkDeleteMode && (
 //         <BulkDeleteControls
 //           selectedVideos={selectedVideos}
@@ -2534,7 +2549,7 @@ import { useVideoGallery } from "../components/videogallerycomponents/hooks/useV
 export async function loader({ request }) {
   return {
     message: "Video Gallery Loaded",
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 }
 
@@ -2557,6 +2572,7 @@ export default function VideoGallery() {
     loadingProducts,
     showVideoPlayer,
 
+    // Setters
     setIsDarkTheme,
     setShowHomepageMedia,
     setBulkDeleteMode,
@@ -2567,6 +2583,7 @@ export default function VideoGallery() {
     setShowProductsModal,
     setSelectedProducts,
 
+    // Actions
     showToast,
     loadMediaFiles,
     toggleVideoSelection,
@@ -2584,9 +2601,20 @@ export default function VideoGallery() {
     toggleProductSelection,
     saveVideoProducts,
     showVideoPlayerModal,
-    hideVideoPlayerModal
+    hideVideoPlayerModal,
   } = useVideoGallery();
 
+  // SEPARATE STATE FOR VIDEO OPTIONS MODAL
+  const [showVideoOptions, setShowVideoOptions] = useState({
+    show: false,
+    video: null,
+  });
+
+  // SEPARATE STATE FOR TAG PRODUCTS MODAL
+  const [showTagProductsModal, setShowTagProductsModal] = useState({
+    show: false,
+    video: null,
+  });
   const [showVideoOptions, setShowVideoOptions] = useState({ show: false, video: null });
   const [showTagProductsModal, setShowTagProductsModal] = useState({ show: false, video: null });
 
@@ -2604,6 +2632,22 @@ export default function VideoGallery() {
     setSelectedProducts(new Set());
   };
 
+  // UPDATED: Handle closing TagProducts modal and trigger refresh for specific video
+  const handleHideTagProducts = () => {
+    console.log(
+      "🔄 TagProductsModal closing, refreshing products for video:",
+      showTagProductsModal.video?.id,
+    );
+
+    // Set the video that needs to be refreshed
+    if (showTagProductsModal.video) {
+      setVideoToRefresh(showTagProductsModal.video.id);
+    }
+
+    setShowTagProductsModal({
+      show: false,
+      video: null,
+    });
   const showVideoOptionsMenu = (video) => {
     setShowVideoOptions({ show: true, video });
   };
@@ -2612,65 +2656,115 @@ export default function VideoGallery() {
     setShowVideoOptions({ show: false, video: null });
     setProductRefreshTrigger(prev => prev + 1);
   };
-
-  const handleTagProducts = (video) => {
-    setShowTagProductsModal({ show: true, video });
-  };
-
-  const handleHideTagProducts = () => {
-    setShowTagProductsModal({ show: false, video: null });
-    setProductRefreshTrigger(prev => prev + 1);
-  };
-
-  // Function to fetch products for a specific video
-  const fetchVideoProducts = async (videoId) => {
-    try {
-      const response = await fetch(`/api/video-products/${videoId}`);
-      const result = await response.json();
-      
-      if (result.success) {
-        setVideoProductsMap(prev => ({
-          ...prev,
-          [videoId]: result.products
-        }));
-      }
-    } catch (error) {
-      console.error('Error fetching video products:', error);
-    }
-  };
-
-  // Fetch products for all videos when mediaFiles load
-  useEffect(() => {
-    if (mediaFiles.length > 0) {
-      mediaFiles.forEach(video => {
-        fetchVideoProducts(video.id);
-      });
-    }
-  }, [mediaFiles]);
-
-  // UPDATED: Enhanced search function that searches both video titles and product names
-  const filteredMediaFiles = mediaFiles.filter(file => {
-    if (!searchTerm.trim()) return true;
-    
-    const searchLower = searchTerm.toLowerCase();
-    
-    // Search in video title
-    const titleMatch = file.title.toLowerCase().includes(searchLower);
-    
-    // Search in product names for this video
-    const videoProducts = videoProductsMap[file.id] || [];
-    const productMatch = videoProducts.some(product => 
-      product.title.toLowerCase().includes(searchLower)
-    );
-    
-    return titleMatch || productMatch;
+// Handler for video options menu (when video is clicked)
+const showVideoOptionsMenu = (video, event) => {
+  setShowVideoOptions({
+    show: true,
+    video: video,
   });
+};
+
+const hideVideoOptionsMenu = () => {
+  setShowVideoOptions({
+    show: false,
+    video: null,
+  });
+};
+
+// Handler for tag products button
+const handleTagProducts = (video, event) => {
+  console.log("Opening tag products modal for video:", video.id);
+  setShowTagProductsModal({
+    show: true,
+    video: video,
+  });
+};
+
+const handleHideTagProducts = () => {
+  setShowTagProductsModal({ show: false, video: null });
+  setProductRefreshTrigger(prev => prev + 1);
+};
+
+// Function to fetch products for a specific video
+const fetchVideoProducts = async (videoId) => {
+  try {
+    const response = await fetch(`/api/video-products/${videoId}`);
+    const result = await response.json();
+    
+    if (result.success) {
+      setVideoProductsMap(prev => ({
+        ...prev,
+        [videoId]: result.products
+      }));
+    }
+  } catch (error) {
+    console.error('Error fetching video products:', error);
+  }
+};
+
+// Fetch products for all videos when mediaFiles load
+useEffect(() => {
+  if (mediaFiles.length > 0) {
+    mediaFiles.forEach(video => {
+      fetchVideoProducts(video.id);
+    });
+  }
+}, [mediaFiles]);
+
+// Enhanced search function that searches both video titles and product names
+const filteredMediaFiles = mediaFiles.filter(file => {
+  if (!searchTerm.trim()) return true;
+  
+  const searchLower = searchTerm.toLowerCase();
+  
+  // Search in video title
+  const titleMatch = file.title.toLowerCase().includes(searchLower);
+  
+  // Search in product names for this video
+  const videoProducts = videoProductsMap[file.id] || [];
+  const productMatch = videoProducts.some(product => 
+    product.title.toLowerCase().includes(searchLower)
+  );
+  
+  return titleMatch || productMatch;
+});
 
   const totalVideos = filteredMediaFiles.length;
   const totalPages = Math.ceil(totalVideos / videosPerPage);
   const startIndex = (currentPage - 1) * videosPerPage;
-  const currentVideos = filteredMediaFiles.slice(startIndex, startIndex + videosPerPage);
+  const currentVideos = filteredMediaFiles.slice(
+    startIndex,
+    startIndex + videosPerPage,
+  );
 
+  // Reset to first page when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  // Theme styles for local use
+  const themeStyles = {
+    light: {
+      background: "linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)",
+      cardBackground: "linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)",
+      text: "#1f2937",
+      mutedText: "#6b7280",
+      border: "1px solid #e2e8f0",
+      shadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+      inputBackground: "white",
+    },
+    dark: {
+      background: "linear-gradient(145deg, #1e293b 0%, #334155 100%)",
+      cardBackground: "linear-gradient(145deg, #374151 0%, #4b5563 100%)",
+      text: "#f8fafc",
+      mutedText: "#94a3b8",
+      border: "1px solid #475569",
+      shadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+      inputBackground: "#374151",
+    },
+  };
+
+  const currentTheme = isDarkTheme ? themeStyles.dark : themeStyles.light;
   useEffect(() => setCurrentPage(1), [searchTerm]);
 
   useEffect(() => {
@@ -2717,6 +2811,7 @@ export default function VideoGallery() {
 
   return (
     <VideoGalleryLayout isDarkTheme={isDarkTheme} toast={toast}>
+      {/* Bulk Delete Controls */}
       {bulkDeleteMode && (
         <BulkDeleteControls
           selectedVideos={selectedVideos}
@@ -2751,7 +2846,7 @@ export default function VideoGallery() {
               {mediaFiles.length}
             </span>
           </h2>
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          <div style={{ display: "flex", gap: "1rem" }}>
             {mediaFiles.length > 0 && (
               <button 
                 onClick={() => setBulkDeleteMode(!bulkDeleteMode)} 
@@ -2766,7 +2861,7 @@ export default function VideoGallery() {
                   transition: 'all 0.3s ease'
                 }}
               >
-                {bulkDeleteMode ? '✕ Cancel Bulk Delete' : '🗑️ Bulk Delete'}
+                {bulkDeleteMode ? "✕ Cancel Bulk Delete" : "🗑️ Bulk Delete"}
               </button>
             )}
             <button 
@@ -2806,12 +2901,12 @@ export default function VideoGallery() {
                 transition: 'all 0.3s ease'
               }}
               onFocus={(e) => {
-                e.target.style.borderColor = '#3b82f6';
-                e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                e.target.style.borderColor = "#3b82f6";
+                e.target.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.1)";
               }}
               onBlur={(e) => {
                 e.target.style.borderColor = currentTheme.border;
-                e.target.style.boxShadow = 'none';
+                e.target.style.boxShadow = "none";
               }}
             />
             <div style={{ 
@@ -2848,87 +2943,98 @@ export default function VideoGallery() {
 
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: '2rem',
-            gap: '1rem',
-            flexWrap: 'wrap'
-          }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "2rem",
+              gap: "1rem",
+              flexWrap: "wrap",
+            }}
+          >
             {/* Previous Button */}
             <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               style={{
-                background: currentPage === 1 ? '#9ca3af' : '#3b82f6',
-                color: 'white',
-                border: 'none',
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s ease',
-                opacity: currentPage === 1 ? 0.6 : 1
+                background: currentPage === 1 ? "#9ca3af" : "#3b82f6",
+                color: "white",
+                border: "none",
+                padding: "0.5rem 1rem",
+                borderRadius: "6px",
+                fontSize: "0.875rem",
+                fontWeight: "500",
+                cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                transition: "all 0.3s ease",
+                opacity: currentPage === 1 ? 0.6 : 1,
               }}
             >
               ← Previous
             </button>
 
             {/* Page Numbers */}
-            <div style={{
-              display: 'flex',
-              gap: '0.5rem',
-              alignItems: 'center'
-            }}>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  style={{
-                    background: currentPage === page ? '#3b82f6' : 'transparent',
-                    color: currentPage === page ? 'white' : currentTheme.text,
-                    border: `1px solid ${currentPage === page ? '#3b82f6' : currentTheme.border}`,
-                    padding: '0.5rem 0.75rem',
-                    borderRadius: '6px',
-                    fontSize: '0.875rem',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    minWidth: '2.5rem'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (currentPage !== page) {
-                      e.target.style.background = isDarkTheme ? '#374151' : '#f3f4f6';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (currentPage !== page) {
-                      e.target.style.background = 'transparent';
-                    }
-                  }}
-                >
-                  {page}
-                </button>
-              ))}
+            <div
+              style={{
+                display: "flex",
+                gap: "0.5rem",
+                alignItems: "center",
+              }}
+            >
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    style={{
+                      background:
+                        currentPage === page ? "#3b82f6" : "transparent",
+                      color: currentPage === page ? "white" : currentTheme.text,
+                      border: `1px solid ${currentPage === page ? "#3b82f6" : currentTheme.border}`,
+                      padding: "0.5rem 0.75rem",
+                      borderRadius: "6px",
+                      fontSize: "0.875rem",
+                      fontWeight: "500",
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                      minWidth: "2.5rem",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (currentPage !== page) {
+                        e.target.style.background = isDarkTheme
+                          ? "#374151"
+                          : "#f3f4f6";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (currentPage !== page) {
+                        e.target.style.background = "transparent";
+                      }
+                    }}
+                  >
+                    {page}
+                  </button>
+                ),
+              )}
             </div>
 
             {/* Next Button */}
             <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
               style={{
-                background: currentPage === totalPages ? '#9ca3af' : '#3b82f6',
-                color: 'white',
-                border: 'none',
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s ease',
-                opacity: currentPage === totalPages ? 0.6 : 1
+                background: currentPage === totalPages ? "#9ca3af" : "#3b82f6",
+                color: "white",
+                border: "none",
+                padding: "0.5rem 1rem",
+                borderRadius: "6px",
+                fontSize: "0.875rem",
+                fontWeight: "500",
+                cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+                transition: "all 0.3s ease",
+                opacity: currentPage === totalPages ? 0.6 : 1,
               }}
             >
               Next →
@@ -2975,6 +3081,7 @@ export default function VideoGallery() {
         selectedProducts={selectedProducts}
         loadingProducts={loadingProducts}
         onLoadProducts={loadProductsForVideo}
+c
         onToggleProduct={toggleProductSelection}
         onSaveProducts={saveVideoProducts}
         onHideProductsModal={closeProductsModal}
