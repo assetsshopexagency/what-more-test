@@ -10,7 +10,7 @@
 
 // // // // // // Loader function required by React Router
 // // // // // export async function loader({ request }) {
-// // // // //   return { 
+// // // // //   return {
 // // // // //     message: "Video Gallery Loaded",
 // // // // //     timestamp: new Date().toISOString()
 // // // // //   };
@@ -35,7 +35,7 @@
 // // // // //     selectedProducts,
 // // // // //     loadingProducts,
 // // // // //     showVideoPlayer,
-    
+
 // // // // //     // Setters
 // // // // //     setIsDarkTheme,
 // // // // //     setShowHomepageMedia,
@@ -46,7 +46,7 @@
 // // // // //     setShowBulkDeleteModal,
 // // // // //     setShowProductsModal,
 // // // // //     setSelectedProducts,
-    
+
 // // // // //     // Actions
 // // // // //     showToast,
 // // // // //     loadMediaFiles,
@@ -169,7 +169,7 @@
 // // // // //     };
 
 // // // // //     checkTheme();
-    
+
 // // // // //     const observer = new MutationObserver(checkTheme);
 // // // // //     observer.observe(document.documentElement, {
 // // // // //       attributes: true,
@@ -192,7 +192,7 @@
 // // // // //   }, [showHomepageMedia]);
 
 // // // // //   return (
-// // // // //     <VideoGalleryLayout 
+// // // // //     <VideoGalleryLayout
 // // // // //       isDarkTheme={isDarkTheme}
 // // // // //       toast={toast}
 // // // // //     >
@@ -554,9 +554,6 @@
 // // // // //   );
 // // // // // }
 
-
-
-
 // // // // // app/routes/app.video-gallery.jsx
 // // // // import { useState, useEffect } from "react";
 // // // // import VideoGalleryLayout from "../components/videogallerycomponents/VideoGalleryLayout";
@@ -569,7 +566,7 @@
 
 // // // // // Loader function required by React Router
 // // // // export async function loader({ request }) {
-// // // //   return { 
+// // // //   return {
 // // // //     message: "Video Gallery Loaded",
 // // // //     timestamp: new Date().toISOString()
 // // // //   };
@@ -594,7 +591,7 @@
 // // // //     selectedProducts,
 // // // //     loadingProducts,
 // // // //     showVideoPlayer,
-    
+
 // // // //     // Setters
 // // // //     setIsDarkTheme,
 // // // //     setShowHomepageMedia,
@@ -605,7 +602,7 @@
 // // // //     setShowBulkDeleteModal,
 // // // //     setShowProductsModal,
 // // // //     setSelectedProducts,
-    
+
 // // // //     // Actions
 // // // //     showToast,
 // // // //     loadMediaFiles,
@@ -728,7 +725,7 @@
 // // // //     };
 
 // // // //     checkTheme();
-    
+
 // // // //     const observer = new MutationObserver(checkTheme);
 // // // //     observer.observe(document.documentElement, {
 // // // //       attributes: true,
@@ -751,7 +748,7 @@
 // // // //   }, [showHomepageMedia]);
 
 // // // //   return (
-// // // //     <VideoGalleryLayout 
+// // // //     <VideoGalleryLayout
 // // // //       isDarkTheme={isDarkTheme}
 // // // //       toast={toast}
 // // // //     >
@@ -1115,8 +1112,6 @@
 // // // //   );
 // // // // }
 
-
-
 // // // // app/routes/app.video-gallery.jsx
 // // // import { useState, useEffect } from "react";
 // // // import VideoGalleryLayout from "../components/videogallerycomponents/VideoGalleryLayout";
@@ -1212,7 +1207,7 @@
 // // //       show: false,
 // // //       video: null
 // // //     });
-    
+
 // // //     // Force a refresh of media files to update the tag products button
 // // //     loadMediaFiles();
 // // //   };
@@ -1680,13 +1675,6 @@
 // // //   );
 // // // }
 
-
-
-
-
-
-
-
 // // // app/routes/app.video-gallery.jsx
 // // import { useState, useEffect } from "react";
 // // import VideoGalleryLayout from "../components/videogallerycomponents/VideoGalleryLayout";
@@ -1781,12 +1769,12 @@
 // //   // UPDATED: Handle closing TagProducts modal and trigger refresh for specific video
 // //   const handleHideTagProducts = () => {
 // //     console.log('🔄 TagProductsModal closing, refreshing products for video:', showTagProductsModal.video?.id);
-    
+
 // //     // Set the video that needs to be refreshed
 // //     if (showTagProductsModal.video) {
 // //       setVideoToRefresh(showTagProductsModal.video.id);
 // //     }
-    
+
 // //     setShowTagProductsModal({
 // //       show: false,
 // //       video: null
@@ -2532,9 +2520,6 @@
 //   );
 // }
 
-
-
-
 // app/routes/app.video-gallery.jsx
 import { useState, useEffect } from "react";
 import VideoGalleryLayout from "../components/videogallerycomponents/VideoGalleryLayout";
@@ -2604,130 +2589,92 @@ export default function VideoGallery() {
     hideVideoPlayerModal,
   } = useVideoGallery();
 
-  // SEPARATE STATE FOR VIDEO OPTIONS MODAL
   const [showVideoOptions, setShowVideoOptions] = useState({
     show: false,
     video: null,
   });
-
-  // SEPARATE STATE FOR TAG PRODUCTS MODAL
   const [showTagProductsModal, setShowTagProductsModal] = useState({
     show: false,
     video: null,
   });
-  const [showVideoOptions, setShowVideoOptions] = useState({ show: false, video: null });
-  const [showTagProductsModal, setShowTagProductsModal] = useState({ show: false, video: null });
-
-  // State to store products for each video
   const [videoProductsMap, setVideoProductsMap] = useState({});
-
   const [productRefreshTrigger, setProductRefreshTrigger] = useState(0);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const videosPerPage = 12;
+
+  // Handler for video options menu (when video is clicked)
+  const showVideoOptionsMenu = (video, event) => {
+    setShowVideoOptions({
+      show: true,
+      video: video,
+    });
+  };
+
+  const hideVideoOptionsMenu = () => {
+    setShowVideoOptions({
+      show: false,
+      video: null,
+    });
+  };
+
+  // Handler for tag products button
+  const handleTagProducts = (video, event) => {
+    console.log("Opening tag products modal for video:", video.id);
+    setShowTagProductsModal({
+      show: true,
+      video: video,
+    });
+  };
+
+  const handleHideTagProducts = () => {
+    console.log(
+      "🔄 TagProductsModal closing, refreshing products for video:",
+      showTagProductsModal.video?.id,
+    );
+    setShowTagProductsModal({ show: false, video: null });
+    setProductRefreshTrigger((prev) => prev + 1);
+  };
+
+  // Function to fetch products for a specific video
+  const fetchVideoProducts = async (videoId) => {
+    try {
+      const response = await fetch(`/api/video-products/${videoId}`);
+      const result = await response.json();
+
+      if (result.success) {
+        setVideoProductsMap((prev) => ({
+          ...prev,
+          [videoId]: result.products,
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching video products:", error);
+    }
+  };
 
   const closeProductsModal = () => {
     setShowProductsModal({ show: false, video: null });
     setSelectedProducts(new Set());
   };
 
-  // UPDATED: Handle closing TagProducts modal and trigger refresh for specific video
-  const handleHideTagProducts = () => {
-    console.log(
-      "🔄 TagProductsModal closing, refreshing products for video:",
-      showTagProductsModal.video?.id,
+  // Enhanced search function that searches both video titles and product names
+  const filteredMediaFiles = mediaFiles.filter((file) => {
+    if (!searchTerm.trim()) return true;
+
+    const searchLower = searchTerm.toLowerCase();
+
+    // Search in video title
+    const titleMatch = file.title.toLowerCase().includes(searchLower);
+
+    // Search in product names for this video
+    const videoProducts = videoProductsMap[file.id] || [];
+    const productMatch = videoProducts.some((product) =>
+      product.title.toLowerCase().includes(searchLower),
     );
 
-    // Set the video that needs to be refreshed
-    if (showTagProductsModal.video) {
-      setVideoToRefresh(showTagProductsModal.video.id);
-    }
-
-    setShowTagProductsModal({
-      show: false,
-      video: null,
-    });
-  const showVideoOptionsMenu = (video) => {
-    setShowVideoOptions({ show: true, video });
-  };
-
-  const hideVideoOptionsMenu = () => {
-    setShowVideoOptions({ show: false, video: null });
-    setProductRefreshTrigger(prev => prev + 1);
-  };
-// Handler for video options menu (when video is clicked)
-const showVideoOptionsMenu = (video, event) => {
-  setShowVideoOptions({
-    show: true,
-    video: video,
+    return titleMatch || productMatch;
   });
-};
-
-const hideVideoOptionsMenu = () => {
-  setShowVideoOptions({
-    show: false,
-    video: null,
-  });
-};
-
-// Handler for tag products button
-const handleTagProducts = (video, event) => {
-  console.log("Opening tag products modal for video:", video.id);
-  setShowTagProductsModal({
-    show: true,
-    video: video,
-  });
-};
-
-const handleHideTagProducts = () => {
-  setShowTagProductsModal({ show: false, video: null });
-  setProductRefreshTrigger(prev => prev + 1);
-};
-
-// Function to fetch products for a specific video
-const fetchVideoProducts = async (videoId) => {
-  try {
-    const response = await fetch(`/api/video-products/${videoId}`);
-    const result = await response.json();
-    
-    if (result.success) {
-      setVideoProductsMap(prev => ({
-        ...prev,
-        [videoId]: result.products
-      }));
-    }
-  } catch (error) {
-    console.error('Error fetching video products:', error);
-  }
-};
-
-// Fetch products for all videos when mediaFiles load
-useEffect(() => {
-  if (mediaFiles.length > 0) {
-    mediaFiles.forEach(video => {
-      fetchVideoProducts(video.id);
-    });
-  }
-}, [mediaFiles]);
-
-// Enhanced search function that searches both video titles and product names
-const filteredMediaFiles = mediaFiles.filter(file => {
-  if (!searchTerm.trim()) return true;
-  
-  const searchLower = searchTerm.toLowerCase();
-  
-  // Search in video title
-  const titleMatch = file.title.toLowerCase().includes(searchLower);
-  
-  // Search in product names for this video
-  const videoProducts = videoProductsMap[file.id] || [];
-  const productMatch = videoProducts.some(product => 
-    product.title.toLowerCase().includes(searchLower)
-  );
-  
-  return titleMatch || productMatch;
-});
 
   const totalVideos = filteredMediaFiles.length;
   const totalPages = Math.ceil(totalVideos / videosPerPage);
@@ -2737,77 +2684,72 @@ const filteredMediaFiles = mediaFiles.filter(file => {
     startIndex + videosPerPage,
   );
 
-  // Reset to first page when search term changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
-
   // Theme styles for local use
   const themeStyles = {
     light: {
       background: "linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)",
-      cardBackground: "linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)",
       text: "#1f2937",
       mutedText: "#6b7280",
       border: "1px solid #e2e8f0",
       shadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
       inputBackground: "white",
+      cardBackground: "linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)",
     },
     dark: {
       background: "linear-gradient(145deg, #1e293b 0%, #334155 100%)",
-      cardBackground: "linear-gradient(145deg, #374151 0%, #4b5563 100%)",
       text: "#f8fafc",
       mutedText: "#94a3b8",
       border: "1px solid #475569",
       shadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
       inputBackground: "#374151",
+      cardBackground: "linear-gradient(145deg, #374151 0%, #4b5563 100%)",
     },
   };
-
   const currentTheme = isDarkTheme ? themeStyles.dark : themeStyles.light;
-  useEffect(() => setCurrentPage(1), [searchTerm]);
 
+  // Effects
   useEffect(() => {
-    const checkTheme = () => setIsDarkTheme(document.documentElement.classList.contains('dark'));
+    const checkTheme = () =>
+      setIsDarkTheme(document.documentElement.classList.contains("dark"));
     checkTheme();
     const observer = new MutationObserver(checkTheme);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => { loadMediaFiles(); }, []);
-  useEffect(() => { if (!showHomepageMedia) loadMediaFiles(); }, [showHomepageMedia]);
+  useEffect(() => {
+    loadMediaFiles();
+  }, []);
+
+  useEffect(() => {
+    if (!showHomepageMedia) loadMediaFiles();
+  }, [showHomepageMedia]);
+
+  // Reset to first page when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  // Fetch products for all videos when mediaFiles load
+  useEffect(() => {
+    if (mediaFiles.length > 0) {
+      mediaFiles.forEach((video) => {
+        fetchVideoProducts(video.id);
+      });
+    }
+  }, [mediaFiles]);
 
   // Refresh video products when productRefreshTrigger changes
   useEffect(() => {
     if (productRefreshTrigger > 0 && mediaFiles.length > 0) {
-      mediaFiles.forEach(video => {
+      mediaFiles.forEach((video) => {
         fetchVideoProducts(video.id);
       });
     }
   }, [productRefreshTrigger]);
-
-  const themeStyles = {
-    light: { 
-      background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)', 
-      text: '#1f2937', 
-      mutedText: '#6b7280', 
-      border: '1px solid #e2e8f0', 
-      shadow: '0 4px 20px rgba(0, 0, 0, 0.08)', 
-      inputBackground: 'white',
-      cardBackground: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)'
-    },
-    dark: { 
-      background: 'linear-gradient(145deg, #1e293b 0%, #334155 100%)', 
-      text: '#f8fafc', 
-      mutedText: '#94a3b8', 
-      border: '1px solid #475569', 
-      shadow: '0 4px 20px rgba(0, 0, 0, 0.3)', 
-      inputBackground: '#374151',
-      cardBackground: 'linear-gradient(145deg, #374151 0%, #4b5563 100%)'
-    }
-  };
-  const currentTheme = isDarkTheme ? themeStyles.dark : themeStyles.light;
 
   return (
     <VideoGalleryLayout isDarkTheme={isDarkTheme} toast={toast}>
@@ -2819,62 +2761,82 @@ const filteredMediaFiles = mediaFiles.filter(file => {
           isDarkTheme={isDarkTheme}
           onSelectAll={selectAllVideos}
           onBulkDelete={showBulkDeleteConfirmation}
-          onCancel={() => { setBulkDeleteMode(false); setSelectedVideos(new Set()); }}
+          onCancel={() => {
+            setBulkDeleteMode(false);
+            setSelectedVideos(new Set());
+          }}
         />
       )}
 
-      <div style={{ 
-        background: currentTheme.cardBackground, 
-        borderRadius: '16px', 
-        padding: '2rem', 
-        border: currentTheme.border, 
-        boxShadow: currentTheme.shadow, 
-        marginBottom: '2rem',
-        animation: 'fadeIn 0.6s ease-out 0.2s both'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: currentTheme.text }}>
+      <div
+        style={{
+          background: currentTheme.cardBackground,
+          borderRadius: "16px",
+          padding: "2rem",
+          border: currentTheme.border,
+          boxShadow: currentTheme.shadow,
+          marginBottom: "2rem",
+          animation: "fadeIn 0.6s ease-out 0.2s both",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "1.5rem",
+          }}
+        >
+          <h2
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: "bold",
+              color: currentTheme.text,
+            }}
+          >
             📁 Your Uploaded Media
-            <span style={{ 
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
-              color: 'white', 
-              padding: '0.25rem 0.75rem', 
-              borderRadius: '20px', 
-              fontSize: '0.875rem', 
-              marginLeft: '0.5rem' 
-            }}>
+            <span
+              style={{
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                color: "white",
+                padding: "0.25rem 0.75rem",
+                borderRadius: "20px",
+                fontSize: "0.875rem",
+                marginLeft: "0.5rem",
+              }}
+            >
               {mediaFiles.length}
             </span>
           </h2>
           <div style={{ display: "flex", gap: "1rem" }}>
             {mediaFiles.length > 0 && (
-              <button 
-                onClick={() => setBulkDeleteMode(!bulkDeleteMode)} 
-                style={{ 
-                  background: bulkDeleteMode ? '#6b7280' : '#f59e0b', 
-                  color: 'white', 
-                  border: 'none', 
-                  padding: '0.75rem 1.5rem', 
-                  borderRadius: '8px', 
-                  fontWeight: '600', 
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
+              <button
+                onClick={() => setBulkDeleteMode(!bulkDeleteMode)}
+                style={{
+                  background: bulkDeleteMode ? "#6b7280" : "#f59e0b",
+                  color: "white",
+                  border: "none",
+                  padding: "0.75rem 1.5rem",
+                  borderRadius: "8px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
                 }}
               >
                 {bulkDeleteMode ? "✕ Cancel Bulk Delete" : "🗑️ Bulk Delete"}
               </button>
             )}
-            <button 
-              onClick={() => setShowHomepageMedia(true)} 
-              style={{ 
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', 
-                color: 'white', 
-                border: 'none', 
-                padding: '0.75rem 1.5rem', 
-                borderRadius: '8px', 
-                fontWeight: '600', 
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
+            <button
+              onClick={() => setShowHomepageMedia(true)}
+              style={{
+                background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                color: "white",
+                border: "none",
+                padding: "0.75rem 1.5rem",
+                borderRadius: "8px",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
               }}
             >
               📤 Upload New Media
@@ -2883,22 +2845,22 @@ const filteredMediaFiles = mediaFiles.filter(file => {
         </div>
 
         {mediaFiles.length > 0 && (
-          <div style={{ marginBottom: '1.5rem', maxWidth: '400px' }}>
+          <div style={{ marginBottom: "1.5rem", maxWidth: "400px" }}>
             <input
               type="text"
               placeholder="Search videos by title or product name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ 
-                width: '100%', 
-                padding: '0.75rem 1rem', 
-                border: `1px solid ${currentTheme.border}`, 
-                borderRadius: '8px', 
-                background: currentTheme.inputBackground, 
-                color: currentTheme.text, 
-                fontSize: '1rem', 
-                outline: 'none',
-                transition: 'all 0.3s ease'
+              style={{
+                width: "100%",
+                padding: "0.75rem 1rem",
+                border: `1px solid ${currentTheme.border}`,
+                borderRadius: "8px",
+                background: currentTheme.inputBackground,
+                color: currentTheme.text,
+                fontSize: "1rem",
+                outline: "none",
+                transition: "all 0.3s ease",
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = "#3b82f6";
@@ -2909,12 +2871,14 @@ const filteredMediaFiles = mediaFiles.filter(file => {
                 e.target.style.boxShadow = "none";
               }}
             />
-            <div style={{ 
-              fontSize: '0.75rem', 
-              color: currentTheme.mutedText, 
-              marginTop: '0.5rem',
-              fontStyle: 'italic'
-            }}>
+            <div
+              style={{
+                fontSize: "0.75rem",
+                color: currentTheme.mutedText,
+                marginTop: "0.5rem",
+                fontStyle: "italic",
+              }}
+            >
               Search by video title or product name
             </div>
           </div>
@@ -3044,26 +3008,41 @@ const filteredMediaFiles = mediaFiles.filter(file => {
 
         {/* Results Info */}
         {mediaFiles.length > 0 && (
-          <div style={{
-            textAlign: 'center',
-            marginTop: '1rem',
-            color: currentTheme.mutedText,
-            fontSize: '0.875rem'
-          }}>
-            Showing {startIndex + 1}-{Math.min(startIndex + videosPerPage, totalVideos)} of {totalVideos} videos
+          <div
+            style={{
+              textAlign: "center",
+              marginTop: "1rem",
+              color: currentTheme.mutedText,
+              fontSize: "0.875rem",
+            }}
+          >
+            Showing {startIndex + 1}-
+            {Math.min(startIndex + videosPerPage, totalVideos)} of {totalVideos}{" "}
+            videos
             {searchTerm && (
               <span>
                 {" for "}
-                <span style={{ fontWeight: '600', color: currentTheme.text }}>
+                <span style={{ fontWeight: "600", color: currentTheme.text }}>
                   "{searchTerm}"
                 </span>
-                {filteredMediaFiles.some(file => {
+                {filteredMediaFiles.some((file) => {
                   const videoProducts = videoProductsMap[file.id] || [];
-                  return videoProducts.some(product => 
-                    product.title.toLowerCase().includes(searchTerm.toLowerCase())
+                  return videoProducts.some((product) =>
+                    product.title
+                      .toLowerCase()
+                      .includes(searchTerm.toLowerCase()),
                   );
                 }) && (
-                  <span style={{ marginLeft: '0.5rem', background: '#10b981', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem' }}>
+                  <span
+                    style={{
+                      marginLeft: "0.5rem",
+                      background: "#10b981",
+                      color: "white",
+                      padding: "0.2rem 0.5rem",
+                      borderRadius: "4px",
+                      fontSize: "0.7rem",
+                    }}
+                  >
                     Includes product matches
                   </span>
                 )}
@@ -3081,7 +3060,6 @@ const filteredMediaFiles = mediaFiles.filter(file => {
         selectedProducts={selectedProducts}
         loadingProducts={loadingProducts}
         onLoadProducts={loadProductsForVideo}
-c
         onToggleProduct={toggleProductSelection}
         onSaveProducts={saveVideoProducts}
         onHideProductsModal={closeProductsModal}
@@ -3089,7 +3067,9 @@ c
         showBulkDeleteModal={showBulkDeleteModal}
         onDelete={deleteVideo}
         onBulkDelete={bulkDeleteVideos}
-        onHideDeleteModal={() => setShowDeleteModal({ show: false, videoId: null, videoTitle: "" })}
+        onHideDeleteModal={() =>
+          setShowDeleteModal({ show: false, videoId: null, videoTitle: "" })
+        }
         onHideBulkDeleteModal={() => setShowBulkDeleteModal(false)}
         isDarkTheme={isDarkTheme}
         productsModalOpened={showProductsModal.show}
@@ -3110,13 +3090,55 @@ c
       )}
 
       {showVideoPlayer?.show && showVideoPlayer.video && (
-        <VideoPlayerModal showVideoPlayer={showVideoPlayer} onHide={hideVideoPlayerModal} videoData={showVideoPlayer.video} isDarkTheme={isDarkTheme} />
+        <VideoPlayerModal
+          showVideoPlayer={showVideoPlayer}
+          onHide={hideVideoPlayerModal}
+          videoData={showVideoPlayer.video}
+          isDarkTheme={isDarkTheme}
+        />
       )}
 
       {showHomepageMedia && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: isDarkTheme ? '#1f2937' : 'white', borderRadius: '16px', padding: 0, maxWidth: '900px', width: '100%', maxHeight: '90vh', overflow: 'auto', position: 'relative' }}>
-            <button onClick={() => setShowHomepageMedia(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: isDarkTheme ? '#374151' : 'white', border: `1px solid ${isDarkTheme ? '#4b5563' : '#e5e7eb'}`, width: '40px', height: '40px', borderRadius: '50%', fontSize: '1.5rem', cursor: 'pointer' }}>✕</button>
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              background: isDarkTheme ? "#1f2937" : "white",
+              borderRadius: "16px",
+              padding: 0,
+              maxWidth: "900px",
+              width: "100%",
+              maxHeight: "90vh",
+              overflow: "auto",
+              position: "relative",
+            }}
+          >
+            <button
+              onClick={() => setShowHomepageMedia(false)}
+              style={{
+                position: "absolute",
+                top: "1rem",
+                right: "1rem",
+                background: isDarkTheme ? "#374151" : "white",
+                border: `1px solid ${isDarkTheme ? "#4b5563" : "#e5e7eb"}`,
+                width: "40px",
+                height: "40px",
+                borderRadius: "50%",
+                fontSize: "1.5rem",
+                cursor: "pointer",
+              }}
+            >
+              ✕
+            </button>
             <HomepageMedia />
           </div>
         </div>
