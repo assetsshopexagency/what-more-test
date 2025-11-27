@@ -5,257 +5,84 @@ export default function Homepage() {
   const [activeTab, setActiveTab] = useState("carousels");
 
   return (
-    <div style={{ 
-      maxWidth: '1400px', 
-      margin: '0 auto',
-      padding: '0 1rem'
-    }}>
-      {/* Enhanced CSS */}
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideIn {
-          from { transform: translateX(-50px); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
-          50% { box-shadow: 0 0 30px rgba(102, 126, 234, 0.6); }
-        }
-      `}</style>
-
+    <div className="max-w-[1400px] mx-auto px-4">
       {/* Header Section */}
-      <div style={{
-        marginBottom: '3rem',
-        animation: 'slideIn 0.6s ease-out'
-      }}>
-        <h1 style={{
-          fontSize: '3rem',
-          fontWeight: 'bold',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          marginBottom: '0.5rem'
-        }}>
+      <div className="mb-12 animate-slide-in">
+        <h1 className="text-5xl font-bold bg-gradient-to-br from-[#667eea] to-[#764ba2] bg-clip-text text-transparent mb-2">
           📊 Analytics
         </h1>
-        <p style={{
-          fontSize: '1.2rem',
-          color: '#6b7280',
-          marginBottom: '2rem'
-        }}>
+        <p className="text-xl text-muted-light mb-8">
           Homepage Performance & Widget Analytics
         </p>
       </div>
 
       {/* Main Content Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '2rem',
-        marginBottom: '2rem'
-      }}>
-        
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Left Column - Active Videos & Carousels */}
-        <div style={{
-          background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-          borderRadius: '20px',
-          padding: '2.5rem',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 10px 40px rgba(0, 0, 0, 0.08)',
-          animation: 'fadeIn 0.6s ease-out 0.2s both'
-        }}>
+        <div className="bg-gradient-to-br from-card-light to-background-light rounded-2xl p-10 border border-border-light shadow-xl animate-fade-in delay-200">
           {/* Active Videos Header */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '2rem'
-          }}>
+          <div className="flex items-center justify-between mb-8">
             <div>
-              <div style={{
-                fontSize: '3.5rem',
-                fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                lineHeight: '1'
-              }}>
+              <div className="text-7xl font-bold bg-gradient-to-br from-success to-[#059669] bg-clip-text text-transparent leading-none">
                 13
               </div>
-              <div style={{
-                fontSize: '1.1rem',
-                color: '#6b7280',
-                fontWeight: '600'
-              }}>
+              <div className="text-lg text-muted-light font-semibold">
                 Active Videos
               </div>
             </div>
-            <div style={{
-              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              color: 'white',
-              padding: '0.5rem 1rem',
-              borderRadius: '20px',
-              fontSize: '0.8rem',
-              fontWeight: 'bold'
-            }}>
+            <div className="bg-gradient-to-br from-success to-[#059669] text-white py-2 px-4 rounded-full text-xs font-bold">
               🟢 LIVE
             </div>
           </div>
 
           {/* Trending Widgets Section */}
           <div>
-            <h3 style={{
-              fontSize: '1.4rem',
-              fontWeight: 'bold',
-              color: '#1f2937',
-              marginBottom: '1.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem'
-            }}>
-              <span style={{
-                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                padding: '0.5rem',
-                borderRadius: '10px',
-                fontSize: '1.2rem'
-              }}>
+            <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+              <span className="bg-gradient-to-br from-[#f59e0b] to-[#d97706] p-2 rounded-lg text-xl">
                 📈
               </span>
               Trending Widgets
             </h3>
 
             {/* Carousels Widget */}
-            <div style={{
-              background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
-              border: '2px solid #f59e0b',
-              borderRadius: '16px',
-              padding: '2rem',
-              marginBottom: '2rem',
-              animation: 'fadeIn 0.6s ease-out 0.4s both'
-            }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '1rem',
-                marginBottom: '1.5rem'
-              }}>
-                <div style={{
-                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                  color: 'white',
-                  padding: '0.75rem',
-                  borderRadius: '12px',
-                  fontSize: '1.5rem'
-                }}>
+            <div className="bg-gradient-to-br from-[#fffbeb] to-[#fef3c7] border-2 border-amber-500 rounded-2xl p-8 mb-8 animate-fade-in delay-400">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="bg-gradient-to-br from-[#f59e0b] to-[#d97706] text-white p-3 rounded-xl text-2xl">
                   🎠
                 </div>
-                <div style={{ flex: 1 }}>
-                  <h4 style={{
-                    fontSize: '1.3rem',
-                    fontWeight: 'bold',
-                    color: '#92400e',
-                    marginBottom: '0.5rem'
-                  }}>
+                <div className="flex-1">
+                  <h4 className="text-xl font-bold text-amber-900 mb-2">
                     Carousels
                   </h4>
-                  <p style={{
-                    color: '#b45309',
-                    lineHeight: '1.5',
-                    marginBottom: '1rem'
-                  }}>
+                  <p className="text-amber-700 leading-relaxed mb-4">
                     Your videos are added but the carousel is not active
                   </p>
-                  <div style={{
-                    background: 'rgba(245, 158, 11, 0.1)',
-                    border: '1px solid #f59e0b',
-                    borderRadius: '10px',
-                    padding: '0.75rem 1rem',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    fontSize: '0.9rem',
-                    fontWeight: '600',
-                    color: '#b45309'
-                  }}>
+                  <div className="bg-amber-50 border border-amber-500 rounded-lg py-3 px-4 inline-flex items-center gap-2 text-sm font-semibold text-amber-700">
                     ⚠️ Activation Required
                   </div>
                 </div>
               </div>
 
               {/* How it looks section */}
-              <div style={{
-                background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-                borderRadius: '12px',
-                padding: '1.5rem',
-                border: '1px solid #e2e8f0'
-              }}>
-                <h5 style={{
-                  fontSize: '1.1rem',
-                  fontWeight: '600',
-                  color: '#374151',
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}>
+              <div className="bg-gradient-to-br from-background-light to-slate-100 rounded-xl p-6 border border-border-light">
+                <h5 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
                   <span>👀</span>
                   How it looks
                 </h5>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '1rem',
-                  marginBottom: '1rem'
-                }}>
-                  <div style={{
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    borderRadius: '8px',
-                    height: '80px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white',
-                    fontSize: '1.5rem'
-                  }}>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="bg-gradient-to-br from-[#667eea] to-[#764ba2] rounded-lg h-20 flex items-center justify-center text-white text-2xl">
                     🎨
                   </div>
-                  <div style={{
-                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                    borderRadius: '8px',
-                    height: '80px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white',
-                    fontSize: '1.5rem'
-                  }}>
+                  <div className="bg-gradient-to-br from-success to-[#059669] rounded-lg h-20 flex items-center justify-center text-white text-2xl">
                     📱
                   </div>
                 </div>
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.5rem'
-                }}>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    color: '#059669',
-                    fontWeight: '600'
-                  }}>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2 text-success font-semibold">
                     <span>✅</span>
                     Choose from 7+ templates
                   </div>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    color: '#059669',
-                    fontWeight: '600'
-                  }}>
+                  <div className="flex items-center gap-2 text-success font-semibold">
                     <span>📈</span>
                     Increase conversions by 5x
                   </div>
@@ -266,148 +93,51 @@ export default function Homepage() {
         </div>
 
         {/* Right Column - Stories & Engagement */}
-        <div style={{
-          background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-          borderRadius: '20px',
-          padding: '2.5rem',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 10px 40px rgba(0, 0, 0, 0.08)',
-          animation: 'fadeIn 0.6s ease-out 0.3s both'
-        }}>
+        <div className="bg-gradient-to-br from-card-light to-background-light rounded-2xl p-10 border border-border-light shadow-xl animate-fade-in delay-300">
           {/* Active Stories Header */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '2rem'
-          }}>
+          <div className="flex items-center justify-between mb-8">
             <div>
-              <div style={{
-                fontSize: '3.5rem',
-                fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                lineHeight: '1'
-              }}>
+              <div className="text-7xl font-bold bg-gradient-to-br from-error to-[#dc2626] bg-clip-text text-transparent leading-none">
                 0
               </div>
-              <div style={{
-                fontSize: '1.1rem',
-                color: '#6b7280',
-                fontWeight: '600'
-              }}>
+              <div className="text-lg text-muted-light font-semibold">
                 Active Stories
               </div>
             </div>
-            <div style={{
-              background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-              color: 'white',
-              padding: '0.5rem 1rem',
-              borderRadius: '20px',
-              fontSize: '0.8rem',
-              fontWeight: 'bold'
-            }}>
+            <div className="bg-gradient-to-br from-error to-[#dc2626] text-white py-2 px-4 rounded-full text-xs font-bold">
               🔴 INACTIVE
             </div>
           </div>
 
           {/* Stories Section */}
-          <div style={{
-            background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
-            border: '2px solid #ef4444',
-            borderRadius: '16px',
-            padding: '2rem',
-            marginBottom: '2rem',
-            animation: 'fadeIn 0.6s ease-out 0.5s both'
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '1rem',
-              marginBottom: '1.5rem'
-            }}>
-              <div style={{
-                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                color: 'white',
-                padding: '0.75rem',
-                borderRadius: '12px',
-                fontSize: '1.5rem'
-              }}>
+          <div className="bg-gradient-to-br from-red-50 to-red-100 border-2 border-error rounded-2xl p-8 mb-8 animate-fade-in delay-500">
+            <div className="flex items-start gap-4 mb-6">
+              <div className="bg-gradient-to-br from-error to-[#dc2626] text-white p-3 rounded-xl text-2xl">
                 📖
               </div>
-              <div style={{ flex: 1 }}>
-                <h4 style={{
-                  fontSize: '1.3rem',
-                  fontWeight: 'bold',
-                  color: '#dc2626',
-                  marginBottom: '0.5rem'
-                }}>
-                  Stories
-                </h4>
-                <p style={{
-                  color: '#b91c1c',
-                  lineHeight: '1.5'
-                }}>
+              <div className="flex-1">
+                <h4 className="text-xl font-bold text-error mb-2">Stories</h4>
+                <p className="text-red-700 leading-relaxed">
                   Your stories are not active yet
                 </p>
               </div>
             </div>
 
             {/* How it looks section for Stories */}
-            <div style={{
-              background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              border: '1px solid #e2e8f0'
-            }}>
-              <h5 style={{
-                fontSize: '1.1rem',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '1rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}>
+            <div className="bg-gradient-to-br from-background-light to-slate-100 rounded-xl p-6 border border-border-light">
+              <h5 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
                 <span>👀</span>
                 How it looks
               </h5>
-              <div style={{
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
-                borderRadius: '8px',
-                height: '100px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontSize: '2rem',
-                marginBottom: '1rem'
-              }}>
+              <div className="bg-gradient-to-br from-[#8b5cf6] to-[#a855f7] rounded-lg h-24 flex items-center justify-center text-white text-3xl mb-4">
                 📱
               </div>
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.5rem'
-              }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  color: '#7c3aed',
-                  fontWeight: '600'
-                }}>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-violet-600 font-semibold">
                   <span>✅</span>
                   Choose from 3+ templates
                 </div>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  color: '#7c3aed',
-                  fontWeight: '600'
-                }}>
+                <div className="flex items-center gap-2 text-violet-600 font-semibold">
                   <span>🔥</span>
                   Add trending videos like (a)
                 </div>
@@ -416,58 +146,19 @@ export default function Homepage() {
           </div>
 
           {/* Engagement Metrics */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '1.5rem',
-            animation: 'fadeIn 0.6s ease-out 0.7s both'
-          }}>
+          <div className="grid grid-cols-2 gap-6 animate-fade-in delay-700">
             {/* Total Clicks */}
-            <div style={{
-              background: 'linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%)',
-              border: '1px solid #3b82f6',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              textAlign: 'center'
-            }}>
-              <div style={{
-                fontSize: '2.5rem',
-                fontWeight: 'bold',
-                color: '#1d4ed8',
-                marginBottom: '0.5rem'
-              }}>
-                57
-              </div>
-              <div style={{
-                fontSize: '0.9rem',
-                color: '#374151',
-                fontWeight: '600'
-              }}>
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-500 rounded-xl p-6 text-center">
+              <div className="text-4xl font-bold text-blue-800 mb-2">57</div>
+              <div className="text-sm text-gray-700 font-semibold">
                 Total Homepage Video Clicks
               </div>
             </div>
 
             {/* Engaged Sections */}
-            <div style={{
-              background: 'linear-gradient(135deg, #f0fdf4 0%, #f7fee7 100%)',
-              border: '1px solid #22c55e',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              textAlign: 'center'
-            }}>
-              <div style={{
-                fontSize: '2.5rem',
-                fontWeight: 'bold',
-                color: '#15803d',
-                marginBottom: '0.5rem'
-              }}>
-                5
-              </div>
-              <div style={{
-                fontSize: '0.9rem',
-                color: '#374151',
-                fontWeight: '600'
-              }}>
+            <div className="bg-gradient-to-br from-green-50 to-lime-100 border border-green-500 rounded-xl p-6 text-center">
+              <div className="text-4xl font-bold text-green-800 mb-2">5</div>
+              <div className="text-sm text-gray-700 font-semibold">
                 Total Engaged Sections
               </div>
             </div>
@@ -476,72 +167,19 @@ export default function Homepage() {
       </div>
 
       {/* Banners Section */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '2rem',
-        marginBottom: '2rem'
-      }}>
-        
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Banners Info */}
-        <div style={{
-          background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-          borderRadius: '20px',
-          padding: '2.5rem',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 10px 40px rgba(0, 0, 0, 0.08)',
-          animation: 'fadeIn 0.6s ease-out 0.8s both'
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '1.5rem'
-          }}>
-            <div style={{
-              background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
-              color: 'white',
-              padding: '1rem',
-              borderRadius: '12px',
-              fontSize: '2rem'
-            }}>
+        <div className="bg-gradient-to-br from-card-light to-background-light rounded-2xl p-10 border border-border-light shadow-xl animate-fade-in delay-800">
+          <div className="flex items-start gap-6">
+            <div className="bg-gradient-to-br from-[#8b5cf6] to-[#a855f7] text-white p-4 rounded-xl text-3xl">
               🎨
             </div>
-            <div style={{ flex: 1 }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#1f2937',
-                marginBottom: '1rem'
-              }}>
-                Banners
-              </h3>
-              <p style={{
-                color: '#6b7280',
-                lineHeight: '1.6',
-                marginBottom: '1.5rem',
-                fontSize: '1.1rem'
-              }}>
+            <div className="flex-1">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Banners</h3>
+              <p className="text-muted-light leading-relaxed mb-6 text-lg">
                 Switch to dynamic video banners, avoid boring image banners
               </p>
-              <button style={{
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
-                color: 'white',
-                border: 'none',
-                padding: '1rem 2rem',
-                borderRadius: '10px',
-                fontSize: '1rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = '0 8px 25px rgba(139, 92, 246, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = 'none';
-              }}>
+              <button className="bg-gradient-to-br from-[#8b5cf6] to-[#a855f7] text-white border-none py-4 px-8 rounded-lg text-base font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-violet-400/40">
                 🚀 Unlock Banners
               </button>
             </div>
@@ -549,87 +187,31 @@ export default function Homepage() {
         </div>
 
         {/* How it looks for Banners */}
-        <div style={{
-          background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-          borderRadius: '20px',
-          padding: '2.5rem',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 10px 40px rgba(0, 0, 0, 0.08)',
-          animation: 'fadeIn 0.6s ease-out 0.9s both'
-        }}>
-          <h4 style={{
-            fontSize: '1.3rem',
-            fontWeight: 'bold',
-            color: '#1f2937',
-            marginBottom: '1.5rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem'
-          }}>
-            <span style={{
-              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-              padding: '0.5rem',
-              borderRadius: '8px',
-              fontSize: '1.1rem'
-            }}>
+        <div className="bg-gradient-to-br from-card-light to-background-light rounded-2xl p-10 border border-border-light shadow-xl animate-fade-in delay-900">
+          <h4 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+            <span className="bg-gradient-to-br from-[#f59e0b] to-[#d97706] p-2 rounded-lg text-lg">
               👀
             </span>
             How it looks
           </h4>
-          
-          <div style={{
-            background: 'linear-gradient(135deg, #fef3c7 0%, #fef7cd 100%)',
-            border: '2px dashed #f59e0b',
-            borderRadius: '12px',
-            padding: '2rem',
-            textAlign: 'center',
-            marginBottom: '1.5rem'
-          }}>
-            <div style={{
-              fontSize: '3rem',
-              marginBottom: '1rem'
-            }}>
-              🎬
-            </div>
-            <div style={{
-              fontSize: '1rem',
-              color: '#92400e',
-              fontWeight: '600'
-            }}>
+
+          <div className="bg-gradient-to-br from-amber-50 to-amber-100 border-2 border-dashed border-amber-500 rounded-xl p-8 text-center mb-6">
+            <div className="text-5xl mb-4">🎬</div>
+            <div className="text-base text-amber-900 font-semibold">
               Dynamic Video Banner Preview
             </div>
           </div>
 
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem'
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
-              padding: '1rem',
-              borderRadius: '8px',
-              border: '1px solid #bbf7d0'
-            }}>
-              <span style={{ color: '#059669', fontSize: '1.2rem' }}>📈</span>
-              <span style={{ color: '#065f46', fontWeight: '600' }}>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-3 bg-gradient-to-br from-green-50 to-emerald-100 py-4 px-4 rounded-lg border border-emerald-300">
+              <span className="text-success text-xl">📈</span>
+              <span className="text-emerald-800 font-semibold">
                 Increase conversion by 3x
               </span>
             </div>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
-              padding: '1rem',
-              borderRadius: '8px',
-              border: '1px solid #bfdbfe'
-            }}>
-              <span style={{ color: '#1d4ed8', fontSize: '1.2rem' }}>⚡</span>
-              <span style={{ color: '#1e40af', fontWeight: '600' }}>
+            <div className="flex items-center gap-3 bg-gradient-to-br from-blue-50 to-indigo-100 py-4 px-4 rounded-lg border border-blue-300">
+              <span className="text-blue-700 text-xl">⚡</span>
+              <span className="text-blue-800 font-semibold">
                 Real-time dynamic banners
               </span>
             </div>
@@ -638,45 +220,43 @@ export default function Homepage() {
       </div>
 
       {/* Quick Stats Footer */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '1.5rem'
-      }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: 'Avg. Session Duration', value: '3:24', icon: '⏱️', color: '#3b82f6' },
-          { label: 'Bounce Rate', value: '32%', icon: '📊', color: '#ef4444' },
-          { label: 'Video Completion', value: '78%', icon: '✅', color: '#10b981' },
-          { label: 'User Engagement', value: '4.2/5', icon: '⭐', color: '#f59e0b' }
+          {
+            label: "Avg. Session Duration",
+            value: "3:24",
+            icon: "⏱️",
+            color: "text-blue-500",
+          },
+          {
+            label: "Bounce Rate",
+            value: "32%",
+            icon: "📊",
+            color: "text-error",
+          },
+          {
+            label: "Video Completion",
+            value: "78%",
+            icon: "✅",
+            color: "text-success",
+          },
+          {
+            label: "User Engagement",
+            value: "4.2/5",
+            icon: "⭐",
+            color: "text-amber-500",
+          },
         ].map((stat, index) => (
-          <div key={stat.label} style={{
-            background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-            borderRadius: '16px',
-            padding: '1.5rem',
-            border: '1px solid #e2e8f0',
-            textAlign: 'center',
-            animation: `fadeIn 0.6s ease-out ${1 + index * 0.1}s both`
-          }}>
-            <div style={{
-              fontSize: '2rem',
-              marginBottom: '0.75rem',
-              color: stat.color
-            }}>
-              {stat.icon}
-            </div>
-            <div style={{
-              fontSize: '1.5rem',
-              fontWeight: 'bold',
-              color: stat.color,
-              marginBottom: '0.5rem'
-            }}>
+          <div
+            key={stat.label}
+            className="bg-gradient-to-br from-card-light to-background-light rounded-2xl p-6 border border-border-light text-center animate-fade-in"
+            style={{ animationDelay: `${1 + index * 0.1}s` }}
+          >
+            <div className={`text-3xl mb-3 ${stat.color}`}>{stat.icon}</div>
+            <div className={`text-2xl font-bold ${stat.color} mb-2`}>
               {stat.value}
             </div>
-            <div style={{
-              fontSize: '0.9rem',
-              color: '#6b7280',
-              fontWeight: '600'
-            }}>
+            <div className="text-sm text-muted-light font-semibold">
               {stat.label}
             </div>
           </div>

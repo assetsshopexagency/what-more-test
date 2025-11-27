@@ -18,64 +18,34 @@ export default function Home() {
   // Detect theme from document
   useEffect(() => {
     const checkTheme = () => {
-      setIsDarkTheme(document.documentElement.classList.contains('dark'));
+      setIsDarkTheme(document.documentElement.classList.contains("dark"));
     };
 
     checkTheme();
-    
+
     // Listen for theme changes
     const observer = new MutationObserver(checkTheme);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class']
+      attributeFilter: ["class"],
     });
 
     return () => observer.disconnect();
   }, []);
-
-  // Theme-based styles
-  const themeStyles = {
-    light: {
-      background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-      cardBackground: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-      text: '#1f2937',
-      mutedText: '#6b7280',
-      border: '1px solid #e2e8f0',
-      shadow: '0 10px 40px rgba(0, 0, 0, 0.08)',
-      inputBackground: 'white',
-      tableRowEven: 'rgba(248, 250, 252, 0.5)',
-      tableRowOdd: 'white',
-      tableHover: 'linear-gradient(135deg, #f0f4ff 0%, #fdf2ff 100%)'
-    },
-    dark: {
-      background: 'linear-gradient(145deg, #1e293b 0%, #334155 100%)',
-      cardBackground: 'linear-gradient(145deg, #374151 0%, #4b5563 100%)',
-      text: '#f8fafc',
-      mutedText: '#94a3b8',
-      border: '1px solid #475569',
-      shadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
-      inputBackground: '#374151',
-      tableRowEven: 'rgba(30, 41, 59, 0.5)',
-      tableRowOdd: '#1e293b',
-      tableHover: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)'
-    }
-  };
-
-  const currentTheme = isDarkTheme ? themeStyles.dark : themeStyles.light;
 
   const loadProducts = async () => {
     setLoading(true);
     setMessage({ text: "", status: "" });
     try {
       console.log("Fetching products from API...");
-      
+
       const res = await fetch("/api/products");
       console.log("Response status:", res.status);
-      
+
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
-      
+
       const data = await res.json();
       console.log("API response:", data);
 
@@ -84,7 +54,10 @@ export default function Home() {
         setFilteredProducts(data.products || []);
         setShowProducts(true);
         setPage(1);
-        setMessage({ text: `🎉 Successfully loaded ${data.products.length} products`, status: "success" });
+        setMessage({
+          text: `🎉 Successfully loaded ${data.products.length} products`,
+          status: "success",
+        });
       } else {
         setMessage({ text: `❌ Failed: ${data.error}`, status: "critical" });
       }
@@ -99,8 +72,8 @@ export default function Home() {
   // Search Filter
   useEffect(() => {
     const query = search.toLowerCase().trim();
-    const filtered = allProducts.filter(p =>
-      p.title.toLowerCase().includes(query)
+    const filtered = allProducts.filter((p) =>
+      p.title.toLowerCase().includes(query),
     );
     setFilteredProducts(filtered);
     setPage(1);
@@ -119,39 +92,26 @@ export default function Home() {
     if (!products.length) return null;
 
     return (
-      <div style={{ marginTop: '2rem' }}>
-        <h2 style={{
-          fontSize: '1.75rem',
-          fontWeight: 'bold',
-          marginBottom: '1.5rem',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          textAlign: 'center'
-        }}>
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
           🛍️ Your Product Collection
         </h2>
-        <div style={{ 
-          overflowX: 'auto',
-          borderRadius: '16px',
-          background: currentTheme.cardBackground,
-          boxShadow: currentTheme.shadow,
-          border: currentTheme.border
-        }}>
-          <table style={{ 
-            width: '100%', 
-            borderCollapse: 'collapse',
-            fontSize: '0.875rem'
-          }}>
+        <div className="overflow-x-auto rounded-2xl bg-card-light dark:bg-card-dark shadow-lg dark:shadow-2xl border border-gray-200 dark:border-gray-700">
+          <table className="w-full border-collapse text-sm">
             <thead>
-              <tr style={{ 
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                color: 'white'
-              }}>
-                <th style={{ padding: '1rem 0.75rem', fontWeight: '600', fontSize: '0.8rem', textAlign: 'left', borderTopLeftRadius: '16px' }}>🖼️ Image</th>
-                <th style={{ padding: '1rem 0.75rem', fontWeight: '600', fontSize: '0.8rem', textAlign: 'left' }}>📦 Product Name</th>
-                <th style={{ padding: '1rem 0.75rem', fontWeight: '600', fontSize: '0.8rem', textAlign: 'right' }}>💰 Price</th>
-                <th style={{ padding: '1rem 0.75rem', fontWeight: '600', fontSize: '0.8rem', textAlign: 'center', borderTopRightRadius: '16px' }}>⚡ Action</th>
+              <tr className="bg-gradient-to-r from-primary to-secondary text-white">
+                <th className="px-3 py-4 font-semibold text-xs text-left rounded-tl-2xl">
+                  🖼️ Image
+                </th>
+                <th className="px-3 py-4 font-semibold text-xs text-left">
+                  📦 Product Name
+                </th>
+                <th className="px-3 py-4 font-semibold text-xs text-right">
+                  💰 Price
+                </th>
+                <th className="px-3 py-4 font-semibold text-xs text-center rounded-tr-2xl">
+                  ⚡ Action
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -162,90 +122,39 @@ export default function Home() {
                 return (
                   <tr
                     key={p.id}
-                    style={{ 
-                      borderBottom: isDarkTheme ? '1px solid #475569' : '1px solid #e5e7eb',
-                      transition: 'all 0.3s ease',
-                      animation: `fadeIn 0.5s ease-out ${i * 50}ms forwards`,
-                      opacity: 0,
-                      background: i % 2 === 0 ? currentTheme.tableRowEven : currentTheme.tableRowOdd,
-                      color: currentTheme.text
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = currentTheme.tableHover;
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = isDarkTheme 
-                        ? '0 4px 20px rgba(0, 0, 0, 0.4)' 
-                        : '0 4px 20px rgba(0, 0, 0, 0.1)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = i % 2 === 0 ? currentTheme.tableRowEven : currentTheme.tableRowOdd;
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
+                    className={`
+                      border-b border-gray-300 dark:border-gray-600 
+                      transition-all duration-300 animate-fade-in
+                      ${
+                        i % 2 === 0
+                          ? "bg-gray-50/50 dark:bg-gray-800/50"
+                          : "bg-white dark:bg-gray-900"
+                      }
+                      text-gray-900 dark:text-gray-100
+                      hover:bg-primary/10 dark:hover:bg-primary/20
+                      hover:-translate-y-0.5
+                      hover:shadow-lg dark:hover:shadow-2xl
+                    `}
                   >
-                    <td style={{ padding: '1rem 0.75rem' }}>
-                      <div style={{
-                        width: '4rem',
-                        height: '4rem',
-                        borderRadius: '12px',
-                        overflow: 'hidden',
-                        boxShadow: isDarkTheme 
-                          ? '0 4px 12px rgba(0, 0, 0, 0.4)' 
-                          : '0 4px 12px rgba(0, 0, 0, 0.15)',
-                        border: isDarkTheme ? '2px solid #475569' : '2px solid white'
-                      }}>
+                    <td className="px-3 py-4">
+                      <div className="w-16 h-16 rounded-xl overflow-hidden shadow-md border-2 border-white dark:border-gray-600">
                         <img
-                          src={p.image?.src || '/placeholder-image.jpg'}
+                          src={p.image?.src || "/placeholder-image.jpg"}
                           alt={p.title}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover'
-                          }}
+                          className="w-full h-full object-cover"
                         />
                       </div>
                     </td>
-                    <td style={{ 
-                      padding: '1rem 0.75rem', 
-                      fontWeight: '600', 
-                      fontSize: '0.9rem',
-                      maxWidth: '20rem'
-                    }}>
+                    <td className="px-3 py-4 font-semibold text-sm max-w-xs">
                       {p.title}
                     </td>
-                    <td style={{ padding: '1rem 0.75rem', textAlign: 'right' }}>
-                      <span style={{ 
-                        fontWeight: 'bold', 
-                        fontSize: '1rem',
-                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent'
-                      }}>
+                    <td className="px-3 py-4 text-right">
+                      <span className="font-bold text-base text-success">
                         {currency} {price}
                       </span>
                     </td>
-                    <td style={{ padding: '1rem 0.75rem', textAlign: 'center' }}>
-                      <button style={{
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        color: 'white',
-                        fontSize: '0.8rem',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '8px',
-                        fontWeight: '600',
-                        border: 'none',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.transform = 'translateY(-2px)';
-                        e.target.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.4)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.transform = 'translateY(0)';
-                        e.target.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.3)';
-                      }}
-                      >
+                    <td className="px-3 py-4 text-center">
+                      <button className="bg-gradient-to-r from-primary to-secondary text-white text-xs py-2 px-4 rounded-lg font-semibold border-none cursor-pointer transition-all duration-300 shadow-lg shadow-primary/30 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/40">
                         👁️ View Details
                       </button>
                     </td>
@@ -260,103 +169,23 @@ export default function Home() {
   };
 
   return (
-    <div style={{ 
-      maxWidth: '1400px', 
-      margin: '0 auto', 
-      width: '100%',
-      padding: '0 1rem',
-      color: currentTheme.text
-    }}>
-      {/* Enhanced CSS */}
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-        @keyframes glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
-          50% { box-shadow: 0 0 30px rgba(102, 126, 234, 0.6); }
-        }
-        @keyframes slideIn {
-          from { transform: translateX(-100px); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
-
+    <div className="max-w-7xl mx-auto w-full px-4 text-gray-900 dark:text-gray-100">
       {/* Animated Welcome Section */}
-      <div style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
-        borderRadius: '24px',
-        padding: '3rem 2rem',
-        marginBottom: '3rem',
-        border: 'none',
-        color: 'white',
-        textAlign: 'center',
-        position: 'relative',
-        overflow: 'hidden',
-        animation: 'slideIn 0.8s ease-out'
-      }}>
-        <div style={{
-          position: 'absolute',
-          top: '-50%',
-          left: '-50%',
-          width: '200%',
-          height: '200%',
-          background: 'radial-gradient(circle, rgba(255,255,255,0.1) 1%, transparent 1%)',
-          backgroundSize: '50px 50px',
-          animation: 'float 6s ease-in-out infinite'
-        }}></div>
-        
-        <h1 style={{
-          fontSize: '3rem',
-          fontWeight: 'bold',
-          marginBottom: '1rem',
-          textShadow: '0 4px 8px rgba(0, 0, 0, 0.2)'
-        }}>
+      <div className="bg-primary rounded-3xl p-12 mb-12 text-white text-center relative overflow-hidden animate-slide-in">
+        <div className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-[radial-gradient(circle,rgba(255,255,255,0.1)_1%,transparent_1%)] bg-[length:50px_50px] animate-float"></div>
+
+        <h1 className="text-5xl font-bold mb-4 text-shadow-lg">
           🎉 Hi DEV STORE!
         </h1>
-        <p style={{
-          fontSize: '1.25rem',
-          marginBottom: '2rem',
-          opacity: 0.9
-        }}>
-          Welcome to <strong>EE-Watch</strong> - Your Ultimate E-commerce Companion!
+        <p className="text-xl mb-8 opacity-90">
+          Welcome to <strong>EE-Watch</strong> - Your Ultimate E-commerce
+          Companion!
         </p>
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          background: 'rgba(255, 255, 255, 0.2)',
-          padding: '0.75rem 1.5rem',
-          borderRadius: '50px',
-          backdropFilter: 'blur(10px)'
-        }}>
+        <div className="inline-flex items-center gap-2 bg-white/20 px-6 py-3 rounded-full backdrop-blur-sm">
           <span>Any questions?</span>
-          <Link to="#" style={{ 
-            color: '#ffd700', 
-            fontWeight: '600',
-            textDecoration: 'none',
-            padding: '0.5rem 1rem',
-            background: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: '25px',
-            transition: 'all 0.3s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.background = 'rgba(255, 215, 0, 0.2)';
-            e.target.style.transform = 'scale(1.05)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-            e.target.style.transform = 'scale(1)';
-          }}
+          <Link
+            to="#"
+            className="text-yellow-300 font-semibold no-underline py-2 px-4 bg-white/10 rounded-full transition-all duration-300 hover:bg-yellow-300/20 hover:scale-105"
           >
             📞 Book a Call Here
           </Link>
@@ -364,240 +193,111 @@ export default function Home() {
       </div>
 
       {/* Main Content Grid */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: '1fr 1fr', 
-        gap: '2rem',
-        marginBottom: '3rem'
-      }}>
-        {/* Feature Card - Enhanced */}
-        <div style={{
-          background: currentTheme.cardBackground,
-          borderRadius: '24px',
-          padding: '2.5rem',
-          border: currentTheme.border,
-          boxShadow: currentTheme.shadow,
-          position: 'relative',
-          overflow: 'hidden'
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: '-100px',
-            right: '-100px',
-            width: '200px',
-            height: '200px',
-            background: `radial-gradient(circle, rgba(59, 130, 246, ${isDarkTheme ? '0.05' : '0.1'}) 0%, transparent 70%)`,
-            borderRadius: '50%'
-          }}></div>
-          
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1rem',
-            marginBottom: '1.5rem'
-          }}>
-            <div style={{
-              width: '60px',
-              height: '60px',
-              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-              borderRadius: '16px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.5rem',
-              color: 'white'
-            }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        {/* Feature Card */}
+        <div className="bg-card-light dark:bg-card-dark rounded-3xl p-10 border border-gray-200 dark:border-gray-700 shadow-lg dark:shadow-2xl relative overflow-hidden">
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 dark:bg-primary/5 rounded-full"></div>
+
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center text-white text-xl">
               🎬
             </div>
-            <h2 style={{
-              fontSize: '1.75rem',
-              fontWeight: 'bold',
-              background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}>
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-800 to-blue-500 bg-clip-text text-transparent">
               Video Carousels
             </h2>
           </div>
-          
-          <p style={{
-            fontSize: '1.1rem',
-            color: currentTheme.mutedText,
-            lineHeight: '1.7',
-            marginBottom: '2rem'
-          }}>
-            🚀 <strong>Reduce user drop off</strong> on your collection pages and <strong>boost CTR</strong> to Product Pages with highly engaging collection page carousels. Available in <strong>5+ stunning styles</strong>!
+
+          <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed mb-8">
+            🚀 <strong>Reduce user drop off</strong> on your collection pages
+            and <strong>boost CTR</strong> to Product Pages with highly engaging
+            collection page carousels. Available in{" "}
+            <strong>5+ stunning styles</strong>!
           </p>
-          
-          <button style={{
-            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-            color: 'white',
-            padding: '1rem 2rem',
-            borderRadius: '12px',
-            border: 'none',
-            fontSize: '1.1rem',
-            fontWeight: '700',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 8px 25px rgba(16, 185, 129, 0.3)',
-            animation: 'glow 2s ease-in-out infinite'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.transform = 'translateY(-3px)';
-            e.target.style.boxShadow = '0 12px 35px rgba(16, 185, 129, 0.5)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = '0 8px 25px rgba(16, 185, 129, 0.3)';
-          }}
-          >
+
+          <button className="bg-gradient-to-r from-success to-green-700 text-white py-4 px-8 rounded-xl border-none text-lg font-bold cursor-pointer transition-all duration-300 shadow-lg shadow-success/30 animate-glow hover:-translate-y-1 hover:shadow-xl hover:shadow-success/50">
             ⚡ ADD NOW! (TAKES 4-5 MINS)
           </button>
         </div>
 
-        {/* Analytics Dashboard - Enhanced */}
-        <div style={{
-          background: currentTheme.cardBackground,
-          borderRadius: '24px',
-          padding: '2.5rem',
-          border: currentTheme.border,
-          boxShadow: currentTheme.shadow,
-          position: 'relative',
-          overflow: 'hidden'
-        }}>
-          <div style={{
-            position: 'absolute',
-            bottom: '-50px',
-            left: '-50px',
-            width: '150px',
-            height: '150px',
-            background: `radial-gradient(circle, rgba(168, 85, 247, ${isDarkTheme ? '0.05' : '0.1'}) 0%, transparent 70%)`,
-            borderRadius: '50%'
-          }}></div>
+        {/* Analytics Dashboard */}
+        <div className="bg-card-light dark:bg-card-dark rounded-3xl p-10 border border-gray-200 dark:border-gray-700 shadow-lg dark:shadow-2xl relative overflow-hidden">
+          <div className="absolute -bottom-12 -left-12 w-36 h-36 bg-purple-500/10 dark:bg-purple-500/5 rounded-full"></div>
 
           {/* Header */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '2rem'
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem'
-            }}>
-              <div style={{
-                width: '50px',
-                height: '50px',
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
-                borderRadius: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.25rem',
-                color: 'white'
-              }}>
+          <div className="flex justify-between items-center mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white text-lg">
                 📊
               </div>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}>
+              <h3 className="text-xl font-bold bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
                 Performance Overview
               </h3>
             </div>
-            <Link to="/analytics" style={{
-              color: '#8b5cf6',
-              fontSize: '0.9rem',
-              fontWeight: '600',
-              textDecoration: 'none',
-              padding: '0.5rem 1rem',
-              background: isDarkTheme ? 'rgba(139, 92, 246, 0.2)' : 'rgba(139, 92, 246, 0.1)',
-              borderRadius: '8px',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.background = 'rgba(139, 92, 246, 0.2)';
-              e.target.style.transform = 'translateX(5px)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = isDarkTheme ? 'rgba(139, 92, 246, 0.2)' : 'rgba(139, 92, 246, 0.1)';
-              e.target.style.transform = 'translateX(0)';
-            }}
+            <Link
+              to="/analytics"
+              className="text-purple-500 text-sm font-semibold no-underline py-2 px-4 bg-purple-500/10 dark:bg-purple-500/20 rounded-lg transition-all duration-300 hover:bg-purple-500/20 hover:translate-x-1"
             >
               🔍 Go to Analytics
             </Link>
           </div>
 
           {/* Metrics Grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr',
-            gap: '1.5rem'
-          }}>
+          <div className="grid grid-cols-1 gap-6">
             {[
-              { label: "Video Product Sales (last 30 days)", value: "0", currency: "PKR", icon: "💰", color: "#10b981" },
-              { label: "Video Session Conversion Rate", value: "0%", currency: "%", icon: "📈", color: "#3b82f6" },
-              { label: "Average Order Value", value: "PKR 0", currency: "PKR", icon: "🛒", color: "#f59e0b" }
+              {
+                label: "Video Product Sales (last 30 days)",
+                value: "0",
+                currency: "PKR",
+                icon: "💰",
+                color: "text-success",
+                bgColor: "bg-success/10",
+                borderColor: "border-success/20",
+              },
+              {
+                label: "Video Session Conversion Rate",
+                value: "0%",
+                currency: "%",
+                icon: "📈",
+                color: "text-blue-500",
+                bgColor: "bg-blue-500/10",
+                borderColor: "border-blue-500/20",
+              },
+              {
+                label: "Average Order Value",
+                value: "PKR 0",
+                currency: "PKR",
+                icon: "🛒",
+                color: "text-yellow-500",
+
+                borderColor: "border-yellow-500/20",
+              },
             ].map((metric, index) => (
-              <div key={index} style={{
-                padding: '1.75rem',
-                background: isDarkTheme 
-                  ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.9) 100%)'
-                  : 'linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(255, 255, 255, 0.9) 100%)',
-                borderRadius: '16px',
-                border: `1px solid ${metric.color}20`,
-                boxShadow: currentTheme.shadow,
-                transition: 'all 0.3s ease',
-                animation: `fadeIn 0.6s ease-out ${index * 200}ms forwards`,
-                opacity: 0
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)';
-                e.currentTarget.style.boxShadow = `0 8px 30px ${metric.color}30`;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = currentTheme.shadow;
-              }}
+              <div
+                key={index}
+                className={`
+                  p-7 rounded-2xl border ${metric.borderColor} 
+                  shadow-lg dark:shadow-2xl transition-all duration-300 
+                  animate-fade-in bg-white/80 dark:bg-gray-800/90
+                  hover:-translate-y-1 hover:shadow-xl
+                  ${metric.bgColor}
+                `}
               >
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  marginBottom: '0.75rem'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ fontSize: '1.25rem' }}>{metric.icon}</span>
-                    <span style={{
-                      fontSize: '0.9rem',
-                      color: currentTheme.mutedText,
-                      fontWeight: '600'
-                    }}>
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">{metric.icon}</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400 font-semibold">
                       {metric.label}
                     </span>
                   </div>
-                  <span style={{
-                    fontSize: '0.75rem',
-                    color: metric.color,
-                    backgroundColor: `${metric.color}15`,
-                    padding: '0.25rem 0.75rem',
-                    borderRadius: '12px',
-                    fontWeight: '600'
-                  }}>
+                  <span
+                    className={`text-xs ${metric.color} ${metric.bgColor} py-1 px-3 rounded-full font-semibold`}
+                  >
                     {metric.currency}
                   </span>
                 </div>
-                <div style={{
-                  fontSize: '2rem',
-                  fontWeight: 'bold',
-                  color: metric.color,
-                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-                }}>
+                <div
+                  className={`text-3xl font-bold ${metric.color} text-shadow-sm`}
+                >
                   {metric.value}
                 </div>
               </div>
@@ -606,79 +306,40 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Products Section - Enhanced */}
-      <div style={{
-        background: currentTheme.cardBackground,
-        borderRadius: '24px',
-        padding: '3rem',
-        border: currentTheme.border,
-        boxShadow: currentTheme.shadow,
-        marginBottom: '2rem'
-      }}>
+      {/* Products Section */}
+      <div className="bg-card-light dark:bg-card-dark rounded-3xl p-12 border border-gray-200 dark:border-gray-700 shadow-lg dark:shadow-2xl mb-8">
         {/* Header */}
-        <div style={{
-          textAlign: 'center',
-          marginBottom: '3rem'
-        }}>
-          <h2 style={{
-            fontSize: '2.5rem',
-            fontWeight: 'bold',
-            background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            marginBottom: '1rem'
-          }}>
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent mb-4">
             🎯 Product Management
           </h2>
-          <p style={{
-            fontSize: '1.1rem',
-            color: currentTheme.mutedText,
-            maxWidth: '600px',
-            margin: '0 auto'
-          }}>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Manage your entire product catalog with powerful tools and insights
           </p>
         </div>
 
         {/* CTA Button */}
         {!showProducts && (
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <div className="text-center mb-12">
             <button
               onClick={loadProducts}
               disabled={loading}
-              style={{
-                background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
-                color: 'white',
-                padding: '1.25rem 3rem',
-                borderRadius: '16px',
-                fontWeight: '700',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '1.1rem',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 8px 30px rgba(236, 72, 153, 0.3)',
-                opacity: loading ? 0.7 : 1
-              }}
-              onMouseEnter={(e) => {
-                if (!loading) {
-                  e.target.style.transform = 'translateY(-3px)';
-                  e.target.style.boxShadow = '0 12px 40px rgba(236, 72, 153, 0.5)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!loading) {
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.boxShadow = '0 8px 30px rgba(236, 72, 153, 0.3)';
-                }
-              }}
+              className={`
+                bg-primary text-white 
+                py-5 px-12 rounded-2xl font-bold border-none cursor-pointer 
+                text-lg transition-all duration-300 
+                shadow-lg shadow-pink-500/30
+                ${loading ? "opacity-70" : "opacity-100"}
+                hover:-translate-y-1 hover:shadow-xl hover:shadow-pink-500/50
+              `}
             >
               {loading ? (
                 <>
-                  <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block', marginRight: '0.5rem' }}>🔄</span>
+                  <span className="animate-spin inline-block mr-2">🔄</span>
                   Loading Products...
                 </>
               ) : (
-                '🚀 Load Your Products'
+                "🚀 Load Your Products"
               )}
             </button>
           </div>
@@ -686,107 +347,52 @@ export default function Home() {
 
         {/* Search Section */}
         {showProducts && (
-          <div style={{ 
-            marginBottom: '2rem',
-            background: isDarkTheme 
-              ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.9) 100%)'
-              : 'linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(255, 255, 255, 0.9) 100%)',
-            padding: '2rem',
-            borderRadius: '16px',
-            border: isDarkTheme ? '1px solid #475569' : '1px solid rgba(139, 92, 246, 0.1)'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-              <div style={{ position: 'relative', width: '100%', maxWidth: '500px' }}>
+          <div className="mb-8 bg-white/80 dark:bg-gray-800/90 p-8 rounded-2xl border border-purple-500/10">
+            <div className="flex justify-center mb-4">
+              <div className="relative w-full max-w-md">
                 <input
                   type="text"
                   placeholder="🔍 Search products by name..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '1rem 1rem 1rem 3rem',
-                    border: isDarkTheme ? '2px solid #475569' : '2px solid rgba(139, 92, 246, 0.2)',
-                    borderRadius: '12px',
-                    color: currentTheme.text,
-                    fontSize: '1rem',
-                    background: currentTheme.inputBackground,
-                    transition: 'all 0.3s ease'
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#8b5cf6';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = isDarkTheme ? '#475569' : 'rgba(139, 92, 246, 0.2)';
-                    e.target.style.boxShadow = 'none';
-                  }}
+                  className="w-full py-4 px-12 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-gray-100 text-base bg-white dark:bg-gray-700 transition-all duration-300 focus:border-purple-500 focus:shadow-lg focus:shadow-purple-500/10"
                 />
-                <span style={{
-                  position: 'absolute',
-                  left: '1rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  fontSize: '1.25rem'
-                }}>
+                <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-xl">
                   🔍
                 </span>
               </div>
             </div>
 
             {/* Results Count */}
-            <p style={{ 
-              textAlign: 'center', 
-              fontSize: '1rem', 
-              color: currentTheme.mutedText,
-              fontWeight: '600'
-            }}>
-              📊 Showing <strong style={{ color: '#8b5cf6' }}>{paginated.length}</strong> of{' '}
-              <strong style={{ color: '#ec4899' }}>{filteredProducts.length}</strong> products
-              {search && (
-                <span style={{ color: '#10b981' }}> for "{search}"</span>
-              )}
+            <p className="text-center text-base text-gray-600 dark:text-gray-400 font-semibold">
+              📊 Showing{" "}
+              <strong className="text-purple-500">{paginated.length}</strong> of{" "}
+              <strong className="text-pink-500">
+                {filteredProducts.length}
+              </strong>{" "}
+              products
+              {search && <span className="text-success"> for "{search}"</span>}
             </p>
           </div>
         )}
 
         {/* Message Alert */}
         {message.text && (
-          <div style={{
-            maxWidth: '600px',
-            margin: '1rem auto 2rem',
-            padding: '1rem 1.5rem',
-            borderRadius: '12px',
-            textAlign: 'center',
-            fontSize: '1rem',
-            fontWeight: '600',
-            border: '1px solid',
-            background: message.status === "critical" 
-              ? (isDarkTheme 
-                  ? 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%)'
-                  : 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)')
-              : (isDarkTheme
-                  ? 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)'
-                  : 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)'),
-            borderColor: message.status === "critical" 
-              ? (isDarkTheme ? '#7f1d1d' : '#fecaca')
-              : (isDarkTheme ? '#065f46' : '#bbf7d0'),
-            color: message.status === "critical" 
-              ? (isDarkTheme ? '#fecaca' : '#dc2626')
-              : (isDarkTheme ? '#bbf7d0' : '#059669'),
-            boxShadow: currentTheme.shadow,
-            animation: 'fadeIn 0.5s ease-out'
-          }}>
+          <div
+            className={`
+            max-w-2xl mx-auto my-4 mb-8 p-6 rounded-xl text-center 
+            text-base font-semibold border shadow-lg animate-fade-in
+            ${
+              message.status === "critical"
+                ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400"
+                : "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-600 dark:text-green-400"
+            }
+          `}
+          >
             {message.text}
             <button
               onClick={() => setMessage({ text: "", status: "" })}
-              style={{ 
-                marginLeft: '1rem', 
-                fontSize: '1rem', 
-                background: 'none', 
-                border: 'none', 
-                cursor: 'pointer',
-                color: 'inherit'
-              }}
+              className="ml-4 text-base bg-none border-none cursor-pointer text-inherit"
             >
               ❌
             </button>
@@ -795,122 +401,56 @@ export default function Home() {
 
         {/* Loading Animation */}
         {loading && (
-          <div style={{ textAlign: 'center', padding: '4rem' }}>
-            <div style={{
-              width: '80px',
-              height: '80px',
-              border: `4px solid ${isDarkTheme ? '#374151' : '#f3f4f6'}`,
-              borderTop: '4px solid #8b5cf6',
-              borderRight: '4px solid #ec4899',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-              margin: '0 auto 1.5rem'
-            }}></div>
-            <p style={{ 
-              color: currentTheme.mutedText, 
-              fontSize: '1.1rem',
-              fontWeight: '600'
-            }}>
+          <div className="text-center py-16">
+            <div className="w-20 h-20 border-4 border-gray-300 dark:border-gray-600 border-t-purple-500 border-r-pink-500 rounded-full animate-spin mx-auto mb-6"></div>
+            <p className="text-gray-600 dark:text-gray-400 text-lg font-semibold">
               Loading your amazing products...
             </p>
           </div>
         )}
 
         {/* Products Table */}
-        {showProducts && paginated.length > 0 && <ProductsTable products={paginated} />}
+        {showProducts && paginated.length > 0 && (
+          <ProductsTable products={paginated} />
+        )}
 
-        {/* Pagination - Enhanced */}
+        {/* Pagination */}
         {showProducts && totalPages > 1 && (
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            gap: '1rem', 
-            marginTop: '3rem',
-            padding: '2rem',
-            background: isDarkTheme 
-              ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.9) 100%)'
-              : 'linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(255, 255, 255, 0.9) 100%)',
-            borderRadius: '16px',
-            border: isDarkTheme ? '1px solid #475569' : '1px solid rgba(139, 92, 246, 0.1)'
-          }}>
+          <div className="flex justify-center items-center gap-4 mt-12 p-8 bg-white/80 dark:bg-gray-800/90 rounded-2xl border border-purple-500/10">
             <button
               onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page === 1}
-              style={{
-                padding: '0.75rem 1.5rem',
-                border: '2px solid #8b5cf6',
-                borderRadius: '10px',
-                color: page === 1 ? (isDarkTheme ? '#6b7280' : '#9ca3af') : '#8b5cf6',
-                backgroundColor: isDarkTheme ? '#1e293b' : 'white',
-                cursor: page === 1 ? 'not-allowed' : 'pointer',
-                fontWeight: '600',
-                transition: 'all 0.3s ease',
-                opacity: page === 1 ? 0.5 : 1
-              }}
-              onMouseEnter={(e) => {
-                if (page !== 1) {
-                  e.target.style.background = '#8b5cf6';
-                  e.target.style.color = 'white';
-                  e.target.style.transform = 'translateX(-3px)';
+              className={`
+                py-3 px-6 border-2 border-purple-500 rounded-lg font-semibold 
+                transition-all duration-300
+                ${
+                  page === 1
+                    ? "text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-50"
+                    : "text-purple-500 bg-white dark:bg-gray-900 cursor-pointer hover:bg-purple-500 hover:text-white hover:-translate-x-1"
                 }
-              }}
-              onMouseLeave={(e) => {
-                if (page !== 1) {
-                  e.target.style.background = isDarkTheme ? '#1e293b' : 'white';
-                  e.target.style.color = '#8b5cf6';
-                  e.target.style.transform = 'translateX(0)';
-                }
-              }}
+              `}
             >
               ⬅️ Previous
             </button>
-            
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              background: 'rgba(139, 92, 246, 0.1)',
-              padding: '0.5rem 1rem',
-              borderRadius: '10px'
-            }}>
-              <span style={{ 
-                color: '#8b5cf6', 
-                fontSize: '0.9rem',
-                fontWeight: '700'
-              }}>
+
+            <div className="flex items-center gap-2 bg-purple-500/10 py-2 px-4 rounded-lg">
+              <span className="text-purple-500 text-sm font-bold">
                 📄 Page {page} of {totalPages}
               </span>
             </div>
-            
+
             <button
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page === totalPages}
-              style={{
-                padding: '0.75rem 1.5rem',
-                border: '2px solid #ec4899',
-                borderRadius: '10px',
-                color: page === totalPages ? (isDarkTheme ? '#6b7280' : '#9ca3af') : '#ec4899',
-                backgroundColor: isDarkTheme ? '#1e293b' : 'white',
-                cursor: page === totalPages ? 'not-allowed' : 'pointer',
-                fontWeight: '600',
-                transition: 'all 0.3s ease',
-                opacity: page === totalPages ? 0.5 : 1
-              }}
-              onMouseEnter={(e) => {
-                if (page !== totalPages) {
-                  e.target.style.background = '#ec4899';
-                  e.target.style.color = 'white';
-                  e.target.style.transform = 'translateX(3px)';
+              className={`
+                py-3 px-6 border-2 border-pink-500 rounded-lg font-semibold 
+                transition-all duration-300
+                ${
+                  page === totalPages
+                    ? "text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 cursor-not-allowed opacity-50"
+                    : "text-pink-500 bg-white dark:bg-gray-900 cursor-pointer hover:bg-pink-500 hover:text-white hover:translate-x-1"
                 }
-              }}
-              onMouseLeave={(e) => {
-                if (page !== totalPages) {
-                  e.target.style.background = isDarkTheme ? '#1e293b' : 'white';
-                  e.target.style.color = '#ec4899';
-                  e.target.style.transform = 'translateX(0)';
-                }
-              }}
+              `}
             >
               Next ➡️
             </button>
@@ -919,49 +459,30 @@ export default function Home() {
 
         {/* Empty State */}
         {showProducts && filteredProducts.length === 0 && (
-          <div style={{
-            textAlign: 'center',
-            padding: '4rem',
-            background: isDarkTheme 
-              ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.9) 100%)'
-              : 'linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(255, 255, 255, 0.9) 100%)',
-            borderRadius: '16px',
-            border: isDarkTheme ? '2px dashed #475569' : '2px dashed #d1d5db'
-          }}>
-            <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>😔</div>
-            <h3 style={{
-              fontSize: '1.5rem',
-              color: currentTheme.mutedText,
-              marginBottom: '0.5rem'
-            }}>
+          <div className="text-center py-16 bg-white/80 dark:bg-gray-800/90 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600">
+            <div className="text-6xl mb-4">😔</div>
+            <h3 className="text-xl text-gray-600 dark:text-gray-400 mb-2">
               No products found
             </h3>
-            <p style={{ color: isDarkTheme ? '#6b7280' : '#9ca3af' }}>
-              {search ? 'Try adjusting your search terms' : 'Start by loading your products'}
+            <p className="text-gray-500 dark:text-gray-500">
+              {search
+                ? "Try adjusting your search terms"
+                : "Start by loading your products"}
             </p>
           </div>
         )}
       </div>
 
-      {/* Enhanced Footer */}
-      <footer style={{
-        textAlign: 'center',
-        padding: '2rem',
-        color: currentTheme.mutedText,
-        fontSize: '0.9rem',
-        background: currentTheme.cardBackground,
-        borderRadius: '16px',
-        marginTop: '2rem',
-        border: currentTheme.border,
-        boxShadow: currentTheme.shadow
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+      {/* Footer */}
+      <footer className="text-center p-8 text-gray-600 dark:text-gray-400 text-sm bg-card-light dark:bg-card-dark rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg dark:shadow-2xl mt-8">
+        <div className="flex justify-center items-center gap-2 mb-2">
           <span>✨</span>
           <span>© 2025 Watch-EE • Built with 💙 using Remix + Shopify</span>
           <span>✨</span>
         </div>
-        <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>
-          Elevating e-commerce experiences with stunning visuals and powerful analytics
+        <p className="text-xs opacity-70">
+          Elevating e-commerce experiences with stunning visuals and powerful
+          analytics
         </p>
       </footer>
     </div>

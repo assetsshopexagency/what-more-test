@@ -1,0 +1,7 @@
+# extensions/video-carousel/shopify.extension.toml
+
+uid = "efcaccd3-c597-87ec-1a42-982f5d205262ffa2157e"
+
+type = "theme_app_extension"
+name = "video-carousel"
+description = "Video carousel grid for storefront"

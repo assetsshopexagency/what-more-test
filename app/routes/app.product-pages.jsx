@@ -8,264 +8,125 @@ export default function ProductPages() {
   // Detect theme from document
   useEffect(() => {
     const checkTheme = () => {
-      setIsDarkTheme(document.documentElement.classList.contains('dark'));
+      setIsDarkTheme(document.documentElement.classList.contains("dark"));
     };
 
     checkTheme();
-    
+
     // Listen for theme changes
     const observer = new MutationObserver(checkTheme);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class']
+      attributeFilter: ["class"],
     });
 
     return () => observer.disconnect();
   }, []);
 
-  // Theme-based styles
-  const themeStyles = {
-    light: {
-      background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-      cardBackground: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-      text: '#1f2937',
-      mutedText: '#6b7280',
-      border: '1px solid #e2e8f0',
-      shadow: '0 10px 40px rgba(0, 0, 0, 0.08)',
-      activeBackground: 'linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.03) 100%)',
-      metricBackground: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-      quickActionBackground: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'
-    },
-    dark: {
-      background: 'linear-gradient(145deg, #1e293b 0%, #334155 100%)',
-      cardBackground: 'linear-gradient(145deg, #374151 0%, #4b5563 100%)',
-      text: '#f8fafc',
-      mutedText: '#94a3b8',
-      border: '1px solid #475569',
-      shadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
-      activeBackground: 'linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.1) 100%)',
-      metricBackground: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.9) 100%)',
-      quickActionBackground: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.9) 100%)'
-    }
-  };
-
-  const currentTheme = isDarkTheme ? themeStyles.dark : themeStyles.light;
-  
   const widgets = [
     {
       id: "floating-widget",
       title: "Floating Widget",
       description: "Hook your users with a floating video showcase",
       status: "INACTIVE",
-      image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300&h=200&fit=crop",
-      features: ["Floating video player", "Auto-play on scroll", "Customizable position"]
+      image:
+        "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300&h=200&fit=crop",
+      features: [
+        "Floating video player",
+        "Auto-play on scroll",
+        "Customizable position",
+      ],
     },
     {
       id: "video-carousel",
       title: "Video Carousel",
       description: "Showcase your product videos in a horizontal section",
       status: "INACTIVE",
-      image: "https://images.unsplash.com/photo-1535223289827-42f1e9919769?w=300&h=200&fit=crop",
-      features: ["Horizontal scrolling", "Multiple videos", "Thumbnail navigation"]
+      image:
+        "https://images.unsplash.com/photo-1535223289827-42f1e9919769?w=300&h=200&fit=crop",
+      features: [
+        "Horizontal scrolling",
+        "Multiple videos",
+        "Thumbnail navigation",
+      ],
     },
     {
       id: "video-stories",
       title: "Video Stories",
       description: "Showcase your product videos as Instagram like stories",
       status: "ACTIVE",
-      image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=300&h=200&fit=crop",
-      features: ["Full-screen experience", "Swipe navigation", "Progress indicators"]
-    }
+      image:
+        "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=300&h=200&fit=crop",
+      features: [
+        "Full-screen experience",
+        "Swipe navigation",
+        "Progress indicators",
+      ],
+    },
   ];
 
   return (
-    <div style={{ 
-      maxWidth: '1400px', 
-      margin: '0 auto',
-      padding: '0 1rem',
-      color: currentTheme.text
-    }}>
-      {/* Enhanced CSS */}
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideIn {
-          from { transform: translateX(-50px); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
-          50% { box-shadow: 0 0 30px rgba(102, 126, 234, 0.6); }
-        }
-      `}</style>
-
+    <div className="max-w-7xl mx-auto px-4 text-gray-900 dark:text-gray-100">
       {/* Header Section */}
-      <div style={{
-        marginBottom: '3rem',
-        animation: 'slideIn 0.6s ease-out'
-      }}>
-        <h1 style={{
-          fontSize: '3rem',
-          fontWeight: 'bold',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          marginBottom: '0.5rem'
-        }}>
+      <div className="mb-12 animate-slide-in">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
           📊 Analytics
         </h1>
-        <p style={{
-          fontSize: '1.2rem',
-          color: currentTheme.mutedText,
-          marginBottom: '2rem'
-        }}>
+        <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
           Monitor and optimize your product page performance
         </p>
       </div>
 
       {/* Main Content Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 400px',
-        gap: '3rem',
-        alignItems: 'start'
-      }}>
-        
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* Left Column - Widgets */}
-        <div>
-          <div style={{
-            background: currentTheme.cardBackground,
-            borderRadius: '20px',
-            padding: '2.5rem',
-            border: currentTheme.border,
-            boxShadow: currentTheme.shadow,
-            marginBottom: '2rem'
-          }}>
-            <h2 style={{
-              fontSize: '1.8rem',
-              fontWeight: 'bold',
-              color: currentTheme.text,
-              marginBottom: '2rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem'
-            }}>
-              <span style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                padding: '0.5rem',
-                borderRadius: '10px',
-                fontSize: '1.5rem'
-              }}>
-                🎯
-              </span>
+        <div className="lg:col-span-2">
+          <div className="bg-card-light dark:bg-card-dark rounded-2xl p-10 border border-gray-200 dark:border-gray-700 shadow-lg mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8 flex items-center gap-4">
+              <span className="bg-primary p-3 rounded-xl text-2xl">🎯</span>
               Product Page Widgets
             </h2>
 
             {/* Widgets Grid */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '2rem'
-            }}>
+            <div className="space-y-8">
               {widgets.map((widget, index) => (
-                <div 
+                <div
                   key={widget.id}
-                  style={{
-                    background: activeTab === widget.id ? 
-                      currentTheme.activeBackground : 
-                      currentTheme.cardBackground,
-                    border: activeTab === widget.id ? 
-                      '2px solid #667eea' : currentTheme.border,
-                    borderRadius: '16px',
-                    padding: '2rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    animation: `fadeIn 0.6s ease-out ${index * 0.2}s both`
-                  }}
+                  className={`
+                    rounded-2xl p-8 cursor-pointer transition-all duration-300 animate-fade-in
+                    ${
+                      activeTab === widget.id
+                        ? "bg-primary/10 border-2 border-primary"
+                        : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                    }
+                    hover:-translate-y-1 hover:shadow-xl
+                  `}
+                  style={{ animationDelay: `${index * 200}ms` }}
                   onClick={() => setActiveTab(widget.id)}
-                  onMouseEnter={(e) => {
-                    if (activeTab !== widget.id) {
-                      e.currentTarget.style.transform = 'translateY(-5px)';
-                      e.currentTarget.style.boxShadow = isDarkTheme 
-                        ? '0 15px 40px rgba(0, 0, 0, 0.4)' 
-                        : '0 15px 40px rgba(0, 0, 0, 0.12)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (activeTab !== widget.id) {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }
-                  }}
                 >
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '120px 1fr auto',
-                    gap: '1.5rem',
-                    alignItems: 'start'
-                  }}>
+                  <div className="grid grid-cols-[120px_1fr_auto] gap-6 items-start">
                     {/* Widget Image */}
-                    <div style={{
-                      width: '120px',
-                      height: '80px',
-                      borderRadius: '12px',
-                      overflow: 'hidden',
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white',
-                      fontSize: '2rem',
-                      position: 'relative'
-                    }}>
-                      <img 
-                        src={widget.image} 
+                    <div className="w-30 h-20 rounded-xl overflow-hidden bg-primary flex items-center justify-center text-white text-3xl relative">
+                      <img
+                        src={widget.image}
                         alt={widget.title}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover'
-                        }}
+                        className="w-full h-full object-cover"
                       />
                     </div>
 
                     {/* Widget Content */}
                     <div>
-                      <h3 style={{
-                        fontSize: '1.4rem',
-                        fontWeight: 'bold',
-                        color: currentTheme.text,
-                        marginBottom: '0.5rem'
-                      }}>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                         {widget.title}
                       </h3>
-                      <p style={{
-                        color: currentTheme.mutedText,
-                        lineHeight: '1.6',
-                        marginBottom: '1rem'
-                      }}>
+                      <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
                         {widget.description}
                       </p>
-                      <div style={{
-                        display: 'flex',
-                        gap: '0.5rem',
-                        flexWrap: 'wrap'
-                      }}>
+                      <div className="flex gap-2 flex-wrap">
                         {widget.features.map((feature, featureIndex) => (
-                          <span 
+                          <span
                             key={featureIndex}
-                            style={{
-                              background: isDarkTheme 
-                                ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)'
-                                : 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
-                              color: isDarkTheme ? '#e5e7eb' : '#475569',
-                              padding: '0.25rem 0.75rem',
-                              borderRadius: '20px',
-                              fontSize: '0.8rem',
-                              fontWeight: '500'
-                            }}
+                            className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-xs font-medium"
                           >
                             {feature}
                           </span>
@@ -274,108 +135,54 @@ export default function ProductPages() {
                     </div>
 
                     {/* Status Badge */}
-                    <div style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '1rem'
-                    }}>
-                      <div style={{
-                        background: widget.status === 'ACTIVE' ? 
-                          'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 
-                          'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
-                        color: 'white',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '20px',
-                        fontSize: '0.8rem',
-                        fontWeight: 'bold',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em'
-                      }}>
+                    <div className="flex flex-col items-center gap-4">
+                      <div
+                        className={`
+                        text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide
+                        ${widget.status === "ACTIVE" ? "bg-success" : "bg-gray-500"}
+                      `}
+                      >
                         {widget.status}
                       </div>
-                      
-                      <button style={{
-                        background: widget.status === 'ACTIVE' ? 
-                          'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 
-                          'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                        color: 'white',
-                        border: 'none',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '8px',
-                        fontSize: '0.8rem',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.transform = 'scale(1.05)';
-                        e.target.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.2)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.transform = 'scale(1)';
-                        e.target.style.boxShadow = 'none';
-                      }}>
-                        {widget.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
+
+                      <button
+                        className={`
+                        text-white border-none px-4 py-2 rounded-lg text-sm font-semibold 
+                        cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg
+                        ${widget.status === "ACTIVE" ? "bg-error" : "bg-success"}
+                      `}
+                      >
+                        {widget.status === "ACTIVE" ? "Deactivate" : "Activate"}
                       </button>
                     </div>
                   </div>
 
                   {/* How it looks section for active widget */}
                   {activeTab === widget.id && (
-                    <div style={{
-                      marginTop: '2rem',
-                      paddingTop: '2rem',
-                      borderTop: isDarkTheme ? '1px solid #475569' : '1px solid #e2e8f0',
-                      animation: 'fadeIn 0.4s ease-out'
-                    }}>
-                      <h4 style={{
-                        fontSize: '1.1rem',
-                        fontWeight: '600',
-                        color: currentTheme.text,
-                        marginBottom: '1rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem'
-                      }}>
+                    <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 animate-fade-in">
+                      <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
                         <span>👀</span>
                         How it looks
                       </h4>
-                      <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                        gap: '1rem'
-                      }}>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {[1, 2, 3].map((preview) => (
-                          <div key={preview} style={{
-                            background: isDarkTheme 
-                              ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.9) 100%)'
-                              : 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-                            borderRadius: '12px',
-                            padding: '1rem',
-                            textAlign: 'center',
-                            border: currentTheme.border
-                          }}>
-                            <div style={{
-                              width: '100%',
-                              height: '120px',
-                              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                              borderRadius: '8px',
-                              marginBottom: '0.5rem',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              color: 'white',
-                              fontSize: '2rem'
-                            }}>
-                              {preview === 1 ? '📱' : preview === 2 ? '💻' : '🖥️'}
+                          <div
+                            key={preview}
+                            className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 text-center border border-gray-200 dark:border-gray-700"
+                          >
+                            <div className="w-full h-30 bg-primary rounded-lg mb-2 flex items-center justify-center text-white text-3xl">
+                              {preview === 1
+                                ? "📱"
+                                : preview === 2
+                                  ? "💻"
+                                  : "🖥️"}
                             </div>
-                            <span style={{
-                              fontSize: '0.8rem',
-                              color: currentTheme.mutedText,
-                              fontWeight: '500'
-                            }}>
-                              {preview === 1 ? 'Mobile View' : preview === 2 ? 'Tablet View' : 'Desktop View'}
+                            <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                              {preview === 1
+                                ? "Mobile View"
+                                : preview === 2
+                                  ? "Tablet View"
+                                  : "Desktop View"}
                             </span>
                           </div>
                         ))}
@@ -391,88 +198,69 @@ export default function ProductPages() {
         {/* Right Column - Analytics Sidebar */}
         <div>
           {/* Performance Overview */}
-          <div style={{
-            background: currentTheme.cardBackground,
-            borderRadius: '20px',
-            padding: '2rem',
-            border: currentTheme.border,
-            boxShadow: currentTheme.shadow,
-            marginBottom: '2rem',
-            animation: 'fadeIn 0.6s ease-out 0.4s both'
-          }}>
-            <h3 style={{
-              fontSize: '1.4rem',
-              fontWeight: 'bold',
-              color: currentTheme.text,
-              marginBottom: '1.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem'
-            }}>
-              <span style={{
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                padding: '0.5rem',
-                borderRadius: '8px',
-                fontSize: '1.2rem'
-              }}>
-                📈
-              </span>
+          <div className="bg-card-light dark:bg-card-dark rounded-2xl p-8 border border-gray-200 dark:border-gray-700 shadow-lg mb-8 animate-fade-in">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-3">
+              <span className="bg-success p-2 rounded-lg text-lg">📈</span>
               Performance Overview
             </h3>
 
             {/* Metrics */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1.5rem'
-            }}>
+            <div className="space-y-6">
               {[
-                { label: 'Total Views', value: '12.4K', change: '+12%', icon: '👁️', color: '#3b82f6' },
-                { label: 'Engagement Rate', value: '24.7%', change: '+8%', icon: '❤️', color: '#ec4899' },
-                { label: 'Conversion Rate', value: '8.2%', change: '+15%', icon: '🔄', color: '#10b981' },
-                { label: 'Avg. Watch Time', value: '2:34', change: '+5%', icon: '⏱️', color: '#f59e0b' }
+                {
+                  label: "Total Views",
+                  value: "12.4K",
+                  change: "+12%",
+                  icon: "👁️",
+                  color: "text-blue-500",
+                },
+                {
+                  label: "Engagement Rate",
+                  value: "24.7%",
+                  change: "+8%",
+                  icon: "❤️",
+                  color: "text-pink-500",
+                },
+                {
+                  label: "Conversion Rate",
+                  value: "8.2%",
+                  change: "+15%",
+                  icon: "🔄",
+                  color: "text-success",
+                },
+                {
+                  label: "Avg. Watch Time",
+                  value: "2:34",
+                  change: "+5%",
+                  icon: "⏱️",
+                  color: "text-yellow-500",
+                },
               ].map((metric, index) => (
-                <div key={metric.label} style={{
-                  background: currentTheme.metricBackground,
-                  borderRadius: '12px',
-                  padding: '1.25rem',
-                  border: currentTheme.border,
-                  animation: `fadeIn 0.6s ease-out ${0.6 + index * 0.1}s both`
-                }}>
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '0.5rem'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <span style={{ fontSize: '1.5rem' }}>{metric.icon}</span>
-                      <span style={{
-                        fontSize: '0.9rem',
-                        fontWeight: '600',
-                        color: currentTheme.text
-                      }}>
+                <div
+                  key={metric.label}
+                  className="bg-gray-50 dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700 animate-fade-in"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl">{metric.icon}</span>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                         {metric.label}
                       </span>
                     </div>
-                    <span style={{
-                      fontSize: '0.8rem',
-                      fontWeight: 'bold',
-                      color: metric.change.startsWith('+') ? '#10b981' : '#ef4444',
-                      background: metric.change.startsWith('+') 
-                        ? (isDarkTheme ? 'rgba(16, 185, 129, 0.2)' : '#dcfce7')
-                        : (isDarkTheme ? 'rgba(239, 68, 68, 0.2)' : '#fef2f2'),
-                      padding: '0.25rem 0.5rem',
-                      borderRadius: '12px'
-                    }}>
+                    <span
+                      className={`
+                      text-xs font-bold px-2 py-1 rounded-full
+                      ${
+                        metric.change.startsWith("+")
+                          ? "text-success bg-success/10"
+                          : "text-error bg-error/10"
+                      }
+                    `}
+                    >
                       {metric.change}
                     </span>
                   </div>
-                  <div style={{
-                    fontSize: '1.5rem',
-                    fontWeight: 'bold',
-                    color: metric.color
-                  }}>
+                  <div className={`text-xl font-bold ${metric.color}`}>
                     {metric.value}
                   </div>
                 </div>
@@ -481,77 +269,31 @@ export default function ProductPages() {
           </div>
 
           {/* Quick Actions */}
-          <div style={{
-            background: currentTheme.cardBackground,
-            borderRadius: '20px',
-            padding: '2rem',
-            border: currentTheme.border,
-            boxShadow: currentTheme.shadow,
-            animation: 'fadeIn 0.6s ease-out 0.8s both'
-          }}>
-            <h3 style={{
-              fontSize: '1.3rem',
-              fontWeight: 'bold',
-              color: currentTheme.text,
-              marginBottom: '1.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem'
-            }}>
-              <span style={{
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
-                padding: '0.5rem',
-                borderRadius: '8px',
-                fontSize: '1.1rem'
-              }}>
-                ⚡
-              </span>
+          <div className="bg-card-light dark:bg-card-dark rounded-2xl p-8 border border-gray-200 dark:border-gray-700 shadow-lg animate-fade-in">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-3">
+              <span className="bg-secondary p-2 rounded-lg text-base">⚡</span>
               Quick Actions
             </h3>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div className="space-y-4">
               {[
-                { label: 'Add New Widget', icon: '➕', color: '#3b82f6' },
-                { label: 'View Analytics', icon: '📊', color: '#10b981' },
-                { label: 'Customize Layout', icon: '🎨', color: '#f59e0b' },
-                { label: 'Export Reports', icon: '📤', color: '#ec4899' }
+                { label: "Add New Widget", icon: "➕", color: "text-blue-500" },
+                { label: "View Analytics", icon: "📊", color: "text-success" },
+                {
+                  label: "Customize Layout",
+                  icon: "🎨",
+                  color: "text-yellow-500",
+                },
+                { label: "Export Reports", icon: "📤", color: "text-pink-500" },
               ].map((action, index) => (
-                <button 
+                <button
                   key={action.label}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem',
-                    background: currentTheme.quickActionBackground,
-                    border: currentTheme.border,
-                    padding: '1rem 1.25rem',
-                    borderRadius: '12px',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    animation: `fadeIn 0.6s ease-out ${1 + index * 0.1}s both`
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = `linear-gradient(135deg, ${action.color}15 0%, ${action.color}08 100%)`;
-                    e.currentTarget.style.borderColor = action.color;
-                    e.currentTarget.style.transform = 'translateX(5px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = currentTheme.quickActionBackground;
-                    e.currentTarget.style.borderColor = currentTheme.border.split(' ')[2];
-                    e.currentTarget.style.transform = 'translateX(0)';
-                  }}
+                  className="flex items-center gap-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-5 py-4 rounded-xl cursor-pointer transition-all duration-300 text-gray-700 dark:text-gray-300 font-medium text-sm hover:border-primary hover:translate-x-1 animate-fade-in"
                 >
-                  <span style={{ 
-                    fontSize: '1.2rem',
-                    color: action.color
-                  }}>
+                  <span className={`text-lg ${action.color}`}>
                     {action.icon}
                   </span>
-                  <span style={{
-                    fontSize: '0.9rem',
-                    fontWeight: '600',
-                    color: currentTheme.text
-                  }}>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">
                     {action.label}
                   </span>
                 </button>
@@ -562,45 +304,42 @@ export default function ProductPages() {
       </div>
 
       {/* Stats Summary */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: '1.5rem',
-        marginTop: '3rem'
-      }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
         {[
-          { label: 'Active Widgets', value: '3/8', icon: '🎯', color: '#10b981' },
-          { label: 'Total Products', value: '47', icon: '📦', color: '#3b82f6' },
-          { label: 'Avg. Load Time', value: '1.2s', icon: '⚡', color: '#f59e0b' },
-          { label: 'User Satisfaction', value: '94%', icon: '😊', color: '#ec4899' }
+          {
+            label: "Active Widgets",
+            value: "3/8",
+            icon: "🎯",
+            color: "text-success",
+          },
+          {
+            label: "Total Products",
+            value: "47",
+            icon: "📦",
+            color: "text-blue-500",
+          },
+          {
+            label: "Avg. Load Time",
+            value: "1.2s",
+            icon: "⚡",
+            color: "text-yellow-500",
+          },
+          {
+            label: "User Satisfaction",
+            value: "94%",
+            icon: "😊",
+            color: "text-pink-500",
+          },
         ].map((stat, index) => (
-          <div key={stat.label} style={{
-            background: currentTheme.cardBackground,
-            borderRadius: '16px',
-            padding: '2rem',
-            border: currentTheme.border,
-            textAlign: 'center',
-            animation: `fadeIn 0.6s ease-out ${1.2 + index * 0.1}s both`
-          }}>
-            <div style={{
-              fontSize: '2.5rem',
-              marginBottom: '1rem'
-            }}>
-              {stat.icon}
-            </div>
-            <div style={{
-              fontSize: '2rem',
-              fontWeight: 'bold',
-              color: stat.color,
-              marginBottom: '0.5rem'
-            }}>
+          <div
+            key={stat.label}
+            className="bg-card-light dark:bg-card-dark rounded-2xl p-8 border border-gray-200 dark:border-gray-700 text-center animate-fade-in"
+          >
+            <div className="text-4xl mb-4">{stat.icon}</div>
+            <div className={`text-3xl font-bold mb-2 ${stat.color}`}>
               {stat.value}
             </div>
-            <div style={{
-              fontSize: '1rem',
-              color: currentTheme.mutedText,
-              fontWeight: '600'
-            }}>
+            <div className="text-base text-gray-600 dark:text-gray-400 font-semibold">
               {stat.label}
             </div>
           </div>

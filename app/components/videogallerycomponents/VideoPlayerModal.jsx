@@ -52,75 +52,32 @@ export default function VideoPlayerModal({
 
   return (
     <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: "rgba(0, 0, 0, 0.8)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 10000,
-        padding: "2rem",
-      }}
+      className="fixed inset-0 bg-black/80 flex items-center justify-center z-[10000] p-8"
       onClick={handleBackdropClick}
     >
       <div
-        style={{
-          background: isDarkTheme ? "#1f2937" : "white",
-          borderRadius: "12px",
-          padding: "2rem",
-          maxWidth: "90vw",
-          maxHeight: "90vh",
-          width: "auto",
-          position: "relative",
-        }}
+        className={`rounded-xl p-8 max-w-[90vw] max-h-[90vh] w-auto relative ${
+          isDarkTheme ? "bg-gray-800" : "bg-white"
+        }`}
       >
         {/* Close Button */}
         <button
           onClick={onHide}
-          style={{
-            position: "absolute",
-            top: "1rem",
-            right: "1rem",
-            background: isDarkTheme ? "#374151" : "white",
-            border: `1px solid ${isDarkTheme ? "#4b5563" : "#e5e7eb"}`,
-            borderRadius: "50%",
-            width: "40px",
-            height: "40px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            color: isDarkTheme ? "#9ca3af" : "#6b7280",
-            fontSize: "1.2rem",
-            fontWeight: "bold",
-            zIndex: 10001,
-          }}
+          className={`absolute top-4 right-4 rounded-full w-10 h-10 flex items-center justify-center cursor-pointer z-[10001] font-bold text-xl border ${
+            isDarkTheme
+              ? "bg-gray-700 border-gray-600 text-gray-400"
+              : "bg-white border-gray-200 text-gray-500"
+          }`}
         >
           ✕
         </button>
 
         {/* Video Player */}
-        <div
-          style={{
-            width: "100%",
-            maxWidth: "800px",
-            marginBottom: "1rem",
-          }}
-        >
+        <div className="w-full max-w-[800px] mb-4">
           <video
             ref={videoRef}
             src={videoSrc}
-            style={{
-              width: "100%",
-              height: "auto",
-              maxHeight: "70vh",
-              borderRadius: "8px",
-              background: "#000",
-            }}
+            className="w-full h-auto max-h-[70vh] rounded-lg bg-black"
             controls
             autoPlay
           />
@@ -128,17 +85,14 @@ export default function VideoPlayerModal({
 
         {/* Video Info */}
         <div
-          style={{
-            color: isDarkTheme ? "#f9fafb" : "#1f2937",
-            textAlign: "center",
-          }}
+          className={`text-center ${
+            isDarkTheme ? "text-gray-100" : "text-gray-800"
+          }`}
         >
           <p
-            style={{
-              color: isDarkTheme ? "#9ca3af" : "#6b7280",
-              margin: 0,
-              fontSize: "0.875rem",
-            }}
+            className={`text-sm m-0 ${
+              isDarkTheme ? "text-gray-400" : "text-gray-500"
+            }`}
           >
             Click the video controls to play/pause
           </p>

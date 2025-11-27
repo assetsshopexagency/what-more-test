@@ -1,13 +1,13 @@
 // components/videogallerycomponents/VideoPlayerWithHover.jsx
 import { useState, useRef, useEffect } from "react";
 
-export default function VideoPlayerWithHover({ 
-  videoUrl, 
-  thumbnailUrl, 
-  title, 
-  onVideoClick, 
+export default function VideoPlayerWithHover({
+  videoUrl,
+  thumbnailUrl,
+  title,
+  onVideoClick,
   isDarkTheme,
-  height = "200px"
+  height = "200px",
 }) {
   const videoRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -17,12 +17,15 @@ export default function VideoPlayerWithHover({
   useEffect(() => {
     if (videoRef.current) {
       if (isHovered && videoUrl) {
-        videoRef.current.play().then(() => {
-          setIsPlaying(true);
-        }).catch(error => {
-          console.log('Auto-play failed:', error);
-          setHasError(true);
-        });
+        videoRef.current
+          .play()
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch((error) => {
+            console.log("Auto-play failed:", error);
+            setHasError(true);
+          });
       } else {
         videoRef.current.pause();
         setIsPlaying(false);
@@ -41,41 +44,28 @@ export default function VideoPlayerWithHover({
 
   return (
     <div
-      style={{
-        position: 'relative',
-        borderRadius: '8px',
-        overflow: 'hidden',
-        background: isDarkTheme ? '#374151' : '#f3f4f6',
-        cursor: 'pointer',
-        height: height
-      }}
+      className={`relative rounded-lg overflow-hidden cursor-pointer ${
+        isDarkTheme ? "bg-gray-700" : "bg-gray-100"
+      }`}
+      style={{ height }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onVideoClick}
     >
       {hasError || !videoUrl ? (
-        <div style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: isDarkTheme ? '#9ca3af' : '#6b7280',
-          flexDirection: 'column',
-          gap: '0.5rem'
-        }}>
-          <div style={{ fontSize: '2rem' }}>🎬</div>
-          <div style={{ fontSize: '0.75rem' }}>Video Preview</div>
+        <div
+          className={`w-full h-full flex items-center justify-center flex-col gap-2 ${
+            isDarkTheme ? "text-gray-400" : "text-gray-500"
+          }`}
+        >
+          <div className="text-2xl">🎬</div>
+          <div className="text-sm">Video Preview</div>
         </div>
       ) : (
         <video
           ref={videoRef}
           src={videoUrl}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover'
-          }}
+          className="w-full h-full object-cover"
           muted
           loop
           playsInline
@@ -83,32 +73,15 @@ export default function VideoPlayerWithHover({
           onLoadedData={handleVideoLoad}
         />
       )}
-      
+
       {/* Play overlay */}
       {!isPlaying && !hasError && videoUrl && (
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.3)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          opacity: isHovered ? 1 : 0,
-          transition: 'opacity 0.3s ease'
-        }}>
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.9)',
-            borderRadius: '50%',
-            width: '50px',
-            height: '50px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1.5rem'
-          }}>
+        <div
+          className={`absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity duration-300 ease-in-out ${
+            isHovered ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <div className="bg-white/90 rounded-full w-12 h-12 flex items-center justify-center text-xl">
             ▶️
           </div>
         </div>
