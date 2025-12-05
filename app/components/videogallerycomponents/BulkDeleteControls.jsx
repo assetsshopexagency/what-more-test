@@ -1,91 +1,42 @@
 // components/videogallerycomponents/BulkDeleteControls.jsx
 export default function BulkDeleteControls({
-    selectedVideos,
-    mediaFiles,
-    isDarkTheme,
-    onSelectAll,
-    onBulkDelete,
-    onCancel
-  }) {
-    const themeStyles = {
-      light: {
-        cardBackground: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-        text: '#1f2937',
-        mutedText: '#6b7280',
-        border: '1px solid #e2e8f0',
-        shadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-      },
-      dark: {
-        cardBackground: 'linear-gradient(145deg, #374151 0%, #4b5563 100%)',
-        text: '#f8fafc',
-        mutedText: '#94a3b8',
-        border: '1px solid #475569',
-        shadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-      }
-    };
-  
-    const currentTheme = isDarkTheme ? themeStyles.dark : themeStyles.light;
-  
-    return (
-      <div style={{
-        background: currentTheme.cardBackground,
-        borderRadius: '12px',
-        padding: '1.5rem',
-        border: currentTheme.border,
-        boxShadow: currentTheme.shadow,
-        marginBottom: '2rem',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        animation: 'fadeIn 0.3s ease-out'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button
-            onClick={onSelectAll}
-            style={{
-              background: 'transparent',
-              border: `1px solid ${currentTheme.mutedText}`,
-              color: currentTheme.text,
-              padding: '0.5rem 1rem',
-              borderRadius: '6px',
-              cursor: 'pointer'
-            }}
-          >
-            {selectedVideos.size === mediaFiles.length ? 'Deselect All' : 'Select All'}
-          </button>
-          <span style={{ color: currentTheme.mutedText }}>
-            {selectedVideos.size} videos selected
-          </span>
-        </div>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <button
-            onClick={onBulkDelete}
-            style={{
-              background: '#ef4444',
-              color: 'white',
-              border: 'none',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '8px',
-              fontWeight: '600',
-              cursor: 'pointer'
-            }}
-          >
-            🗑️ Delete Selected ({selectedVideos.size})
-          </button>
-          <button
-            onClick={onCancel}
-            style={{
-              background: 'transparent',
-              border: `1px solid ${currentTheme.mutedText}`,
-              color: currentTheme.text,
-              padding: '0.75rem 1.5rem',
-              borderRadius: '8px',
-              cursor: 'pointer'
-            }}
-          >
-            Cancel
-          </button>
-        </div>
+  selectedVideos,
+  mediaFiles,
+  isDarkTheme,
+  onSelectAll,
+  onBulkDelete,
+  onCancel
+}) {
+  // This component now correctly shows "Deselect All" when all videos are selected
+  // and "Select All" when not all videos are selected
+
+  return (
+    <div className={`bg-gradient-to-br from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-600 shadow-lg mb-8 flex items-center justify-between animate-fade-in`}>
+      <div className="flex items-center gap-4">
+        <button
+          onClick={onSelectAll}
+          className="bg-transparent border border-gray-500 dark:border-gray-400 text-gray-900 dark:text-white px-4 py-2 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+        >
+          {selectedVideos.size === mediaFiles.length ? 'Deselect All' : 'Select All'}
+        </button>
+        <span className="text-gray-600 dark:text-gray-300">
+          Selected ({selectedVideos.size})
+        </span>
       </div>
-    );
-  }
+      <div className="flex gap-4">
+        <button
+          onClick={onBulkDelete}
+          className="bg-red-500 hover:bg-red-600 text-white border-none px-6 py-3 rounded-lg font-semibold cursor-pointer transition-all duration-200"
+        >
+          🗑️ Remove Selected
+        </button>
+        <button
+          onClick={onCancel}
+          className="bg-transparent border border-gray-500 dark:border-gray-400 text-gray-900 dark:text-white px-6 py-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}

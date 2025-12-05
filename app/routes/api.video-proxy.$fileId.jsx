@@ -4,7 +4,7 @@ import { getShopifyContext } from "../shopify.server.js";
 export async function loader({ request, params }) {
   try {
     const { session, error } = await getShopifyContext();
-    
+
     if (error || !session?.shop || !session?.accessToken) {
       return new Response(
         JSON.stringify({ 
@@ -19,7 +19,7 @@ export async function loader({ request, params }) {
     }
 
     const fileId = params.fileId;
-    
+
     // Get file details from Shopify using GraphQL with 2026-01 API version
     const query = `
       query getFile($id: ID!) {
@@ -73,13 +73,13 @@ export async function loader({ request, params }) {
     }
 
     const fileNode = result.data?.node;
-    
+
     if (!fileNode) {
       throw new Error("File not found");
     }
 
     let videoUrl = '';
-    
+
     // Extract the actual video URL
     if (fileNode.sources?.[0]?.url) {
       videoUrl = fileNode.sources[0].url; // Video
@@ -132,3 +132,7 @@ export async function loader({ request, params }) {
     );
   }
 }
+
+
+
+

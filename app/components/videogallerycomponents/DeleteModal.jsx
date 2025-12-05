@@ -1,51 +1,57 @@
 // components/videogallerycomponents/DeleteModal.jsx
 export default function DeleteModal({
-    showDeleteModal,
-    onDelete,
-    onHide
-  }) {
-    if (!showDeleteModal.show) return null;
-  
-    return (
-      <div className="modal-overlay">
-        <div className="modal-content">
-          <h3 style={{ marginBottom: '1rem', color: '#1f2937' }}>
-            Confirm Delete
-          </h3>
-          <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
-            Are you sure you want to delete "{showDeleteModal.videoTitle}"? This action cannot be undone.
-          </p>
-          <div className="modal-buttons">
-            <button
-              onClick={() => onDelete(showDeleteModal.videoId)}
-              style={{
-                background: '#ef4444',
-                color: 'white',
-                border: 'none',
-                padding: '0.75rem 1.5rem',
-                borderRadius: '8px',
-                fontWeight: '600',
-                cursor: 'pointer'
-              }}
-            >
-              Yes, Delete
-            </button>
-            <button
-              onClick={onHide}
-              style={{
-                background: '#6b7280',
-                color: 'white',
-                border: 'none',
-                padding: '0.75rem 1.5rem',
-                borderRadius: '8px',
-                fontWeight: '600',
-                cursor: 'pointer'
-              }}
-            >
-              Cancel
-            </button>
-          </div>
+  showDeleteModal,
+  onDelete,
+  onHide
+}) {
+  if (!showDeleteModal.show) return null;
+
+  const handleCancel = (e) => {
+    e.stopPropagation();
+    onHide();
+  };
+
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onHide();
+    }
+  };
+
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    onDelete(showDeleteModal.videoId);
+  };
+
+  return (
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onClick={handleBackdropClick}
+    >
+      <div
+        className="bg-white rounded-xl p-6 max-w-md w-full mx-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Confirm Delete
+        </h3>
+        <p className="text-gray-600 mb-6">
+          Are you sure you want to delete "{showDeleteModal.videoTitle}"? This action cannot be undone.
+        </p>
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={handleDelete}
+            className="bg-red-500 hover:bg-red-600 text-white border-none px-6 py-3 rounded-lg font-semibold cursor-pointer transition-colors"
+          >
+            Yes, Delete
+          </button>
+          <button
+            onClick={handleCancel}
+            className="bg-gray-500 hover:bg-gray-600 text-white border-none px-6 py-3 rounded-lg font-semibold cursor-pointer transition-colors"
+          >
+            Cancel
+          </button>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}

@@ -19,72 +19,39 @@ export default function ProductsModal({
     product.title.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  const theme = isDarkTheme
-    ? { bg: "#1f2937", text: "#f3f4f6", border: "#374151", input: "#374151" }
-    : { bg: "#ffffff", text: "#1f2937", border: "#e5e7eb", input: "#ffffff" };
+  const handleSave = async () => {
+    if (onSaveProducts) {
+      await onSaveProducts();
+    }
+    // The onHide callback should be called after saving is complete
+    // so that the parent component can refresh its data
+    if (onHide) {
+      onHide();
+    }
+  };
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.6)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 20000,
-        padding: "1rem",
-      }}
-    >
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
       <div
-        style={{
-          background: theme.bg,
-          border: `1px solid ${theme.border}`,
-          borderRadius: "16px",
-          width: "100%",
-          maxWidth: "520px",
-          maxHeight: "85vh",
-          overflow: "auto",
-          boxShadow: "0 20px 50px rgba(0,0,0,0.3)",
-          position: "relative",
-        }}
+        className={`relative rounded-2xl border w-full max-w-lg max-h-[85vh] overflow-auto shadow-2xl ${isDarkTheme
+          ? 'bg-gray-800 border-gray-700'
+          : 'bg-white border-gray-200'
+          }`}
       >
-        {/* Close Button */}
         <button
           onClick={onHide}
-          style={{
-            position: "absolute",
-            top: "1rem",
-            right: "1rem",
-            background: "transparent",
-            border: "none",
-            fontSize: "1.8rem",
-            fontWeight: "bold",
-            cursor: "pointer",
-            color: isDarkTheme ? "#9ca3af" : "#6b7280",
-            width: "40px",
-            height: "40px",
-            borderRadius: "50%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          onMouseEnter={(e) =>
-            (e.target.style.background = isDarkTheme ? "#374151" : "#f3f4f6")
-          }
-          onMouseLeave={(e) => (e.target.style.background = "transparent")}
+          className={`absolute top-4 right-4 bg-transparent border-none text-2xl font-bold cursor-pointer w-10 h-10 rounded-full flex items-center justify-center transition-all ${isDarkTheme
+            ? 'text-gray-400 hover:bg-gray-700'
+            : 'text-gray-500 hover:bg-gray-100'
+            }`}
         >
           X
         </button>
 
-        <div style={{ padding: "2rem" }}>
+        <div className="p-8">
           <h3
-            style={{
-              margin: "0 0 1.5rem",
-              fontSize: "1.25rem",
-              fontWeight: "bold",
-              color: theme.text,
-            }}
+            className={`m-0 mb-6 text-xl font-bold ${isDarkTheme ? 'text-white' : 'text-gray-900'
+              }`}
           >
             TAG PRODUCTS
           </h3>
@@ -94,124 +61,63 @@ export default function ProductsModal({
             placeholder="SEARCH PRODUCTS..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "0.9rem 1rem",
-              border: `2px solid ${theme.border}`,
-              borderRadius: "12px",
-              background: theme.input,
-              color: theme.text,
-              fontSize: "1rem",
-              fontWeight: "600",
-              outline: "none",
-              marginBottom: "1.5rem",
-            }}
-            onFocus={(e) => (e.target.style.borderColor = "#10b981")}
-            onBlur={(e) => (e.target.style.borderColor = theme.border)}
+            className={`w-full py-3 px-4 border-2 rounded-xl text-base font-semibold outline-none transition-colors mb-6 ${isDarkTheme
+              ? 'bg-gray-700 border-gray-600 text-white focus:border-green-500'
+              : 'bg-white border-gray-200 text-gray-900 focus:border-green-500'
+              }`}
           />
 
           {loadingProducts ? (
             <div
-              style={{
-                textAlign: "center",
-                padding: "3rem",
-                color: theme.text,
-                fontSize: "1.1rem",
-                fontWeight: "bold",
-              }}
+              className={`text-center py-12 font-bold ${isDarkTheme ? 'text-white' : 'text-gray-900'
+                }`}
             >
               LOADING PRODUCTS...
             </div>
           ) : (
             <>
               <div
-                style={{
-                  maxHeight: "300px",
-                  overflowY: "auto",
-                  border: `1px solid ${theme.border}`,
-                  borderRadius: "12px",
-                  padding: "0.5rem",
-                }}
+                className={`max-h-80 overflow-y-auto border rounded-xl p-2 ${isDarkTheme
+                  ? 'border-gray-600'
+                  : 'border-gray-200'
+                  }`}
               >
                 {filteredProducts.length === 0 ? (
-                  <div
-                    style={{
-                      textAlign: "center",
-                      padding: "2rem",
-                      color: "#9ca3af",
-                      fontStyle: "italic",
-                    }}
-                  >
+                  <div className="text-center py-8 text-gray-400 italic">
                     NO PRODUCTS FOUND
                   </div>
                 ) : (
                   filteredProducts.map((product) => (
                     <label
                       key={product.id}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "1rem",
-                        padding: "0.9rem",
-                        background: isDarkTheme ? "#374151" : "#f8fafc",
-                        borderRadius: "10px",
-                        marginBottom: "0.5rem",
-                        cursor: "pointer",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.background = isDarkTheme
-                          ? "#4b5563"
-                          : "#e5e7eb")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.background = isDarkTheme
-                          ? "#374151"
-                          : "#f8fafc")
-                      }
+                      className={`flex items-center gap-4 p-3 rounded-xl mb-2 cursor-pointer transition-colors ${isDarkTheme
+                        ? 'bg-gray-700 hover:bg-gray-600'
+                        : 'bg-gray-50 hover:bg-gray-200'
+                        }`}
                     >
                       <input
                         type="checkbox"
                         checked={selectedProducts.has(product.id)}
                         onChange={() => onToggleProduct(product.id)}
-                        style={{
-                          width: "20px",
-                          height: "20px",
-                          cursor: "pointer",
-                        }}
+                        className="w-5 h-5 cursor-pointer"
                       />
                       {product.image_url ? (
                         <img
                           src={product.image_url}
                           alt={product.title}
-                          style={{
-                            width: "40px",
-                            height: "40px",
-                            borderRadius: "8px",
-                            objectFit: "cover",
-                          }}
+                          className="w-10 h-10 rounded object-cover"
                         />
                       ) : (
-                        <div
-                          style={{
-                            width: "40px",
-                            height: "40px",
-                            background: "#10b981",
-                            borderRadius: "8px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "white",
-                            fontWeight: "bold",
-                          }}
-                        >
+                        <div className="w-10 h-10 rounded flex items-center justify-center bg-green-500 text-white font-bold">
                           P
                         </div>
                       )}
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: "600", color: theme.text }}>
+                      <div className="flex-1">
+                        <div className={`font-semibold ${isDarkTheme ? 'text-white' : 'text-gray-900'
+                          }`}>
                           {product.title}
                         </div>
-                        <div style={{ color: "#10b981", fontSize: "0.9rem" }}>
+                        <div className="text-green-500 text-sm">
                           ${product.price}
                         </div>
                       </div>
@@ -220,40 +126,16 @@ export default function ProductsModal({
                 )}
               </div>
 
-              <div
-                style={{
-                  display: "flex",
-                  gap: "1rem",
-                  marginTop: "1.5rem",
-                  justifyContent: "flex-end",
-                }}
-              >
+              <div className="flex gap-4 mt-6 justify-end">
                 <button
-                  onClick={onSaveProducts}
-                  style={{
-                    background: "#10b981",
-                    color: "white",
-                    border: "none",
-                    padding: "0.9rem 1.8rem",
-                    borderRadius: "12px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                    fontSize: "1rem",
-                  }}
+                  onClick={handleSave}
+                  className="bg-green-500 text-white border-none py-3 px-7 rounded-xl font-bold cursor-pointer text-base"
                 >
                   SAVE ({selectedProducts.size})
                 </button>
                 <button
                   onClick={onHide}
-                  style={{
-                    background: "#6b7280",
-                    color: "white",
-                    border: "none",
-                    padding: "0.9rem 1.8rem",
-                    borderRadius: "12px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
+                  className="bg-gray-500 text-white border-none py-3 px-7 rounded-xl font-bold cursor-pointer"
                 >
                   CANCEL
                 </button>

@@ -1,0 +1,2633 @@
+<!-- video-carousel.liquid -->
+<div class="video-carousel" data-shop="{{ shop.permanent_domain }}">
+  <!-- Header -->
+  <div class="carousel-header">
+    <h2 class="section-title">Watch and Buy</h2>
+    <button class="saved-videos-btn" onclick="openSavedVideos()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+      </svg>
+      Saved Videos
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading" id="loadingState">
+    <div class="loading-spinner"></div>
+    <p>Loading videos...</p>
+  </div>
+  
+  <!-- Main Carousel -->
+  <div class="carousel-container" id="carouselContainer" style="display: none;">
+    <button class="nav-btn prev-btn" onclick="showPreviousVideos()" aria-label="Previous videos">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    
+    <div class="videos-grid" id="videosGrid"></div>
+    
+    <button class="nav-btn next-btn" onclick="showNextVideos()" aria-label="Next videos">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" id="emptyState" style="display: none;">
+    <div class="empty-icon">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+        <polyline points="2,10 12,15 22,10"></polyline>
+      </svg>
+    </div>
+    <h3>No videos available</h3>
+    <p>Check back later for new content</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" id="errorState" style="display: none;">
+    <div class="error-icon">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    </div>
+    <h3>Failed to load videos</h3>
+    <p>Please try again</p>
+    <button class="retry-btn" onclick="loadVideos()">Try Again</button>
+  </div>
+</div>
+
+<!-- Modal Carousel Viewer -->
+<div class="modal-carousel" id="modalCarousel" style="display: none;">
+  <div class="modal-background" onclick="closeModalCarousel()"></div>
+  
+  <div class="modal-content">
+    <!-- Close Button -->
+    <button class="modal-close-btn" onclick="closeModalCarousel()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    
+    <!-- Main Carousel Container -->
+    <div class="modal-carousel-container">
+      <!-- Previous Video Preview -->
+      <div class="video-preview prev-video" id="prevVideoPreview">
+        <div class="preview-overlay"></div>
+        <video class="preview-video" muted playsinline loop></video>
+      </div>
+      
+      <!-- Main Video Container -->
+      <div class="modal-video-container">
+        <!-- Main Video Player -->
+        <div class="modal-video-wrapper">
+          <video 
+            class="modal-video-player"
+            id="modalVideoPlayer"
+            muted
+            playsinline
+            autoplay
+            onclick="toggleModalVideoPlayPause(this)"
+          ></video>
+          
+          <!-- Progress Bar -->
+          <div class="video-progress-container">
+            <div class="video-progress-bar" id="videoProgressBar">
+              <div class="video-progress-fill" id="videoProgressFill"></div>
+            </div>
+          </div>
+          
+          <!-- Volume Control - Top Left Corner -->
+          <div class="modal-volume-control">
+            <button class="volume-btn" onclick="toggleModalMute(this)">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"></polygon>
+                <path d="M19.07,4.93a10,10,0,0,1,0,14.14M15.54,8.46a5,5,0,0,1,0,7.07" class="volume-high"></path>
+                <line x1="23" y1="1" x2="1" y2="23" class="volume-mute" style="display: none;"></line>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Download Control - Top Right Corner (Opposite side of volume) -->
+          <div class="modal-download-control">
+            <button class="download-control-btn" onclick="downloadModalVideo()">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M21,15v4a2,2,0,0,1-2,2H5a2,2,0,0,1-2-2V15"></path>
+                <polyline points="7,10 12,15 17,10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Product Carousel -->
+          <div class="product-carousel" id="modalProductCarousel"></div>
+          
+          <!-- Engagement Buttons on Video -->
+          <div class="modal-engagement-buttons">
+            <button class="engagement-btn like-btn" id="modalLikeBtn" onclick="toggleModalLike()">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M20.84,4.61a5.5,5.5,0,0,0-7.78,0L12,5.67l-1.06-1.06a5.5,5.5,0,0,0-7.78,7.78l1.06,1.06L12,21.23l7.78-7.78,1.06-1.06a5.5,5.5,0,0,0,0-7.78Z"/>
+              </svg>
+              <span class="engagement-count" id="modalLikeCount">0</span>
+            </button>
+            
+            <button class="engagement-btn comment-btn" onclick="openModalComments()">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M21,11.5a8.38,8.38,0,0,1-.9,3.8,8.5,8.5,0,0,1-7.6,4.7,8.38,8.38,0,0,1-3.8-.9L3,21l1.9-5.7a8.38,8.38,0,0,1-.9-3.8,8.5,8.5,0,0,1,4.7-7.6,8.38,8.38,0,0,1,3.8-.9h.5a8.48,8.48,0,0,1,8,8v.5Z"/>
+              </svg>
+              <span class="engagement-count" id="modalCommentCount">0</span>
+            </button>
+            
+            <button class="engagement-btn save-btn" id="modalSaveBtn" onclick="toggleModalSave()">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <span class="engagement-count" id="modalSaveCount">0</span>
+            </button>
+            
+            <button class="engagement-btn share-btn" onclick="shareModalVideo()">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+              <span class="engagement-count" id="modalShareCount">0</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Next Video Preview -->
+      <div class="video-preview next-video" id="nextVideoPreview">
+        <div class="preview-overlay"></div>
+        <video class="preview-video" muted playsinline loop></video>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Comments Section -->
+<div class="comments-section" id="commentsSection" style="display: none;">
+  <div class="comments-header">
+    <h3>Comments</h3>
+    <button class="close-comments" style="color: black;" onclick="closeComments()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+  <div class="comments-list" id="commentsList">
+    <!-- Comments will be loaded here -->
+  </div>
+  <div class="add-comment">
+    <input type="text" id="commentInput" placeholder="Add a comment..." class="comment-input">
+    <button onclick="postComment()" class="post-comment-btn">Post</button>
+  </div>
+</div>
+
+<!-- Saved Videos Modal -->
+<div class="saved-videos-modal" id="savedVideosModal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Your Saved Videos</h3>
+      <button class="close-modal" onclick="closeSavedVideos()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="saved-videos-list" id="savedVideosList">
+      <!-- Saved videos will be loaded here -->
+    </div>
+  </div>
+</div>
+
+<!-- Enhanced Share Modal -->
+<div class="share-modal" id="shareModal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">Share link</div>
+      <button class="close-button" onclick="closeShareModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="share-url-container">
+        <input type="text" class="share-url-input" id="shareUrlInput" value="https://devstore-dd.myshopify.com/devstore-dd.myshopif..." readonly>
+        <button class="copy-button" onclick="copyShareUrl()">Copy</button>
+      </div>
+      <div class="share-options">
+        <div class="share-option" onclick="shareToNearby()">
+          <div class="share-icon nearby-sharing">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 3.5C14.18 3.01 13.15 3.01 12.33 3.5L6 7V9L12 5.5L18 9V11L12 14.5L6 11V13L12 16.5L18 13V15L12 18.5L6 15V17L12 20.5L21 15V9Z" fill="white"/>
+            </svg>
+          </div>
+          <div class="share-name">Nearby Sharing</div>
+        </div>
+        <div class="share-option" onclick="shareToWhatsApp()">
+          <div class="share-icon whatsapp">W</div>
+          <div class="share-name">WhatsApp</div>
+        </div>
+        <div class="share-option" onclick="shareToPhoneLink()">
+          <div class="share-icon phone-link">P</div>
+          <div class="share-name">Phone Link</div>
+        </div>
+        <div class="share-option" onclick="shareToGmail()">
+          <div class="share-icon gmail">G</div>
+          <div class="share-name">Gmail</div>
+        </div>
+        <div class="share-option" onclick="shareToFacebook()">
+          <div class="share-icon facebook">f</div>
+          <div class="share-name">Facebook</div>
+        </div>
+        <div class="share-option" onclick="shareToCopilot()">
+          <div class="share-icon copilot">C</div>
+          <div class="share-name">Copilot</div>
+        </div>
+        <div class="share-option" onclick="shareToTwitter()">
+          <div class="share-icon twitter">t</div>
+          <div class="share-name">Twitter</div>
+        </div>
+        <div class="share-option" onclick="shareToOutlook()">
+          <div class="share-icon outlook">O</div>
+          <div class="share-name">Outlook</div>
+        </div>
+        <div class="share-option" onclick="shareToLinkedIn()">
+          <div class="share-icon linkedin">in</div>
+          <div class="share-name">LinkedIn</div>
+        </div>
+        <div class="share-option" onclick="shareToTelegramDesktop()">
+          <div class="share-icon telegram-desktop">T</div>
+          <div class="share-name">Telegram Desktop</div>
+        </div>
+        <div class="share-option" onclick="shareToMessenger()">
+          <div class="share-icon messenger">M</div>
+          <div class="share-name">Messenger</div>
+        </div>
+        <div class="share-option" onclick="shareToDiscord()">
+          <div class="share-icon discord">D</div>
+          <div class="share-name">Discord</div>
+        </div>
+        <div class="share-option" onclick="shareToOneNote()">
+          <div class="share-icon onenote">N</div>
+          <div class="share-name">OneNote</div>
+        </div>
+        <div class="share-option" onclick="shareToTeams()">
+          <div class="share-icon teams">T</div>
+          <div class="share-name">Teams</div>
+        </div>
+        <div class="share-option" onclick="shareToTelegramInstall()">
+          <div class="share-icon telegram-install">T</div>
+          <div class="share-name">Telegram Install</div>
+        </div>
+        <div class="share-option" onclick="shareToQuickShare()">
+          <div class="share-icon quick-share">Q</div>
+          <div class="share-name">Quick Share</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Base Styles */
+  .video-carousel {
+    width: 100%;
+    max-width: none;
+    margin: 0 auto;
+    padding: 2rem 0;
+    background: #fff;
+    position: relative;
+  }
+
+  .carousel-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e5e5e5;
+    position: relative;
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #000;
+    margin: 0;
+    text-align: center;
+  }
+
+  .saved-videos-btn {
+    background: #000;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    position: absolute;
+    right: 0;
+  }
+
+  .saved-videos-btn:hover {
+    background: #333;
+    transform: translateY(-1px);
+  }
+
+  /* Loading, Empty, Error States */
+  .loading, .empty-state, .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 600px;
+    color: #666;
+    text-align: center;
+    font-size: 18px;
+  }
+
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(0,0,0,0.1);
+    border-radius: 50%;
+    border-top-color: #000;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 1rem;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Main Carousel */
+  .carousel-container {
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+
+  .videos-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+    flex: 1;
+  }
+
+  .nav-btn {
+    background: #fff;
+    border: 2px solid #e5e5e5;
+    color: #000;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+  }
+
+  .nav-btn:hover:not(:disabled) {
+    background: #f8f8f8;
+    border-color: #000;
+    transform: scale(1.05);
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  /* Video Card */
+  .video-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+    position: relative;
+    aspect-ratio: 9/16;
+    cursor: pointer;
+    height: 100%;
+  }
+
+  .video-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  .video-player-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    border-radius: 12px;
+  }
+
+  .video-player {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border-radius: 12px;
+  }
+
+  .video-card:hover .video-player {
+    transform: scale(1.05);
+  }
+
+  /* Modal Carousel Styles */
+  .modal-carousel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.79);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-content {
+    position: relative;
+    width: 95%;
+    height: 95vh;
+    background: none;
+    border-radius: 0;
+    overflow: hidden;
+    z-index: 1001;
+  }
+
+  .modal-close-btn {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    background: none;
+    border: none;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1002;
+    transition: all 0.3s ease;
+  }
+
+  .modal-close-btn:hover {
+    transform: scale(1.1);
+  }
+
+  .modal-carousel-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+  }
+
+  /* Video Preview Styles */
+  .video-preview {
+    height: 70vh;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    opacity: 0.6;
+    cursor: pointer;
+  }
+
+  .video-preview:hover {
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+
+  .prev-video {
+    order: 1;
+  }
+
+  .next-video {
+    order: 3;
+  }
+
+  .preview-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 16px;
+  }
+
+  .preview-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 16px;
+  }
+
+  /* Main Video Container */
+  .modal-video-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    max-width: 800px;
+    order: 2;
+  }
+
+  .modal-video-wrapper {
+    position: relative;
+    height: 80vh;
+    background: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal-video-player {
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    border-radius: 20px;
+  }
+
+  /* Progress Bar Styles */
+  .video-progress-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    z-index: 10;
+  }
+
+  .video-progress-bar {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    position: relative;
+  }
+
+  .video-progress-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: white;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  /* Modal Volume Control - Top Left */
+  .modal-volume-control {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+  }
+
+  .volume-btn {
+    background: none;
+    border: none;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .volume-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+  }
+
+  /* Modal Download Control - Top Right (Opposite side of volume) */
+  .modal-download-control {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+  }
+
+  .download-control-btn {
+    background: none;
+    border: none;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .download-control-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+  }
+
+  /* Modal Engagement Buttons */
+  .modal-engagement-buttons {
+    position: absolute;
+    bottom: 40px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: flex-end;
+    z-index: 10;
+  }
+
+  .engagement-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.3s ease;
+    padding: 0;
+  }
+
+  .engagement-btn:hover {
+    background: none !important;
+    transform: none !important;
+  }
+
+  .engagement-btn svg {
+    width: 40px;
+    height: 40px;
+    background: none;
+    border-radius: 50%;
+    padding: 0.8rem;
+    transition: all 0.3s ease;
+  }
+
+  .engagement-btn:hover svg {
+    background: none !important;
+    transform: none !important;
+  }
+
+  .engagement-count {
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+  }
+
+  .engagement-btn.active {
+    color: #ff0050;
+  }
+
+  .engagement-btn.active svg {
+    background: rgba(255, 0, 80, 0.3);
+  }
+
+  .engagement-btn.saved {
+    color: #1da1f2;
+  }
+
+  .engagement-btn.saved svg {
+    background: rgba(29, 161, 242, 0.3);
+  }
+
+  /* UPDATED Product Carousel Styles - Fully Transparent */
+  .product-carousel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: transparent; /* Fully transparent */
+    scrollbar-width: thin; /* Hide scrollbar */
+    scrollbar-color: rgba(255,255,255,0.6) transparent;
+    z-index: 10;
+  }
+
+  /* UPDATED Product Card Styles - Button moved closer */
+  .product-card {
+    flex: 0 0 280px;
+    background: transparent;
+    border-radius: 8px;
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    border: none;
+  }
+
+  .product-card:hover {
+    background: #000;
+  }
+
+  .product-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+
+  .product-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-right: 0.5rem; /* Added margin to bring button closer */
+  }
+
+  .product-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: white;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .product-price {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+  }
+
+  .add-to-cart-btn {
+    background: white;
+    color: black;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    flex-shrink: 0;
+    margin-left: 0; /* Removed auto margin to bring button closer */
+  }
+
+  .add-to-cart-btn:hover {
+    background: #fa1515c6;
+    transform: translateY(-1px);
+  }
+
+  /* Comments Section */
+  .comments-section {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 400px;
+    height: 100%;
+    background: white;
+    z-index: 1002;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .comments-section.active {
+    transform: translateX(0);
+  }
+
+  .comments-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e5e5;
+    background: white;
+  }
+
+  .comments-header h3 {
+    margin: 0;
+    color: #000;
+    font-size: 1.2rem;
+  }
+
+  .close-comments {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+  }
+
+  .close-comments:hover {
+    background: #f5f5f5;
+  }
+
+  .comments-list {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    background: #fafafa;
+  }
+
+  .comment-item {
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+  }
+
+  .comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .comment-author {
+    font-weight: 600;
+    color: #000;
+    font-size: 0.9rem;
+  }
+
+  .comment-date {
+    color: #666;
+    font-size: 0.8rem;
+  }
+
+  .comment-text {
+    margin: 0;
+    color: #333;
+    line-height: 1.4;
+    font-size: 0.9rem;
+  }
+
+  .add-comment {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-top: 1px solid #e5e5e5;
+    background: white;
+  }
+
+  .comment-input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #e5e5e5;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+
+  .comment-input:focus {
+    border-color: #000;
+  }
+
+  .post-comment-btn {
+    background: #000;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s ease;
+    font-weight: 600;
+  }
+
+  .post-comment-btn:hover {
+    background: #333;
+  }
+
+  /* Modals */
+  .saved-videos-modal,
+  .share-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .saved-videos-modal.active,
+  .share-modal.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .saved-videos-modal .modal-content,
+  .share-modal .modal-content {
+    background: white;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+  }
+
+  .saved-videos-modal.active .modal-content,
+  .share-modal.active .modal-content {
+    transform: scale(1);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  .modal-header h3 {
+    margin: 0;
+    color: #000;
+  }
+
+  .close-modal {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+
+  .close-modal:hover {
+    background: #f5f5f5;
+  }
+
+  /* Enhanced Share Modal Styles */
+  .share-modal .modal-content {
+    background-color: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .share-modal .modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #eaeaea;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #777;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+  }
+
+  .close-button:hover {
+    background-color: #f0f0f0;
+  }
+
+  .modal-body {
+    padding: 20px 24px;
+  }
+
+  .share-url-container {
+    display: flex;
+    margin-bottom: 24px;
+  }
+
+  .share-url-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px 0 0 8px;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .copy-button {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-left: none;
+    border-radius: 0 8px 8px 0;
+    padding: 0 16px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #333;
+    transition: background-color 0.2s;
+  }
+
+  .copy-button:hover {
+    background-color: #e5e5e5;
+  }
+
+  .share-options {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+  }
+
+  .share-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 12px 8px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+  }
+
+  .share-option:hover {
+    background-color: #f9f9f9;
+  }
+
+  .share-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 18px;
+    color: white;
+  }
+
+  .share-name {
+    font-size: 12px;
+    color: #555;
+    text-align: center;
+  }
+
+  /* Platform-specific colors */
+  .nearby-sharing { background-color: #0078d7; }
+  .whatsapp { background-color: #25d366; }
+  .phone-link { background-color: #0078d7; }
+  .gmail { background-color: #ea4335; }
+  .facebook { background-color: #1877f2; }
+  .copilot { background-color: #0078d7; }
+  .twitter { background-color: #1da1f2; }
+  .outlook { background-color: #0078d7; }
+  .linkedin { background-color: #0a66c2; }
+  .telegram-desktop { background-color: #0088cc; }
+  .messenger { background-color: #0084ff; }
+  .discord { background-color: #5865f2; }
+  .onenote { background-color: #80397b; }
+  .teams { background-color: #6264a7; }
+  .telegram-install { background-color: #0088cc; }
+  .quick-share { background-color: #0078d7; }
+
+  /* Saved Videos List */
+  .saved-videos-list {
+    padding: 1rem;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .saved-video-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+    cursor: pointer;
+    border: 1px solid #f0f0f0;
+    margin-bottom: 0.5rem;
+  }
+
+  .saved-video-item:hover {
+    background: #f5f5f5;
+  }
+
+  .saved-video-thumbnail {
+    width: 80px;
+    height: 120px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #000;
+  }
+
+  .saved-video-info {
+    flex: 1;
+  }
+
+  .saved-video-title {
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #000;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1400px) {
+    .videos-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .videos-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .modal-carousel-container {
+      gap: 1rem;
+    }
+    
+    .video-preview {
+      width: 20%;
+    }
+
+    .share-options {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .product-card {
+      flex: 0 0 250px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .videos-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .video-carousel {
+      padding: 1.5rem 0;
+    }
+    
+    .carousel-header {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .saved-videos-btn {
+      position: static;
+    }
+    
+    .modal-content {
+      width: 100%;
+      height: 100vh;
+      border-radius: 0;
+    }
+    
+    .modal-carousel-container {
+      flex-direction: column;
+      gap: 0.5rem;
+      overflow-y: auto;
+      height: 100%;
+    }
+    
+    .video-preview {
+      display: none;
+    }
+    
+    .modal-video-container {
+      height: 100%;
+      max-width: none;
+    }
+    
+    .modal-engagement-buttons {
+      top: 1rem;
+      right: 1rem;
+      gap: 1rem;
+    }
+    
+    .engagement-btn svg {
+      width: 40px;
+      height: 40px;
+      padding: 0.6rem;
+    }
+    
+    .modal-volume-control {
+      top: 1rem;
+      left: 1rem;
+    }
+    
+    .modal-download-control {
+      top: 1rem;
+      right: 1rem;
+    }
+    
+    .download-control-btn {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .product-carousel {
+      padding: 0.5rem;
+    }
+    
+    .product-card {
+      flex: 0 0 220px;
+      padding: 0.5rem;
+    }
+    
+    .product-image {
+      width: 50px;
+      height: 50px;
+    }
+    
+    .product-title {
+      font-size: 0.8rem;
+    }
+    
+    .product-price {
+      font-size: 0.8rem;
+    }
+    
+    .add-to-cart-btn {
+      font-size: 0.75rem;
+      padding: 0.4rem 0.8rem;
+    }
+    
+    .comments-section {
+      width: 100%;
+    }
+
+    .share-options {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .videos-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    .section-title {
+      font-size: 2rem;
+    }
+    
+    .carousel-container {
+      gap: 0.5rem;
+    }
+    
+    .nav-btn {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .modal-close-btn {
+      top: 1rem;
+      right: 1rem;
+      width: 40px;
+      height: 40px;
+    }
+    
+    .modal-volume-control {
+      top: 1rem;
+      left: 1rem;
+    }
+    
+    .modal-download-control {
+      top: 1rem;
+      right: 1rem;
+    }
+    
+    .download-control-btn {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .volume-btn {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .modal-engagement-buttons {
+      gap: 0.8rem;
+    }
+    
+    .engagement-btn svg {
+      width: 40px;
+      height: 40px;
+      padding: 0.5rem;
+    }
+    
+    .engagement-count {
+      font-size: 0.8rem;
+    }
+    
+    .product-card {
+      flex: 0 0 200px;
+    }
+    
+    .product-image {
+      width: 45px;
+      height: 45px;
+    }
+    
+    .product-title {
+      font-size: 0.75rem;
+    }
+    
+    .product-price {
+      font-size: 0.75rem;
+    }
+    
+    .add-to-cart-btn {
+      font-size: 0.7rem;
+      padding: 0.35rem 0.7rem;
+    }
+
+    .share-options {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .video-card {
+    animation: fadeInUp 0.5s ease forwards;
+  }
+
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .modal-content {
+    animation: modalFadeIn 0.3s ease;
+  }
+</style>
+
+<script>
+  // Global variables
+  let allVideos = [];
+  let currentPage = 0;
+  const VIDEOS_PER_PAGE = 6;
+  let currentShareVideo = null;
+  let currentCommentsVideo = null;
+  let currentModalIndex = 0;
+  let progressInterval = null;
+  let storeCurrency = 'USD'; // Default currency
+
+  // Initialize the carousel
+  async function loadVideos() {
+    const shop = document.querySelector('.video-carousel').dataset.shop;
+    const loadingState = document.getElementById('loadingState');
+    const carouselContainer = document.getElementById('carouselContainer');
+    const emptyState = document.getElementById('emptyState');
+    const errorState = document.getElementById('errorState');
+
+    // Show loading, hide others
+    loadingState.style.display = 'flex';
+    carouselContainer.style.display = 'none';
+    emptyState.style.display = 'none';
+    errorState.style.display = 'none';
+
+    try {
+      console.log('🔄 Fetching videos...');
+      const response = await fetch(`/a/carousel-videos?shop=${encodeURIComponent(shop)}`)
+      
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('📦 Loaded videos:', data.videos);
+
+      if (data.success && data.videos && data.videos.length > 0) {
+        allVideos = data.videos;
+        storeCurrency = data.store_currency || 'USD'; // Get store currency from API
+        currentPage = 0;
+        renderCurrentVideos();
+        updateNavigation();
+        carouselContainer.style.display = 'flex';
+      } else {
+        emptyState.style.display = 'flex';
+      }
+
+    } catch (error) {
+      console.error('❌ Error loading videos:', error);
+      errorState.style.display = 'flex';
+    } finally {
+      loadingState.style.display = 'none';
+    }
+  }
+
+  // Render videos in carousel
+  function renderCurrentVideos() {
+    const videosGrid = document.getElementById('videosGrid');
+    let videosHTML = '';
+
+    const startIndex = currentPage * VIDEOS_PER_PAGE;
+    const endIndex = startIndex + VIDEOS_PER_PAGE;
+    const videosToShow = allVideos.slice(startIndex, endIndex);
+    
+    videosToShow.forEach((video, index) => {
+      const globalIndex = startIndex + index;
+      
+      videosHTML += `
+        <div class="video-card" onclick="openModalCarousel(${globalIndex})">
+          <div class="video-player-container">
+            <video 
+              class="video-player"
+              src="${video.shopify_file_url}"
+              loop
+              muted
+              playsinline
+              autoplay
+              poster="https://via.placeholder.com/300x533/333/fff?text=Loading+Video"
+              data-video-id="${video.id}"
+              preload="metadata"
+            ></video>
+          </div>
+        </div>
+      `;
+    });
+
+    videosGrid.innerHTML = videosHTML;
+  }
+
+  // Modal Carousel Functions
+  function openModalCarousel(startIndex) {
+    currentModalIndex = startIndex;
+    const modal = document.getElementById('modalCarousel');
+    
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    loadModalVideo(currentModalIndex);
+  }
+
+  function closeModalCarousel() {
+    const modal = document.getElementById('modalCarousel');
+    const videoPlayer = document.getElementById('modalVideoPlayer');
+    
+    if (videoPlayer) {
+      videoPlayer.pause();
+      videoPlayer.src = '';
+      videoPlayer.removeEventListener('ended', handleVideoEnded);
+    }
+    
+    // Clear progress interval
+    if (progressInterval) {
+      clearInterval(progressInterval);
+      progressInterval = null;
+    }
+    
+    // Reset progress bar
+    const progressFill = document.getElementById('videoProgressFill');
+    if (progressFill) {
+      progressFill.style.width = '0%';
+    }
+    
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    closeComments();
+  }
+
+  async function loadModalVideo(index) {
+    if (index < 0 || index >= allVideos.length) return;
+    
+    const video = allVideos[index];
+    const videoPlayer = document.getElementById('modalVideoPlayer');
+    
+    // Clear previous progress interval
+    if (progressInterval) {
+      clearInterval(progressInterval);
+      progressInterval = null;
+    }
+    
+    // Reset progress bar
+    const progressFill = document.getElementById('videoProgressFill');
+    if (progressFill) {
+      progressFill.style.width = '0%';
+    }
+    
+    // Update video source
+    videoPlayer.src = video.shopify_file_url;
+    videoPlayer.muted = true; // Start muted
+    
+    // Remove loop to allow 'ended' event
+    videoPlayer.removeAttribute('loop');
+    
+    // Add ended event listener
+    videoPlayer.addEventListener('ended', handleVideoEnded, { once: true });
+    
+    // Add timeupdate event for progress bar
+    videoPlayer.addEventListener('timeupdate', updateProgressBar);
+    
+    // Update engagement counts
+    document.getElementById('modalLikeCount').textContent = video.like_count || 0;
+    document.getElementById('modalCommentCount').textContent = video.comment_count || 0;
+    document.getElementById('modalSaveCount').textContent = video.save_count || 0;
+    document.getElementById('modalShareCount').textContent = video.share_count || 0;
+    
+    // Update engagement button states
+    const likeBtn = document.getElementById('modalLikeBtn');
+    const saveBtn = document.getElementById('modalSaveBtn');
+    
+    if (video.user_has_liked) {
+      likeBtn.classList.add('active');
+    } else {
+      likeBtn.classList.remove('active');
+    }
+    
+    if (video.user_has_saved) {
+      saveBtn.classList.add('saved');
+    } else {
+      saveBtn.classList.remove('saved');
+    }
+    
+    // Load preview videos
+    loadPreviewVideos(index);
+    
+    // Fetch and render products with proper currency
+    const productCarousel = document.getElementById('modalProductCarousel');
+    productCarousel.innerHTML = '<p style="color: white; text-align: center; padding: 1rem;">Loading products...</p>';
+    
+    let productsHTML = '';
+    
+    try {
+      // Fetch direct products
+      const response = await fetch(`/a/carousel-videos?action=getProducts&mediaFileId=${video.id}`);
+      const data = await response.json();
+      console.log('API Response for products:', data);
+      if (data.success && data.products && data.products.length > 0) {
+        data.products.forEach(product => {
+          // Use the currency from the product data or fallback to store currency
+          const currencyCode = product.currency_code || storeCurrency;
+          // Use variant_id for both direct and collection products
+          const variantId = product.variant_id || product.shopify_variant_id;
+          productsHTML += `
+            <div class="product-card">
+              <img src="${product.image_url || 'https://via.placeholder.com/60x60/333/fff?text=Image'}" alt="${product.title}" class="product-image">
+              <div class="product-info">
+                <h4 class="product-title">${product.title}</h4>
+                <p class="product-price">${currencyCode} ${product.price || '0.00'}</p>
+              </div>
+              <button class="add-to-cart-btn" onclick="addToCart('${variantId}', '${product.title.replace(/'/g, "\\'")}')">Add to Cart</button>
+            </div>
+          `;
+        });
+      } 
+    } catch (error) {
+      console.error('Error loading products:', error);
+    }
+
+    try {
+      // Fetch collection products and append
+      const collectionResponse = await fetch(`/a/carousel-videos?action=getCollectionProducts&mediaFileId=${video.id}`);
+      const collectionData = await collectionResponse.json();
+      console.log('API Response for collection products:', collectionData);
+      if (collectionData.success && collectionData.products && collectionData.products.length > 0) {
+        collectionData.products.forEach(product => {
+          const currencyCode = product.currency_code || storeCurrency;
+          // Use variant_id for both direct and collection products
+          const variantId = product.variant_id || product.shopify_variant_id;
+          productsHTML += `
+            <div class="product-card">
+              <img src="${product.image_url || 'https://via.placeholder.com/60x60/333/fff?text=Image'}" alt="${product.title}" class="product-image">
+              <div class="product-info">
+                <h4 class="product-title">${product.title}</h4>
+                <p class="product-price">${currencyCode} ${product.price || '0.00'}</p>
+              </div>
+              <button class="add-to-cart-btn" onclick="addToCart('${variantId}', '${product.title.replace(/'/g, "\\'")}')">Add to Cart</button>
+            </div>
+          `;
+        });
+      } 
+    } catch (error) {
+      console.error('Error loading collection products:', error);
+    }
+
+    if (productsHTML) {
+      productCarousel.innerHTML = productsHTML;
+    } else {
+      productCarousel.innerHTML = '<p style="color: white; text-align: center; padding: 1rem;">No products associated with this video</p>';
+    }
+
+    // Play video with autoplay
+    videoPlayer.play().catch(e => {
+      console.log('Autoplay blocked:', e);
+    });
+  }
+
+  function updateProgressBar() {
+    const videoPlayer = document.getElementById('modalVideoPlayer');
+    const progressFill = document.getElementById('videoProgressFill');
+    
+    if (videoPlayer && progressFill && videoPlayer.duration) {
+      const progress = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+      progressFill.style.width = `${progress}%`;
+    }
+  }
+
+  function loadPreviewVideos(currentIndex) {
+    // Previous video
+    const prevIndex = (currentIndex - 1 + allVideos.length) % allVideos.length;
+    const prevVideo = allVideos[prevIndex];
+    const prevPreview = document.getElementById('prevVideoPreview');
+    const prevVideoElement = prevPreview.querySelector('.preview-video');
+    prevVideoElement.src = prevVideo.shopify_file_url;
+    prevPreview.onclick = () => {
+      currentModalIndex = prevIndex;
+      loadModalVideo(currentModalIndex);
+    };
+    
+    // Next video
+    const nextIndex = (currentIndex + 1) % allVideos.length;
+    const nextVideo = allVideos[nextIndex];
+    const nextPreview = document.getElementById('nextVideoPreview');
+    const nextVideoElement = nextPreview.querySelector('.preview-video');
+    nextVideoElement.src = nextVideo.shopify_file_url;
+    nextPreview.onclick = () => {
+      currentModalIndex = nextIndex;
+      loadModalVideo(currentModalIndex);
+    };
+  }
+
+  function handleVideoEnded() {
+    showNextModalVideo();
+  }
+
+  function showNextModalVideo() {
+    currentModalIndex = (currentModalIndex + 1) % allVideos.length;
+    loadModalVideo(currentModalIndex);
+  }
+
+  function showPrevModalVideo() {
+    currentModalIndex = (currentModalIndex - 1 + allVideos.length) % allVideos.length;
+    loadModalVideo(currentModalIndex);
+  }
+
+  // Modal Video Controls
+  function toggleModalVideoPlayPause(video) {
+    if (video.paused) {
+      video.play();
+    } else {
+      video.pause();
+    }
+  }
+
+  function toggleModalMute(button) {
+    const video = document.getElementById('modalVideoPlayer');
+    const volumeHigh = button.querySelector('.volume-high');
+    const volumeMute = button.querySelector('.volume-mute');
+    
+    video.muted = !video.muted;
+    
+    if (video.muted) {
+      volumeHigh.style.display = 'none';
+      volumeMute.style.display = 'block';
+    } else {
+      volumeHigh.style.display = 'block';
+      volumeMute.style.display = 'none';
+    }
+  }
+
+  // Modal Engagement Functions
+  async function toggleModalLike() {
+    const video = allVideos[currentModalIndex];
+    const likeBtn = document.getElementById('modalLikeBtn');
+    const likeCount = document.getElementById('modalLikeCount');
+    const isLiked = likeBtn.classList.contains('active');
+    let currentCount = parseInt(likeCount.textContent) || 0;
+    
+    try {
+      const formData = new FormData();
+      formData.append('actionType', isLiked ? 'unlike' : 'like');
+      formData.append('mediaFileId', video.id);
+      
+      const response = await fetch('/a/carousel-videos', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        if (isLiked) {
+          likeBtn.classList.remove('active');
+          likeCount.textContent = Math.max(0, currentCount - 1);
+          video.user_has_liked = false;
+          video.like_count = Math.max(0, (video.like_count || 1) - 1);
+        } else {
+          likeBtn.classList.add('active');
+          likeCount.textContent = currentCount + 1;
+          video.user_has_liked = true;
+          video.like_count = (video.like_count || 0) + 1;
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
+  }
+
+  async function toggleModalSave() {
+    const video = allVideos[currentModalIndex];
+    const saveBtn = document.getElementById('modalSaveBtn');
+    const saveCount = document.getElementById('modalSaveCount');
+    const isSaved = saveBtn.classList.contains('saved');
+    let currentCount = parseInt(saveCount.textContent) || 0;
+    
+    try {
+      const formData = new FormData();
+      formData.append('actionType', isSaved ? 'unsave' : 'save');
+      formData.append('mediaFileId', video.id);
+      
+      const response = await fetch('/a/carousel-videos', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        if (isSaved) {
+          saveBtn.classList.remove('saved');
+          saveCount.textContent = Math.max(0, currentCount - 1);
+          video.user_has_saved = false;
+          video.save_count = Math.max(0, (video.save_count || 1) - 1);
+        } else {
+          saveBtn.classList.add('saved');
+          saveCount.textContent = currentCount + 1;
+          video.user_has_saved = true;
+          video.save_count = (video.save_count || 0) + 1;
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling save:', error);
+    }
+  }
+
+  async function shareModalVideo() {
+    const video = allVideos[currentModalIndex];
+    const shareCount = document.getElementById('modalShareCount');
+    let currentCount = parseInt(shareCount.textContent) || 0;
+    
+    try {
+      const formData = new FormData();
+      formData.append('actionType', 'share');
+      formData.append('mediaFileId', video.id);
+      
+      const response = await fetch('/a/carousel-videos', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        shareCount.textContent = currentCount + 1;
+        video.share_count = (video.share_count || 0) + 1;
+        openShareModal(video.id);
+      }
+    } catch (error) {
+      console.error('Error sharing video:', error);
+    }
+  }
+
+  // Enhanced Download Function
+  async function downloadModalVideo() {
+    const video = allVideos[currentModalIndex];
+    
+    try {
+      console.log('📥 Starting download for video:', video.title);
+      
+      // Show downloading state
+      showDownloadingMessage();
+      
+      // Track download in your database
+      const formData = new FormData();
+      formData.append('actionType', 'download');
+      formData.append('mediaFileId', video.id);
+      
+      await fetch('/a/carousel-videos', {
+        method: 'POST',
+        body: formData
+      });
+      
+      // Method 1: Force download using fetch and blob (Recommended)
+      const response = await fetch(video.shopify_file_url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      
+      // Create a temporary anchor element to trigger download
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // Extract filename from URL or use video title
+      const filename = getFilenameFromUrl(video.shopify_file_url) || 
+                      `${video.title || 'video'}.mp4`;
+      
+      link.download = filename;
+      document.body.appendChild(link);
+      
+      // Trigger the download
+      link.click();
+      
+      // Clean up
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      // Update download count in the video object
+      video.download_count = (video.download_count || 0) + 1;
+      
+      // Show success message
+      showDownloadSuccessMessage(filename);
+      
+      console.log('✅ Download completed successfully');
+      
+    } catch (error) {
+      console.error('❌ Download error:', error);
+      
+      // Fallback method if blob approach fails
+      try {
+        console.log('🔄 Trying fallback download method...');
+        const link = document.createElement('a');
+        link.href = video.shopify_file_url;
+        link.download = `${video.title || 'video'}.mp4`;
+        link.target = '_blank'; // Fallback: open in new tab if download fails
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Still count as success for fallback
+        video.download_count = (video.download_count || 0) + 1;
+        
+        showDownloadSuccessMessage(`${video.title || 'video'}.mp4`);
+        
+      } catch (fallbackError) {
+        console.error('❌ Fallback download also failed:', fallbackError);
+        showErrorToast('Failed to download video. Please try again.');
+      }
+    }
+  }
+
+  // Helper function to extract filename from URL
+  function getFilenameFromUrl(url) {
+    try {
+      const urlObj = new URL(url);
+      const pathname = urlObj.pathname;
+      const filename = pathname.substring(pathname.lastIndexOf('/') + 1);
+      
+      // If no proper extension, add .mp4
+      if (filename && !filename.includes('.')) {
+        return `${filename}.mp4`;
+      }
+      
+      return filename || 'video.mp4';
+    } catch (error) {
+      return 'video.mp4';
+    }
+  }
+
+  // Show downloading progress message
+  function showDownloadingMessage() {
+    // Remove any existing messages
+    const existingMessages = document.querySelectorAll('.download-message');
+    existingMessages.forEach(msg => msg.remove());
+    
+    const downloadingMsg = document.createElement('div');
+    downloadingMsg.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #007bff;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 10000;
+        animation: slideInDown 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      ">
+        <div class="download-spinner" style="
+          width: 16px;
+          height: 16px;
+          border: 2px solid transparent;
+          border-top: 2px solid white;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        "></div>
+        <div>
+          <strong>Preparing Download...</strong>
+          <div style="font-size: 0.9rem; margin-top: 0.25rem;">Your video will download shortly</div>
+        </div>
+      </div>
+    `;
+    
+    downloadingMsg.className = 'download-message';
+    document.body.appendChild(downloadingMsg);
+    
+    // Auto-remove after 5 seconds (in case something goes wrong)
+    setTimeout(() => {
+      if (document.body.contains(downloadingMsg)) {
+        downloadingMsg.remove();
+      }
+    }, 5000);
+  }
+
+  // Show download success message
+  function showDownloadSuccessMessage(filename) {
+    // Remove downloading message
+    const downloadingMsg = document.querySelector('.download-message');
+    if (downloadingMsg) {
+      downloadingMsg.remove();
+    }
+    
+    // Remove any existing success messages
+    const existingMessages = document.querySelectorAll('.download-success-message');
+    existingMessages.forEach(msg => msg.remove());
+    
+    const successMsg = document.createElement('div');
+    successMsg.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #28a745;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 10000;
+        animation: slideInDown 0.3s ease;
+      ">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 13l4 4L19 7"></path>
+          </svg>
+          <div>
+            <strong>Download Complete!</strong>
+            <div style="font-size: 0.9rem; margin-top: 0.25rem;">${filename}</div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    successMsg.className = 'download-success-message';
+    document.body.appendChild(successMsg);
+    
+    setTimeout(() => {
+      if (document.body.contains(successMsg)) {
+        successMsg.remove();
+      }
+    }, 3000);
+  }
+
+  function openModalComments() {
+    const video = allVideos[currentModalIndex];
+    openComments(video.id);
+  }
+
+  // Comments System
+  async function openComments(videoId) {
+    currentCommentsVideo = videoId;
+    const commentsSection = document.getElementById('commentsSection');
+    
+    // Load comments
+    try {
+      const formData = new FormData();
+      formData.append('actionType', 'getComments');
+      formData.append('mediaFileId', videoId);
+      
+      const response = await fetch('/a/carousel-videos', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        let commentsHTML = '';
+        if (result.comments && result.comments.length > 0) {
+          result.comments.forEach(comment => {
+            commentsHTML += `
+              <div class="comment-item">
+                <div class="comment-header">
+                  <span class="comment-author">${comment.userName || 'User'}</span>
+                  <span class="comment-date">${new Date(comment.created_at).toLocaleDateString()}</span>
+                </div>
+                <p class="comment-text">${comment.comment}</p>
+              </div>
+            `;
+          });
+        } else {
+          commentsHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No comments yet. Be the first to comment!</p>';
+        }
+        
+        document.getElementById('commentsList').innerHTML = commentsHTML;
+      }
+    } catch (error) {
+      console.error('Error loading comments:', error);
+      document.getElementById('commentsList').innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">Error loading comments</p>';
+    }
+    
+    commentsSection.style.display = 'flex';
+    setTimeout(() => {
+      commentsSection.classList.add('active');
+    }, 10);
+  }
+
+  function closeComments() {
+    const commentsSection = document.getElementById('commentsSection');
+    commentsSection.classList.remove('active');
+    setTimeout(() => {
+      commentsSection.style.display = 'none';
+    }, 300);
+    currentCommentsVideo = null;
+  }
+
+  async function postComment() {
+    const commentInput = document.getElementById('commentInput');
+    const comment = commentInput.value.trim();
+    
+    if (!comment || !currentCommentsVideo) {
+      alert('Please enter a comment');
+      return;
+    }
+    
+    try {
+      const formData = new FormData();
+      formData.append('actionType', 'comment');
+      formData.append('mediaFileId', currentCommentsVideo);
+      formData.append('comment', comment);
+      
+      const response = await fetch('/a/carousel-videos', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        commentInput.value = '';
+        // Reload comments to show the new one
+        openComments(currentCommentsVideo);
+        
+        // Update comment count in modal
+        const commentCount = document.getElementById('modalCommentCount');
+        let currentCount = parseInt(commentCount.textContent) || 0;
+        commentCount.textContent = currentCount + 1;
+        
+        // Update video data
+        const video = allVideos.find(v => v.id === currentCommentsVideo);
+        if (video) {
+          video.comment_count = (video.comment_count || 0) + 1;
+        }
+      } else {
+        alert('Failed to post comment: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error posting comment:', error);
+      alert('Error posting comment. Please try again.');
+    }
+  }
+
+  // FIXED: Enhanced addToCart function with proper variant ID handling
+  async function addToCart(variantId, productTitle = 'Product') {
+    try {
+      console.log('🛒 Original variantId:', variantId);
+      
+      // Convert any format to numeric ID - IMPORTANT FIX
+      let cleanVariantId = variantId;
+      
+      // Handle different ID formats
+      if (typeof variantId === 'string') {
+        // Handle GraphQL ID format: gid://shopify/ProductVariant/44765432901873
+        if (variantId.startsWith('gid://shopify/ProductVariant/')) {
+          cleanVariantId = variantId.replace('gid://shopify/ProductVariant/', '');
+        }
+        
+        // Extract only numbers (in case there are any non-numeric characters)
+        cleanVariantId = cleanVariantId.replace(/\D/g, '');
+      }
+      
+      console.log('🛒 Cleaned variantId:', cleanVariantId);
+      
+      if (!cleanVariantId || cleanVariantId.length < 5) {
+        showErrorToast('Invalid product variant. Please try again.');
+        return;
+      }
+      
+      // Convert to number to ensure it's numeric
+      const numericVariantId = parseInt(cleanVariantId);
+      
+      if (isNaN(numericVariantId)) {
+        showErrorToast('Invalid product variant ID format.');
+        return;
+      }
+      
+      console.log('🛒 Final numeric variantId:', numericVariantId);
+      
+      // Shopify expects the variant ID as a number in the cart API
+      const response = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          items: [{ 
+            id: numericVariantId, 
+            quantity: 1 
+          }] 
+        })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('❌ Shopify cart error:', error);
+        
+        let errorMessage = 'Cannot add to cart: ';
+        if (error.description) {
+          errorMessage += error.description;
+        } else if (error.message) {
+          errorMessage += error.message;
+        } else {
+          errorMessage += 'Product unavailable or out of stock';
+        }
+        
+        showErrorToast(errorMessage);
+        return;
+      }
+      
+      const result = await response.json();
+      console.log('✅ Added to cart successfully:', result);
+      
+      // Show success and redirect to cart
+      showCartSuccessMessage(productTitle);
+      setTimeout(() => {
+        window.location.href = '/cart';
+      }, 1500);
+      
+    } catch (error) {
+      console.error('❌ Add to cart error:', error);
+      showErrorToast('Network error. Please check your connection and try again.');
+    }
+  }
+
+  // Red Error Toast Function
+  function showErrorToast(message) {
+    // Remove any existing error toasts
+    const existingToasts = document.querySelectorAll('.error-toast');
+    existingToasts.forEach(toast => toast.remove());
+    
+    // Create error toast element
+    const errorToast = document.createElement('div');
+    errorToast.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #dc3545;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 10000;
+        animation: slideInError 0.3s ease;
+        max-width: 300px;
+        border-left: 4px solid #a71e2a;
+      ">
+        <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+          <div>
+            <strong style="display: block; margin-bottom: 0.25rem;">Error</strong>
+            <div style="font-size: 0.9rem;">${message}</div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    errorToast.className = 'error-toast';
+    
+    // Add CSS animation for error toast
+    const style = document.createElement('style');
+    if (!document.querySelector('#error-toast-styles')) {
+      style.id = 'error-toast-styles';
+      style.textContent = `
+        @keyframes slideInError {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        @keyframes shakeError {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
+        }
+        .error-toast:hover {
+          animation: shakeError 0.5s ease;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(errorToast);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      errorToast.remove();
+    }, 5000);
+    
+    // Also allow manual close on click
+    errorToast.addEventListener('click', () => {
+      errorToast.remove();
+    });
+  }
+
+  // Also update your existing success toast to ensure it doesn't conflict
+  function showCartSuccessMessage(productTitle) {
+    // Remove any existing toasts first
+    const existingToasts = document.querySelectorAll('.success-toast, .error-toast');
+    existingToasts.forEach(toast => toast.remove());
+    
+    const successMsg = document.createElement('div');
+    successMsg.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+        max-width: 300px;
+        border-left: 4px solid #1e7e34;
+      ">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+          <div>
+            <strong>Added to Cart!</strong>
+            <div style="font-size: 0.9rem; margin-top: 0.25rem;">${productTitle}</div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    successMsg.className = 'success-toast';
+    document.body.appendChild(successMsg);
+    
+    setTimeout(() => {
+      successMsg.remove();
+    }, 3000);
+  }
+
+  // Utility Functions
+  function updateNavigation() {
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+    
+    const totalPages = Math.ceil(allVideos.length / VIDEOS_PER_PAGE);
+    
+    prevBtn.disabled = currentPage === 0;
+    nextBtn.disabled = currentPage >= totalPages - 1;
+  }
+
+  function showNextVideos() {
+    const totalPages = Math.ceil(allVideos.length / VIDEOS_PER_PAGE);
+    if (currentPage < totalPages - 1) {
+      currentPage++;
+      renderCurrentVideos();
+      updateNavigation();
+    }
+  }
+
+  function showPreviousVideos() {
+    if (currentPage > 0) {
+      currentPage--;
+      renderCurrentVideos();
+      updateNavigation();
+    }
+  }
+
+  // Enhanced Share Modal Functions
+  function openShareModal(videoId) {
+    currentShareVideo = videoId;
+    const modal = document.getElementById('shareModal');
+    const shareUrlInput = document.getElementById('shareUrlInput');
+    const video = allVideos.find(v => v.id === videoId);
+    
+    if (video) {
+      shareUrlInput.value = `${window.location.origin}/videos/${video.id}`;
+    } else {
+      shareUrlInput.value = "https://devstore-dd.myshopify.com/devstore-dd.myshopif...";
+    }
+    
+    modal.style.display = 'flex';
+    setTimeout(() => {
+      modal.classList.add('active');
+    }, 10);
+  }
+
+  function closeShareModal() {
+    const modal = document.getElementById('shareModal');
+    modal.classList.remove('active');
+    setTimeout(() => {
+      modal.style.display = 'none';
+    }, 300);
+    currentShareVideo = null;
+  }
+
+  function copyShareUrl() {
+    const shareUrlInput = document.getElementById('shareUrlInput');
+    shareUrlInput.select();
+    document.execCommand('copy');
+    alert('URL copied to clipboard!');
+  }
+
+  // Share functions for each platform
+  function shareToNearby() {
+    alert('Sharing via Nearby Sharing');
+  }
+
+  function shareToWhatsApp() {
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this video: ${document.getElementById('shareUrlInput').value}`)}`;
+    window.open(url, '_blank');
+  }
+
+  function shareToPhoneLink() {
+    alert('Sharing via Phone Link');
+  }
+
+  function shareToGmail() {
+    const url = `https://mail.google.com/mail/?view=cm&fs=1&su=Check out this video&body=${encodeURIComponent(`Check out this video: ${document.getElementById('shareUrlInput').value}`)}`;
+    window.open(url, '_blank');
+  }
+
+  function shareToFacebook() {
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(document.getElementById('shareUrlInput').value)}`;
+    window.open(url, '_blank');
+  }
+
+  function shareToCopilot() {
+    alert('Sharing via Copilot');
+  }
+
+  function shareToTwitter() {
+    const url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(document.getElementById('shareUrlInput').value)}&text=Check out this video!`;
+    window.open(url, '_blank');
+  }
+
+  function shareToOutlook() {
+    const url = `https://outlook.live.com/owa/?path=/mail/action/compose&to=&subject=Check out this video&body=${encodeURIComponent(`Check out this video: ${document.getElementById('shareUrlInput').value}`)}`;
+    window.open(url, '_blank');
+  }
+
+  function shareToLinkedIn() {
+    const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(document.getElementById('shareUrlInput').value)}`;
+    window.open(url, '_blank');
+  }
+
+  function shareToTelegramDesktop() {
+    const url = `https://t.me/share/url?url=${encodeURIComponent(document.getElementById('shareUrlInput').value)}&text=Check out this video!`;
+    window.open(url, '_blank');
+  }
+
+  function shareToMessenger() {
+    alert('Sharing via Messenger');
+  }
+
+  function shareToDiscord() {
+    alert('Sharing via Discord');
+  }
+
+  function shareToOneNote() {
+    alert('Sharing via OneNote');
+  }
+
+  function shareToTeams() {
+    alert('Sharing via Microsoft Teams');
+  }
+
+  function shareToTelegramInstall() {
+    const url = `https://t.me/share/url?url=${encodeURIComponent(document.getElementById('shareUrlInput').value)}&text=Check out this video!`;
+    window.open(url, '_blank');
+  }
+
+  function shareToQuickShare() {
+    alert('Sharing via Quick Share');
+  }
+
+  // Close share modal when clicking outside
+  document.getElementById('shareModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeShareModal();
+    }
+  });
+
+  // Event Listeners for keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    const modal = document.getElementById('modalCarousel');
+    if (modal.style.display === 'flex') {
+      if (e.key === 'ArrowLeft') {
+        showPrevModalVideo();
+      } else if (e.key === 'ArrowRight') {
+        showNextModalVideo();
+      } else if (e.key === 'Escape') {
+        closeModalCarousel();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        const videoPlayer = document.getElementById('modalVideoPlayer');
+        toggleModalVideoPlayPause(videoPlayer);
+      }
+    } else {
+      if (e.key === 'ArrowLeft') {
+        showPreviousVideos();
+      } else if (e.key === 'ArrowRight') {
+        showNextVideos();
+      }
+    }
+  });
+
+  // Initialize when page loads
+  document.addEventListener('DOMContentLoaded', loadVideos);
+
+  // Saved Videos Modal
+  function openSavedVideos() {
+    const modal = document.getElementById('savedVideosModal');
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+
+    loadSavedVideos();
+  }
+
+  function closeSavedVideos() {
+    const modal = document.getElementById('savedVideosModal');
+    modal.classList.remove('active');
+    setTimeout(() => {
+      modal.style.display = 'none';
+    }, 300);
+  }
+
+  async function loadSavedVideos() {
+    const savedVideosList = document.getElementById('savedVideosList');
+    try {
+      const formData = new FormData();
+      formData.append('actionType', 'getSavedVideos');
+      
+      const response = await fetch('/a/carousel-videos', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        let videosHTML = '';
+        if (result.savedVideos && result.savedVideos.length > 0) {
+          result.savedVideos.forEach(video => {
+            videosHTML += `
+              <div class="saved-video-item" onclick="openModalCarouselFromSaved(${video.id})">
+                <img src="${video.thumbnail_url || 'https://via.placeholder.com/80x120'}" class="saved-video-thumbnail" alt="${video.title}">
+                <div class="saved-video-info">
+                  <h4 class="saved-video-title">${video.title || 'Untitled Video'}</h4>
+                </div>
+              </div>
+            `;
+          });
+        } else {
+          videosHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No saved videos</p>';
+        }
+        savedVideosList.innerHTML = videosHTML;
+      }
+    } catch (error) {
+      console.error('Error loading saved videos:', error);
+      savedVideosList.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">Error loading saved videos</p>';
+    }
+  }
+
+  function openModalCarouselFromSaved(videoId) {
+    const index = allVideos.findIndex(v => v.id === videoId);
+    if (index !== -1) {
+      openModalCarousel(index);
+      closeSavedVideos();
+    }
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Video Carousel Grid",
+  "target": "section",
+  "settings": [],
+  "enabled_on": {
+    "templates": ["*"],
+    "groups": ["*"]
+  }
+}
+{% endschema %}
