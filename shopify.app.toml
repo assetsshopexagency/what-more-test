@@ -23,5 +23,9 @@ api_version = "2026-01"
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "read_products,write_products"
 
+subpath = "videos"
+prefix = "apps"
+
+
 [auth]
 redirect_urls = [ "https://example.com/api/auth" ]
