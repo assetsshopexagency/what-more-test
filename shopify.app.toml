@@ -1,28 +1,20 @@
-# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
-
+# shopify.app.toml
+name = "React Router"
 client_id = "702ade2bec98d9b1fe514e134598255d"
-name = "EE-Watch"
-application_url = "https://example.com"
+application_url = "https://arctic-forecast-every-eva.trycloudflare.com"
 embedded = false
 
-[build]
-automatically_update_urls_on_dev = true
-include_config_on_deploy = true
+[auth]
+redirect_urls = ["https://arctic-forecast-every-eva.trycloudflare.com/auth/callback"]
 
 [webhooks]
-api_version = "2026-01"
+api_version = "2024-01"
 
-  [[webhooks.subscriptions]]
-  topics = [ "app/uninstalled" ]
-  uri = "/webhooks/app/uninstalled"
+[app_proxy]
+url = "https://arctic-forecast-every-eva.trycloudflare.com"
+subpath = "videos"
+prefix = "apps"
 
-  [[webhooks.subscriptions]]
-  topics = [ "app/scopes_update" ]
-  uri = "/webhooks/app/scopes_update"
-
-[access_scopes]
-# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_products,write_products,read_content,write_content,read_themes,write_themes"
-
-[auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = true
