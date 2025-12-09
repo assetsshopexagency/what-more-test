@@ -1,257 +1,241 @@
 <!-- blocks/shopify-video-carousel.liquid -->
-{{ '//unpkg.com/@shopify/theme-video@1.0.0/index.js' | script_tag }}
-
-<div class="shopify-video-carousel" data-shop="{{ shop.permanent_domain }}">
-  <h2 class="carousel-title">{{ block.settings.title | default: 'Featured Videos' }}</h2>
-  
-  <!-- Loading -->
-  <div class="loading-state" id="loadingState">
-    <div class="spinner">
-      <svg width="50" height="50" viewBox="0 0 50 50">
-        <circle cx="25" cy="25" r="20" fill="none" stroke="#3b82f6" stroke-width="4" stroke-dasharray="31.4 31.4">
-          <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/>
-        </circle>
-      </svg>
-    </div>
-    <p>Loading videos...</p>
-  </div>
-  
-  <!-- Videos Grid -->
-  <div class="videos-grid-container" id="videosContainer" style="display: none;">
-    <div class="shopify-videos-grid" id="videosGrid">
-      <!-- Videos will be inserted here -->
-    </div>
-  </div>
-  
-  <!-- Empty -->
-  <div class="empty-state" id="emptyState" style="display: none;">
-    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5">
-      <rect x="2" y="2" width="20" height="20" rx="2.5"/>
-      <path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"/>
-    </svg>
-    <p>No videos available</p>
-    <p class="subtitle">Upload videos from your app dashboard</p>
-  </div>
-  
-  <!-- Error -->
-  <div class="error-state" id="errorState" style="display: none;">
-    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5">
-      <circle cx="12" cy="12" r="10"/>
-      <line x1="12" y1="8" x2="12" y2="12"/>
-      <line x1="12" y1="16" x2="12.01" y2="16"/>
-    </svg>
-    <p>Failed to load videos</p>
-    <p class="error-message"></p>
-    <button class="retry-btn">Try Again</button>
-  </div>
-</div>
-
 <script>
-class ShopifyVideoCarousel {
-  constructor() {
-    this.shop = document.querySelector('.shopify-video-carousel').dataset.shop;
-    this.API_URL = `https://dir-abraham-characterization-jose.trycloudflare.com/api/public/videos?shop=${encodeURIComponent(this.shop)}`;
-    this.videos = [];
-    
-    this.init();
-  }
-  
-  async init() {
-    console.log('🚀 Initializing Shopify Video Carousel');
-    await this.loadVideos();
-  }
-  
-  async loadVideos() {
-    this.showLoading();
-    
-    try {
-      console.log('📡 Fetching from:', this.API_URL);
-      const response = await fetch(this.API_URL);
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+  class ShopifyVideoCarousel {
+    constructor() {
+      // Get the shop domain from the element's data attribute
+      const container = document.querySelector('.shopify-video-carousel');
+      if (!container) return;
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+      this.shop = container.dataset.shop || '{{ shop.permanent_domain }}';
+      
+      // Build the API URL
+      this.API_URL = `/api/videos?shop=${encodeURIComponent(this.shop)}`;
+      
+     this.API_URL = 'https://associates-legislature-sub-back.trycloudflare.com/api/videos?shop=' + encodeURIComponent(this.shop);
+      
+      console.log('🚀 Initializing Shopify Video Carousel for shop:', this.shop);
+      console.log('📡 API URL:', this.API_URL);
+      
+      this.videos = [];
+      this.init();
+    }
+    
+    async init() {
+      await this.loadVideos();
+      this.setupEventListeners();
+    }
+    
+    async loadVideos() {
+      this.showLoading();
+      
+      try {
+        console.log('📡 Fetching videos from:', this.API_URL);
+        const response = await fetch(this.API_URL);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('✅ API Response:', data);
+        
+        if (data.success && data.videos && data.videos.length > 0) {
+          this.videos = data.videos;
+          this.renderVideos();
+          this.showVideos();
+        } else {
+          console.log('No videos found or empty response');
+          this.showEmptyState();
+        }
+        
+      } catch (error) {
+        console.error('❌ Error loading videos:', error);
+        this.showError(error.message || 'Failed to load videos');
       }
+    }
+    
+    renderVideos() {
+      const videosGrid = document.getElementById('videosGrid');
+      if (!videosGrid) return;
       
-      const data = await response.json();
-      console.log('✅ API Response:', data);
+      videosGrid.innerHTML = '';
       
-      if (data.success && data.videos && data.videos.length > 0) {
-        this.videos = data.videos;
-        this.renderVideos();
-        this.showVideos();
-      } else {
+      // Show only first 4 videos for performance
+      const videosToShow = this.videos.slice(0, 4);
+      
+      if (videosToShow.length === 0) {
         this.showEmptyState();
+        return;
       }
       
-    } catch (error) {
-      console.error('❌ Error:', error);
-      this.showError(error.message);
-    }
-  }
-  
-  renderVideos() {
-    const videosGrid = document.getElementById('videosGrid');
-    if (!videosGrid) return;
-    
-    videosGrid.innerHTML = '';
-    
-    // Show only first 4 videos for performance
-    const videosToShow = this.videos.slice(0, 4);
-    
-    videosToShow.forEach((video, index) => {
-      const videoCard = document.createElement('div');
-      videoCard.className = 'shopify-video-card';
-      
-      // Get the best MP4 source
-      const mp4Source = video.sources?.find(s => s.format === 'mp4');
-      const videoUrl = mp4Source?.url || '';
-      
-      // Get thumbnail
-      const thumbnailUrl = video.thumbnail_url || video.previewImage?.url || 
-                          'https://placehold.co/400x300/1e40af/ffffff?text=Video';
-      
-      videoCard.innerHTML = `
-        <div class="video-card-inner">
-          <!-- Shopify Video Element -->
-          <div class="video-wrapper">
-            ${videoUrl ? `
-              <shopify-video 
-                data-video-sources='${JSON.stringify(video.sources || [])}'
-                data-preview-image='${JSON.stringify(video.previewImage || {})}'
-                data-autoplay="${index === 0 ? 'true' : 'false'}"
-                data-loop="true"
-                data-muted="true"
-                data-controls="true"
-                data-playsinline="true"
-                data-loading="lazy"
-              >
-                <!-- Fallback for older browsers -->
-                <video
-                  src="${videoUrl}"
-                  poster="${thumbnailUrl}"
-                  loop
-                  muted
-                  playsinline
-                  controls
-                  preload="metadata"
-                  loading="lazy"
-                  style="width: 100%; height: 100%; object-fit: cover;"
-                >
-                  ${video.sources?.map(source => `
-                    <source src="${source.url}" type="${source.mimeType}">
-                  `).join('') || ''}
-                  Your browser does not support the video tag.
-                </video>
-              </shopify-video>
-            ` : `
-              <div class="no-video">
-                <img 
-                  src="${thumbnailUrl}" 
-                  alt="${video.title}"
-                  loading="lazy"
-                  style="width: 100%; height: 100%; object-fit: cover;"
-                />
-              </div>
-            `}
+      videosToShow.forEach((video, index) => {
+        const videoCard = document.createElement('div');
+        videoCard.className = 'shopify-video-card';
+        videoCard.dataset.videoId = video.id;
+        
+        // Use direct video URL
+        const videoUrl = video.video_url || video.shopify_file_url || '';
+        const thumbnailUrl = video.thumbnail_url || 'https://placehold.co/400x300/1e40af/ffffff?text=Video';
+        
+        videoCard.innerHTML = `
+          <div class="video-card-inner">
+            <!-- Video Player -->
+            <div class="video-wrapper">
+              ${videoUrl ? `
+                <div class="video-player">
+                  <video
+                    id="video-${video.id}"
+                    src="${videoUrl}"
+                    poster="${thumbnailUrl}"
+                    controls
+                    playsinline
+                    preload="metadata"
+                    loading="lazy"
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                  
+                  <!-- Play button overlay -->
+                  <div class="video-overlay">
+                    <button class="shopify-play-btn" aria-label="Play video" data-video-id="${video.id}">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              ` : `
+                <div class="no-video">
+                  <img 
+                    src="${thumbnailUrl}" 
+                    alt="${video.title}"
+                    loading="lazy"
+                  />
+                </div>
+              `}
+            </div>
             
-            <!-- Play button overlay -->
-            ${videoUrl ? `
-              <div class="video-overlay">
-                <button class="shopify-play-btn" aria-label="Play video">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                </button>
-              </div>
-            ` : ''}
+            <!-- Video Info -->
+            <div class="video-info">
+              <h3 class="video-title">${this.escapeHtml(video.title)}</h3>
+              ${video.description ? `<p class="video-description">${this.escapeHtml(video.description)}</p>` : ''}
+              ${video.duration && video.duration !== '0:00' ? `
+                <div class="video-meta">
+                  <span class="duration">${video.duration}</span>
+                </div>
+              ` : ''}
+            </div>
           </div>
-          
-          <!-- Video Info -->
-          <div class="video-info">
-            <h3 class="video-title">${video.title}</h3>
-            ${video.description ? `<p class="video-description">${video.description}</p>` : ''}
-            ${video.duration && video.duration !== '0:00' ? `
-              <div class="video-meta">
-                <span class="duration">${video.duration}</span>
-              </div>
-            ` : ''}
-          </div>
-        </div>
-      `;
+        `;
+        
+        videosGrid.appendChild(videoCard);
+        
+        // Initialize video controls if video exists
+        if (videoUrl) {
+          this.initializeVideoControls(videoCard, video.id);
+        }
+      });
       
-      videosGrid.appendChild(videoCard);
+      console.log(`✅ Rendered ${videosToShow.length} videos`);
+    }
+    
+    initializeVideoControls(videoCard, videoId) {
+      const videoElement = videoCard.querySelector(`#video-${videoId}`);
+      const playButton = videoCard.querySelector(`.shopify-play-btn[data-video-id="${videoId}"]`);
+      const overlay = videoCard.querySelector('.video-overlay');
       
-      // Initialize Shopify video component
-      if (videoUrl && window.Shopify && window.Shopify.Video) {
-        setTimeout(() => {
-          const shopifyVideo = videoCard.querySelector('shopify-video');
-          if (shopifyVideo) {
-            try {
-              // Initialize Shopify video component
-              new window.Shopify.Video(shopifyVideo);
-            } catch (error) {
-              console.log('Shopify Video component error:', error);
-            }
+      if (!videoElement || !playButton || !overlay) return;
+      
+      // Play button click handler
+      playButton.addEventListener('click', () => {
+        if (videoElement.paused) {
+          videoElement.play().catch(e => console.error('Play failed:', e));
+        }
+      });
+      
+      // Video play/pause events
+      videoElement.addEventListener('play', () => {
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
+      });
+      
+      videoElement.addEventListener('pause', () => {
+        overlay.style.opacity = '1';
+        overlay.style.pointerEvents = 'auto';
+      });
+      
+      // Hide overlay when controls are shown
+      videoElement.addEventListener('mouseenter', () => {
+        if (!videoElement.paused) {
+          overlay.style.opacity = '0';
+        }
+      });
+      
+      // Pause other videos when one plays
+      videoElement.addEventListener('play', () => {
+        document.querySelectorAll('video').forEach(vid => {
+          if (vid !== videoElement && !vid.paused) {
+            vid.pause();
           }
-        }, 100);
+        });
+      });
+    }
+    
+    escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    showLoading() {
+      this.hideAllStates();
+      const loadingState = document.getElementById('loadingState');
+      if (loadingState) loadingState.style.display = 'flex';
+    }
+    
+    showVideos() {
+      this.hideAllStates();
+      const videosContainer = document.getElementById('videosContainer');
+      if (videosContainer) videosContainer.style.display = 'block';
+    }
+    
+    showEmptyState() {
+      this.hideAllStates();
+      const emptyState = document.getElementById('emptyState');
+      if (emptyState) emptyState.style.display = 'flex';
+    }
+    
+    showError(message) {
+      this.hideAllStates();
+      const errorState = document.getElementById('errorState');
+      if (errorState) {
+        errorState.style.display = 'flex';
+        const errorMsg = errorState.querySelector('.error-message');
+        if (errorMsg) errorMsg.textContent = message;
       }
-    });
+    }
     
-    console.log(`✅ Rendered ${videosToShow.length} videos`);
-  }
-  
-  showLoading() {
-    document.getElementById('loadingState').style.display = 'flex';
-    document.getElementById('videosContainer').style.display = 'none';
-    document.getElementById('emptyState').style.display = 'none';
-    document.getElementById('errorState').style.display = 'none';
-  }
-  
-  showVideos() {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('videosContainer').style.display = 'block';
-    document.getElementById('emptyState').style.display = 'none';
-    document.getElementById('errorState').style.display = 'none';
-  }
-  
-  showEmptyState() {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('videosContainer').style.display = 'none';
-    document.getElementById('emptyState').style.display = 'flex';
-    document.getElementById('errorState').style.display = 'none';
-  }
-  
-  showError(message) {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('videosContainer').style.display = 'none';
-    document.getElementById('emptyState').style.display = 'none';
-    document.getElementById('errorState').style.display = 'flex';
+    hideAllStates() {
+      const states = ['loadingState', 'videosContainer', 'emptyState', 'errorState'];
+      states.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.style.display = 'none';
+      });
+    }
     
-    const errorMessage = document.querySelector('.error-message');
-    if (errorMessage) errorMessage.textContent = message;
-    
-    // Setup retry button
-    const retryBtn = document.querySelector('.retry-btn');
-    if (retryBtn) {
-      retryBtn.onclick = () => this.loadVideos();
+    setupEventListeners() {
+      // Retry button
+      const retryBtn = document.querySelector('.retry-btn');
+      if (retryBtn) {
+        retryBtn.addEventListener('click', () => this.loadVideos());
+      }
     }
   }
-}
-
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  // Load Shopify Video component if available
-  if (typeof Shopify === 'undefined') {
-    // Load Shopify theme scripts
-    const script = document.createElement('script');
-    script.src = '//cdn.shopify.com/shopifycloud/shopify-common.js';
-    script.onload = () => {
-      new ShopifyVideoCarousel();
-    };
-    document.head.appendChild(script);
-  } else {
-    new ShopifyVideoCarousel();
-  }
+  
+  // Initialize the carousel
+  new ShopifyVideoCarousel();
 });
 </script>
 
@@ -291,6 +275,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 .spinner circle {
   stroke-linecap: round;
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .loading-state p {
@@ -417,7 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
   height: 100%;
 }
 
-/* Video Wrapper */
+/* Video Player */
 .video-wrapper {
   position: relative;
   width: 100%;
@@ -426,16 +416,17 @@ document.addEventListener('DOMContentLoaded', () => {
   background: #000;
 }
 
-shopify-video {
+.video-player {
   width: 100%;
   height: 100%;
-  display: block;
+  position: relative;
 }
 
-shopify-video video {
+.video-player video {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .no-video {
@@ -448,6 +439,9 @@ shopify-video video {
 }
 
 .no-video img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   opacity: 0.5;
 }
 
@@ -461,17 +455,18 @@ shopify-video video {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.2);
-  opacity: 0;
-  transition: opacity 0.3s;
+  background: rgba(0, 0, 0, 0.3);
+  transition: opacity 0.3s, background 0.3s;
+  opacity: 1;
+  cursor: pointer;
 }
 
-.shopify-video-card:hover .video-overlay {
-  opacity: 1;
+.video-overlay:hover {
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .shopify-play-btn {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(59, 130, 246, 0.9);
   border: none;
   border-radius: 50%;
   width: 56px;
@@ -485,12 +480,13 @@ shopify-video video {
 }
 
 .shopify-play-btn:hover {
-  background: rgba(59, 130, 246, 0.9);
+  background: rgba(37, 99, 235, 0.9);
   transform: scale(1.1);
 }
 
 .shopify-play-btn svg {
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  margin-left: 4px; /* Center the play icon */
 }
 
 /* Video Info */
@@ -513,6 +509,10 @@ shopify-video video {
   color: #ccc;
   margin: 0 0 1rem 0;
   line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .video-meta {
@@ -554,21 +554,52 @@ shopify-video video {
     padding: 1.25rem;
   }
 }
-
-/* Performance optimizations */
-shopify-video {
-  contain: content;
-}
-
-.video-wrapper {
-  content-visibility: auto;
-  contain-intrinsic-size: 250px;
-}
-
-.shopify-video-card {
-  will-change: transform;
-}
 </style>
+
+<div class="shopify-video-carousel" data-shop="{{ shop.permanent_domain }}">
+  <h2 class="carousel-title">{{ block.settings.title | default: 'Featured Videos' }}</h2>
+  
+  <!-- Loading State -->
+  <div class="loading-state" id="loadingState">
+    <div class="spinner">
+      <svg width="50" height="50" viewBox="0 0 50 50">
+        <circle cx="25" cy="25" r="20" fill="none" stroke="#3b82f6" stroke-width="4" stroke-dasharray="31.4 31.4">
+          <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+    <p>Loading videos...</p>
+  </div>
+  
+  <!-- Videos Grid -->
+  <div class="videos-grid-container" id="videosContainer" style="display: none;">
+    <div class="shopify-videos-grid" id="videosGrid">
+      <!-- Videos will be inserted here by JavaScript -->
+    </div>
+  </div>
+  
+  <!-- Empty State -->
+  <div class="empty-state" id="emptyState" style="display: none;">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5">
+      <rect x="2" y="2" width="20" height="20" rx="2.5"/>
+      <path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"/>
+    </svg>
+    <p>No videos available</p>
+    <p class="subtitle">Upload videos from your app dashboard</p>
+  </div>
+  
+  <!-- Error State -->
+  <div class="error-state" id="errorState" style="display: none;">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <p>Failed to load videos</p>
+    <p class="error-message"></p>
+    <button class="retry-btn">Try Again</button>
+  </div>
+</div>
 
 {% schema %}
 {

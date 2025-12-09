@@ -273,33 +273,193 @@
 // }
 
 // app/routes/api.public.videos.jsx
+// import { json } from "@remix-run/node";
+// import prisma from "../db.server";
+
+// // Storefront Access Token from your app
+// const STOREFRONT_TOKEN = process.env.STOREFRONT_ACCESS_TOKEN;
+
+// export async function loader({ request }) {
+//   try {
+//     const url = new URL(request.url);
+//     const shop = url.searchParams.get("shop");
+
+//     console.log("🎬 Public API for shop:", shop);
+
+//     if (!shop) {
+//       return json({ success: false, error: "Shop required" }, { status: 400 });
+//     }
+
+//     const shopDomain = shop.toLowerCase().trim();
+
+//     // Get videos from your database
+//     const videos = await prisma.mediaFile.findMany({
+//       where: { session: { shop: shopDomain } },
+//       select: {
+//         id: true,
+//         title: true,
+//         description: true,
+//         shopify_gid: true, // This is crucial!
+//         thumbnail_url: true,
+//         duration: true,
+//         created_at: true,
+//       },
+//       orderBy: { created_at: "desc" },
+//       take: 20,
+//     });
+
+//     // Get video data from Shopify Storefront API
+//     const shopifyVideos = await Promise.all(
+//       videos.map(async (video) => {
+//         if (!video.shopify_gid) {
+//           return {
+//             ...video,
+//             sources: [],
+//             previewImage: null,
+//           };
+//         }
+
+//         try {
+//           // Query Shopify Storefront API for video data
+//           const response = await fetch(
+//             `https://${shopDomain}/api/2024-01/graphql.json`,
+//             {
+//               method: "POST",
+//               headers: {
+//                 "Content-Type": "application/json",
+//                 "X-Shopify-Storefront-Access-Token": STOREFRONT_TOKEN,
+//               },
+//               body: JSON.stringify({
+//                 query: `
+//                   query GetVideo($id: ID!) {
+//                     node(id: $id) {
+//                       ... on Video {
+//                         sources {
+//                           url
+//                           mimeType
+//                           format
+//                           height
+//                           width
+//                         }
+//                         previewImage {
+//                           url(transform: { maxWidth: 800, maxHeight: 800 })
+//                         }
+//                         alt
+//                       }
+//                     }
+//                   }
+//                 `,
+//                 variables: { id: video.shopify_gid },
+//               }),
+//             },
+//           );
+
+//           const data = await response.json();
+
+//           if (data.errors) {
+//             console.error("GraphQL errors:", data.errors);
+//             return {
+//               ...video,
+//               sources: [],
+//               previewImage: null,
+//             };
+//           }
+
+//           const videoNode = data.data?.node;
+
+//           return {
+//             id: video.id,
+//             title: video.title || videoNode?.alt || "Video",
+//             description: video.description || "",
+//             shopify_gid: video.shopify_gid,
+//             sources: videoNode?.sources || [],
+//             previewImage: videoNode?.previewImage || null,
+//             thumbnail_url:
+//               video.thumbnail_url ||
+//               videoNode?.previewImage?.url ||
+//               "https://placehold.co/400x300/1e40af/ffffff?text=Video",
+//             duration: video.duration || "0:00",
+//             created_at: video.created_at.toISOString(),
+//           };
+//         } catch (error) {
+//           console.error("Error fetching from Storefront API:", error);
+//           return {
+//             ...video,
+//             sources: [],
+//             previewImage: null,
+//           };
+//         }
+//       }),
+//     );
+
+//     return json(
+//       {
+//         success: true,
+//         videos: shopifyVideos,
+//         total: shopifyVideos.length,
+//         shop: shopDomain,
+//       },
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//           "Access-Control-Allow-Origin": "*",
+//           "Cache-Control": "public, max-age=60",
+//         },
+//       },
+//     );
+//   } catch (error) {
+//     console.error("❌ API Error:", error);
+//     return json(
+//       { success: false, error: "Failed to load videos" },
+//       { status: 500 },
+//     );
+//   }
+// }
+
+// app/routes/api.videos.jsx
 import { json } from "@remix-run/node";
 import prisma from "../db.server";
-
-// Storefront Access Token from your app
-const STOREFRONT_TOKEN = process.env.STOREFRONT_ACCESS_TOKEN;
 
 export async function loader({ request }) {
   try {
     const url = new URL(request.url);
+
+    // Get shop from query parameter
     const shop = url.searchParams.get("shop");
 
-    console.log("🎬 Public API for shop:", shop);
+    console.log("🎬 Video API called for shop:", shop);
 
     if (!shop) {
-      return json({ success: false, error: "Shop required" }, { status: 400 });
+      return json(
+        {
+          success: false,
+          error: "Shop parameter required",
+          example: "/api/videos?shop=your-store.myshopify.com",
+        },
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+        },
+      );
     }
 
     const shopDomain = shop.toLowerCase().trim();
 
-    // Get videos from your database
+    // Fetch videos from database
     const videos = await prisma.mediaFile.findMany({
-      where: { session: { shop: shopDomain } },
+      where: {
+        session: {
+          shop: shopDomain,
+        },
+      },
       select: {
         id: true,
         title: true,
         description: true,
-        shopify_gid: true, // This is crucial!
+        shopify_file_url: true,
         thumbnail_url: true,
         duration: true,
         created_at: true,
@@ -308,110 +468,81 @@ export async function loader({ request }) {
       take: 20,
     });
 
-    // Get video data from Shopify Storefront API
-    const shopifyVideos = await Promise.all(
-      videos.map(async (video) => {
-        if (!video.shopify_gid) {
-          return {
-            ...video,
-            sources: [],
-            previewImage: null,
-          };
-        }
+    console.log(`✅ Found ${videos.length} videos for ${shopDomain}`);
 
-        try {
-          // Query Shopify Storefront API for video data
-          const response = await fetch(
-            `https://${shopDomain}/api/2024-01/graphql.json`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "X-Shopify-Storefront-Access-Token": STOREFRONT_TOKEN,
-              },
-              body: JSON.stringify({
-                query: `
-                  query GetVideo($id: ID!) {
-                    node(id: $id) {
-                      ... on Video {
-                        sources {
-                          url
-                          mimeType
-                          format
-                          height
-                          width
-                        }
-                        previewImage {
-                          url(transform: { maxWidth: 800, maxHeight: 800 })
-                        }
-                        alt
-                      }
-                    }
-                  }
-                `,
-                variables: { id: video.shopify_gid },
-              }),
-            },
-          );
+    // Format videos for frontend
+    const formattedVideos = videos.map((video) => {
+      // Format duration from seconds to MM:SS
+      let durationFormatted = "0:00";
+      if (video.duration && video.duration > 0) {
+        const minutes = Math.floor(video.duration / 60);
+        const seconds = video.duration % 60;
+        durationFormatted = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+      }
 
-          const data = await response.json();
+      // Ensure thumbnail URL exists
+      let thumbnailUrl = video.thumbnail_url;
+      if (!thumbnailUrl) {
+        thumbnailUrl = "https://placehold.co/400x300/1e40af/ffffff?text=Video";
+      }
 
-          if (data.errors) {
-            console.error("GraphQL errors:", data.errors);
-            return {
-              ...video,
-              sources: [],
-              previewImage: null,
-            };
-          }
-
-          const videoNode = data.data?.node;
-
-          return {
-            id: video.id,
-            title: video.title || videoNode?.alt || "Video",
-            description: video.description || "",
-            shopify_gid: video.shopify_gid,
-            sources: videoNode?.sources || [],
-            previewImage: videoNode?.previewImage || null,
-            thumbnail_url:
-              video.thumbnail_url ||
-              videoNode?.previewImage?.url ||
-              "https://placehold.co/400x300/1e40af/ffffff?text=Video",
-            duration: video.duration || "0:00",
-            created_at: video.created_at.toISOString(),
-          };
-        } catch (error) {
-          console.error("Error fetching from Storefront API:", error);
-          return {
-            ...video,
-            sources: [],
-            previewImage: null,
-          };
-        }
-      }),
-    );
+      return {
+        id: video.id,
+        title: video.title || "Untitled Video",
+        description: video.description || "",
+        video_url: video.shopify_file_url || "",
+        thumbnail_url: thumbnailUrl,
+        duration: durationFormatted,
+        created_at: video.created_at.toISOString(),
+      };
+    });
 
     return json(
       {
         success: true,
-        videos: shopifyVideos,
-        total: shopifyVideos.length,
+        videos: formattedVideos,
+        total: formattedVideos.length,
         shop: shopDomain,
+        timestamp: new Date().toISOString(),
       },
       {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
-          "Cache-Control": "public, max-age=60",
+          "Cache-Control": "public, max-age=300",
         },
       },
     );
   } catch (error) {
     console.error("❌ API Error:", error);
     return json(
-      { success: false, error: "Failed to load videos" },
-      { status: 500 },
+      {
+        success: false,
+        error: "Failed to load videos",
+      },
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      },
     );
   }
+}
+
+// Handle CORS preflight
+export async function action({ request }) {
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
+    });
+  }
+
+  return json({ error: "Method not allowed" }, { status: 405 });
 }
