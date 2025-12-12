@@ -1,595 +1,3246 @@
-<!-- blocks/shopify-video-carousel.liquid -->
-{{ '//unpkg.com/@shopify/theme-video@1.0.0/index.js' | script_tag }}
+<!-- video-carousel.liquid -->
+<div class="video-carousel" data-shop="{{ shop.permanent_domain }}">
+  <!-- Header -->
+  <div class="carousel-header">
+    <h2 class="section-title">Watch and Shop</h2>
+  </div>
 
-<div class="shopify-video-carousel" data-shop="{{ shop.permanent_domain }}">
-  <h2 class="carousel-title">{{ block.settings.title | default: 'Featured Videos' }}</h2>
-  
-  <!-- Loading -->
-  <div class="loading-state" id="loadingState">
-    <div class="spinner">
-      <svg width="50" height="50" viewBox="0 0 50 50">
-        <circle cx="25" cy="25" r="20" fill="none" stroke="#3b82f6" stroke-width="4" stroke-dasharray="31.4 31.4">
-          <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/>
-        </circle>
-      </svg>
-    </div>
+  <!-- Loading State -->
+  <div class="loading" id="loadingState">
+    <div class="loading-spinner"></div>
     <p>Loading videos...</p>
   </div>
   
-  <!-- Videos Grid -->
-  <div class="videos-grid-container" id="videosContainer" style="display: none;">
-    <div class="shopify-videos-grid" id="videosGrid">
-      <!-- Videos will be inserted here -->
+  <!-- Main Carousel Grid View -->
+  <div class="carousel-container" id="carouselContainer" style="display: none;">
+    <button class="nav-btn prev-btn" onclick="scrollCarousel('left')" aria-label="Previous videos" id="prevBtn">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    
+    <div class="carousel-viewport">
+      <div class="videos-carousel" id="videosCarousel"></div>
     </div>
+    
+    <button class="nav-btn next-btn" onclick="scrollCarousel('right')" aria-label="Next videos" id="nextBtn">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
   </div>
-  
-  <!-- Empty -->
+
+  <!-- Empty State -->
   <div class="empty-state" id="emptyState" style="display: none;">
-    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5">
-      <rect x="2" y="2" width="20" height="20" rx="2.5"/>
-      <path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"/>
-    </svg>
-    <p>No videos available</p>
-    <p class="subtitle">Upload videos from your app dashboard</p>
+    <div class="empty-icon">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+        <polyline points="2,10 12,15 22,10"></polyline>
+      </svg>
+    </div>
+    <h3>No videos available</h3>
+    <p>Upload videos from your app dashboard</p>
   </div>
-  
-  <!-- Error -->
+
+  <!-- Error State -->
   <div class="error-state" id="errorState" style="display: none;">
-    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5">
-      <circle cx="12" cy="12" r="10"/>
-      <line x1="12" y1="8" x2="12" y2="12"/>
-      <line x1="12" y1="16" x2="12.01" y2="16"/>
-    </svg>
-    <p>Failed to load videos</p>
-    <p class="error-message"></p>
-    <button class="retry-btn">Try Again</button>
+    <div class="error-icon">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    </div>
+    <h3>Failed to load videos</h3>
+    <p id="errorMessage">Please try again</p>
+    <button class="retry-btn" onclick="loadVideos()">Try Again</button>
   </div>
 </div>
 
-<script>
-class ShopifyVideoCarousel {
-  constructor() {
-    this.shop = document.querySelector('.shopify-video-carousel').dataset.shop;
-    this.API_URL = `https://dir-abraham-characterization-jose.trycloudflare.com/api/public/videos?shop=${encodeURIComponent(this.shop)}`;
-    this.videos = [];
+<!-- Modal Carousel Viewer -->
+<div class="modal-carousel" id="modalCarousel" style="display: none;">
+  <div class="modal-background" onclick="closeModalCarousel()"></div>
+  
+  <div class="modal-content">
+    <!-- Close Button -->
+    <button class="modal-close-btn" onclick="closeModalCarousel()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
     
-    this.init();
+    <!-- Main Carousel Container -->
+    <div class="modal-carousel-container">
+      <!-- Previous Video Preview -->
+      <div class="video-preview prev-video" id="prevVideoPreview" onclick="showPrevModalVideo()">
+        <div class="preview-overlay"></div>
+        <video class="preview-video" muted playsinline loop></video>
+        <div class="preview-arrow">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <path d="M15 18L9 12L15 6"/>
+          </svg>
+        </div>
+      </div>
+      
+      <!-- Main Video Container -->
+      <div class="modal-video-container">
+        <!-- Main Video Player -->
+        <div class="modal-video-wrapper">
+          <video 
+            class="modal-video-player"
+            id="modalVideoPlayer"
+            muted
+            playsinline
+            autoplay
+            onclick="toggleModalVideoPlayPause(this)"
+          ></video>
+          
+          <!-- Progress Bar -->
+          <div class="video-progress-container">
+            <div class="video-progress-bar" id="videoProgressBar">
+              <div class="video-progress-fill" id="videoProgressFill"></div>
+            </div>
+          </div>
+          
+          <!-- Volume Control -->
+          <div class="modal-volume-control">
+            <button class="volume-btn" onclick="toggleModalMute(this)">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"></polygon>
+                <path d="M19.07,4.93a10,10,0,0,1,0,14.14M15.54,8.46a5,5,0,0,1,0,7.07" class="volume-high"></path>
+                <line x1="23" y1="1" x2="1" y2="23" class="volume-mute" style="display: none;"></line>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Download Control -->
+          <div class="modal-download-control">
+            <button class="download-control-btn" onclick="downloadModalVideo()">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M21,15v4a2,2,0,0,1-2,2H5a2,2,0,0,1-2,2V15"></path>
+                <polyline points="7,10 12,15 17,10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Product Carousel -->
+          <div class="product-carousel" id="modalProductCarousel"></div>
+          
+          <!-- Engagement Buttons -->
+          <div class="modal-engagement-buttons">
+            <button class="engagement-btn like-btn" id="modalLikeBtn" onclick="toggleModalLike()">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M20.84,4.61a5.5,5.5,0,0,0-7.78,0L12,5.67l-1.06-1.06a5.5,5.5,0,0,0-7.78,7.78l1.06,1.06L12,21.23l7.78-7.78,1.06-1.06a5.5,5.5,0,0,0,0-7.78Z"/>
+              </svg>
+              <span class="engagement-count" id="modalLikeCount">0</span>
+            </button>
+            
+            <button class="engagement-btn comment-btn" onclick="openModalComments()">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M21,11.5a8.38,8.38,0,0,1-.9,3.8,8.5,8.5,0,0,1-7.6,4.7,8.38,8.38,0,0,1-3.8-.9L3,21l1.9-5.7a8.38,8.38,0,0,1-.9-3.8,8.5,8.5,0,0,1,4.7-7.6,8.38,8.38,0,0,1,3.8-.9h.5a8.48,8.48,0,0,1,8,8v.5Z"/>
+              </svg>
+              <span class="engagement-count" id="modalCommentCount">0</span>
+            </button>
+            
+            <button class="engagement-btn save-btn" id="modalSaveBtn" onclick="toggleModalSave()">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <span class="engagement-count" id="modalSaveCount">0</span>
+            </button>
+            
+            <button class="engagement-btn share-btn" onclick="shareModalVideo()">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+              <span class="engagement-count" id="modalShareCount">0</span>
+            </button>
+          </div>
+          
+          <!-- Video Info Overlay -->
+          <div class="modal-video-info-overlay">
+            <p id="modalVideoDescription"></p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Next Video Preview -->
+      <div class="video-preview next-video" id="nextVideoPreview" onclick="showNextModalVideo()">
+        <div class="preview-overlay"></div>
+        <video class="preview-video" muted playsinline loop></video>
+        <div class="preview-arrow">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <path d="M9 18L15 12L9 6"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Comments Section -->
+<div class="comments-section" id="commentsSection" style="display: none;">
+  <div class="comments-header">
+    <h3>Comments</h3>
+    <button class="close-comments" onclick="closeComments()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+  <div class="comments-list" id="commentsList">
+    <!-- Comments will be loaded here -->
+  </div>
+  <div class="add-comment">
+    <input type="text" id="commentInput" placeholder="Add a comment..." class="comment-input">
+    <button onclick="postComment()" class="post-comment-btn">Post</button>
+  </div>
+</div>
+
+<!-- Share Modal -->
+<div class="share-modal" id="shareModal" style="display: none;">
+  <div class="modal-background" onclick="closeShareModal()"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">Share this video</div>
+      <button class="close-button" onclick="closeShareModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="share-url-container">
+        <input type="text" class="share-url-input" id="shareUrlInput" readonly>
+        <button class="copy-button" onclick="copyShareUrl()">Copy</button>
+      </div>
+      <div class="share-options">
+        <button class="share-option" onclick="shareToFacebook()">
+          <div class="share-icon facebook">f</div>
+          <span>Facebook</span>
+        </button>
+        <button class="share-option" onclick="shareToTwitter()">
+          <div class="share-icon twitter">t</div>
+          <span>Twitter</span>
+        </button>
+        <button class="share-option" onclick="shareToWhatsApp()">
+          <div class="share-icon whatsapp">W</div>
+          <span>WhatsApp</span>
+        </button>
+        <button class="share-option" onclick="shareToLinkedIn()">
+          <div class="share-icon linkedin">in</div>
+          <span>LinkedIn</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Base Styles */
+  .video-carousel {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 3rem 1rem;
+    background: #fff;
+    position: relative;
   }
-  
-  async init() {
-    console.log('🚀 Initializing Shopify Video Carousel');
-    await this.loadVideos();
+
+  .carousel-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 0 1rem;
   }
+
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #000;
+    margin: 0;
+  }
+
+  /* Loading, Empty, Error States */
+  .loading, .empty-state, .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    color: #666;
+    text-align: center;
+  }
+
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(0,0,0,0.1);
+    border-radius: 50%;
+    border-top-color: #000;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 1rem;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Main Carousel */
+  .carousel-container {
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0 2rem;
+    margin: 0 auto;
+  }
+
+  .carousel-viewport {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    padding: 1rem 0;
+  }
+
+  .videos-carousel {
+    display: flex;
+    gap: 1.5rem;
+    transition: transform 0.5s ease-in-out;
+    width: max-content;
+    padding: 0.5rem;
+  }
+
+  /* Video Card */
+  .video-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+    position: relative;
+    aspect-ratio: 9/16;
+    cursor: pointer;
+    height: 450px;
+    width: 280px;
+    flex-shrink: 0;
+  }
+
+  .video-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  .video-player-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    border-radius: 12px;
+  }
+
+  .video-player {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border-radius: 12px;
+  }
+
+  .video-card:hover .video-player {
+    transform: scale(1.05);
+  }
+
+  /* Video Info Overlay in Card */
+  .video-info-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    padding: 1.5rem 1rem 1rem;
+    color: white;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+    border-radius: 0 0 12px 12px;
+  }
+
+  .video-card:hover .video-info-overlay {
+    transform: translateY(0);
+  }
+
+  .video-info-overlay h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .video-info-overlay p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Navigation Buttons */
+  .nav-btn {
+    background: #fff;
+    border: 2px solid #e5e5e5;
+    color: #000;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+    z-index: 10;
+    opacity: 1;
+  }
+
+  .nav-btn:hover:not(:disabled) {
+    background: #f8f8f8;
+    border-color: #000;
+    transform: scale(1.05);
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .nav-btn:disabled:hover {
+    transform: none;
+    background: #fff;
+    border-color: #e5e5e5;
+  }
+
+  /* Ensure buttons are clickable */
+  .nav-btn * {
+    pointer-events: none;
+  }
+
+  /* Modal Carousel Styles */
+  .modal-carousel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .modal-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.96);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+
+  .modal-content {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: none;
+    border-radius: 0;
+    overflow: hidden;
+    z-index: 1001;
+  }
+
+  .modal-close-btn {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    background: none;
+    border: none;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1002;
+    transition: all 0.3s ease;
+  }
+
+  .modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+  }
+
+  /* Modal Carousel Container */
+  .modal-carousel-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    gap: 2rem;
+    padding: 0 4rem;
+  }
+
+  /* Video Preview Styles */
+  .video-preview {
+    width: 25%;
+    height: 70vh;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    opacity: 0.7;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .video-preview:hover {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+
+  .prev-video {
+    order: 1;
+  }
+
+  .next-video {
+    order: 3;
+  }
+
+  .preview-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  .preview-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 12px;
+  }
+
+  .preview-arrow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+  }
+
+  /* Main Video Container */
+  .modal-video-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 50%;
+    order: 2;
+    flex-shrink: 0;
+  }
+
+  .modal-video-wrapper {
+    position: relative;
+    width: 100%;
+    height: 80vh;
+    background: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal-video-player {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    border-radius: 16px;
+  }
+
+  /* Progress Bar Styles */
+  .video-progress-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    z-index: 10;
+  }
+
+  .video-progress-bar {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    position: relative;
+  }
+
+  .video-progress-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: white;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  /* Controls */
+  .modal-volume-control,
+  .modal-download-control {
+    position: absolute;
+    top: 20px;
+    z-index: 10;
+  }
+
+  .modal-volume-control {
+    left: 20px;
+  }
+
+  .modal-download-control {
+    right: 20px;
+  }
+
+  .volume-btn,
+  .download-control-btn {
+    background: none;
+    border: none;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .volume-btn:hover,
+  .download-control-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+    transform: scale(1.1);
+  }
+
+  /* Modal Engagement Buttons */
+  .modal-engagement-buttons {
+    position: absolute;
+    bottom: 40px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: flex-end;
+    z-index: 10;
+  }
+
+  .engagement-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.3s ease;
+    padding: 0;
+  }
+
+  .engagement-btn:hover {
+    transform: scale(1.1);
+  }
+
+  .engagement-btn svg {
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    padding: 0.8rem;
+    transition: all 0.3s ease;
+  }
+
+  .engagement-btn:hover svg {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  .engagement-count {
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+  }
+
+  .engagement-btn.active {
+    color: #ff0050;
+  }
+
+  .engagement-btn.active svg {
+    fill: #ff0050;
+    stroke: #ff0050;
+  }
+
+  .engagement-btn.saved {
+    color: #1da1f2;
+  }
+
+  .engagement-btn.saved svg {
+    fill: #1da1f2;
+    stroke: #1da1f2;
+  }
+
+  /* Video Info Overlay */
+  .modal-video-info-overlay {
+    position: absolute;
+    bottom: 40px;
+    left: 20px;
+    max-width: 60%;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 1rem;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+  }
+
+  .modal-video-info-overlay h3 {
+    color: white;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .modal-video-info-overlay p {
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  /* Product Carousel Styles */
+  .product-carousel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: transparent;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.6) transparent;
+    z-index: 10;
+  }
+
+  .product-carousel::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .product-carousel::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .product-carousel::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.6);
+    border-radius: 2px;
+  }
+
+  .product-card {
+    flex: 0 0 280px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+  }
+
+  .product-card:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: translateY(-2px);
+  }
+
+  .product-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+
+  .product-image:hover {
+    transform: scale(1.08);
+  }
+
+  .product-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .product-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: white;
+    margin: 0;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .product-price {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+  }
+
+  .add-to-cart-btn {
+    background: white;
+    color: black;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .add-to-cart-btn:hover {
+    background: #fa1515;
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  .add-to-cart-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Product Tag Styles */
+  .product-tag-button {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    z-index: 10;
+    padding: 6px 12px;
+    min-width: 40px;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+
+  .product-tag-button:hover {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateX(-50%) scale(1.05);
+  }
+
+  .product-tag-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .loading-product-tags {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .small-spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  .product-tag-images {
+    gap: 14px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    height: 24px;
+  }
+
+  .product-tag-image {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border: 1.5px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .product-tag-image.overlapping {
+    margin-left: -8px;
+  }
+
+  .product-tag-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .product-tag-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+  }
+
+  .product-tag-count {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    margin-left: -5px;
+    z-index: 5;
+    border: 1.5px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Video Card Overlay Adjustments */
+  .video-info-overlay {
+    padding-bottom: 50px;
+  }
+
+  /* Product Image Modal Styles - Clean Version */
+  .video-product-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  .video-product-modal.active {
+    display: flex;
+  }
+
+  .video-product-modal .modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    z-index: 2001;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: modalSlideUp 0.3s ease;
+  }
+
+  @keyframes modalSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .video-product-modal .modal-body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .video-product-image-section {
+    width: 100%;
+    height: 250px;
+    background: #f8f8f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .video-main-product-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  .video-product-details-section {
+    padding: 20px;
+  }
+
+  .video-product-modal-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #000;
+    margin: 0 0 15px 0;
+    line-height: 1.4;
+  }
+
+  .video-product-price-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+  }
+
+  .video-original-price {
+    font-size: 1.1rem;
+    color: #666;
+    text-decoration: line-through;
+  }
+
+  .video-discounted-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ff0050;
+  }
+
+  .video-discount-percentage {
+    background: #ff0050;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .video-product-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .video-add-to-cart-btn,
+  .video-more-info-btn {
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    width: 100%;
+  }
+
+  .video-add-to-cart-btn {
+    background: #000;
+    color: white;
+    font-weight: 700;
+  }
+
+  .video-add-to-cart-btn:hover:not(:disabled) {
+    background: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .video-add-to-cart-btn:disabled {
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .video-more-info-btn {
+    background: transparent;
+    color: #000;
+    border: 2px solid #000;
+    font-weight: 700;
+  }
+
+  .video-more-info-btn:hover {
+    background: #000;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .video-product-description {
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+  }
+
+  .video-product-description p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #666;
+    margin: 0;
+  }
+
+  /* Comments Section */
+  .comments-section {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 400px;
+    height: 100%;
+    background: white;
+    z-index: 1002;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .comments-section.active {
+    transform: translateX(0);
+  }
+
+  .comments-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e5e5;
+    background: white;
+  }
+
+  .comments-header h3 {
+    margin: 0;
+    color: #000;
+    font-size: 1.2rem;
+  }
+
+  .close-comments {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+
+  .close-comments:hover {
+    background: #f5f5f5;
+  }
+
+  .comments-list {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    background: #fafafa;
+  }
+
+  .comment-item {
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+  }
+
+  .comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .comment-author {
+    font-weight: 600;
+    color: #000;
+    font-size: 0.9rem;
+  }
+
+  .comment-date {
+    color: #666;
+    font-size: 0.8rem;
+  }
+
+  .comment-text {
+    margin: 0;
+    color: #333;
+    line-height: 1.4;
+    font-size: 0.9rem;
+  }
+
+  .add-comment {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-top: 1px solid #e5e5e5;
+    background: white;
+  }
+
+  .comment-input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #e5e5e5;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+
+  .comment-input:focus {
+    border-color: #000;
+  }
+
+  .post-comment-btn {
+    background: #000;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s ease;
+    font-weight: 600;
+  }
+
+  .post-comment-btn:hover {
+    background: #333;
+  }
+
+  /* Share Modal */
+  .share-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .share-modal.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .share-modal .modal-content {
+    background: white;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+  }
+
+  .share-modal.active .modal-content {
+    transform: scale(1);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  .modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .close-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+    font-size: 1.5rem;
+    color: #666;
+  }
+
+  .close-button:hover {
+    background: #f5f5f5;
+  }
+
+  .share-url-container {
+    display: flex;
+    margin-bottom: 24px;
+  }
+
+  .share-url-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px 0 0 8px;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .copy-button {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-left: none;
+    border-radius: 0 8px 8px 0;
+    padding: 0 16px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #333;
+    transition: background-color 0.2s;
+  }
+
+  .copy-button:hover {
+    background-color: #e5e5e5;
+  }
+
+  .share-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .share-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 12px 8px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    background: none;
+    border: 1px solid #eee;
+  }
+
+  .share-option:hover {
+    background-color: #f9f9f9;
+  }
+
+  .share-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 18px;
+    color: white;
+    font-weight: bold;
+  }
+
+  .share-option span {
+    font-size: 12px;
+    color: #555;
+    text-align: center;
+  }
+
+  /* Platform-specific colors */
+  .facebook { background-color: #1877f2; }
+  .twitter { background-color: #1da1f2; }
+  .whatsapp { background-color: #25d366; }
+  .linkedin { background-color: #0a66c2; }
+
+  /* Responsive Design */
+  @media (max-width: 1200px) {
+    .video-carousel {
+      max-width: 100%;
+      padding: 2rem 0.5rem;
+    }
+    
+    .carousel-container {
+      padding: 0 1rem;
+    }
+    
+    .video-card {
+      width: 250px;
+      height: 400px;
+    }
+    
+    .modal-carousel-container {
+      padding: 0 3rem;
+      gap: 1.5rem;
+    }
+    
+    .video-preview {
+      width: 30%;
+      height: 65vh;
+    }
+    
+    .modal-video-container {
+      width: 40%;
+    }
+    
+    .modal-video-wrapper {
+      height: 75vh;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .section-title {
+      font-size: 2rem;
+    }
+    
+    .carousel-container {
+      padding: 0 0.5rem;
+      gap: 1rem;
+    }
+    
+    .videos-carousel {
+      gap: 1rem;
+    }
+    
+    .video-card {
+      width: 220px;
+      height: 350px;
+    }
+    
+    .video-info-overlay {
+      padding: 1rem 0.75rem 0.75rem;
+    }
+    
+    .video-info-overlay h3 {
+      font-size: 1rem;
+    }
+    
+    .video-info-overlay p {
+      font-size: 0.85rem;
+    }
+    
+    .modal-carousel-container {
+      flex-direction: column;
+      padding: 1rem;
+      gap: 1rem;
+    }
+    
+    .video-preview {
+      display: none;
+    }
+    
+    .modal-video-container {
+      width: 100%;
+      height: auto;
+      flex: 1;
+    }
+    
+    .modal-video-wrapper {
+      height: 60vh;
+      max-height: 600px;
+    }
+    
+    .modal-engagement-buttons {
+      bottom: 20px;
+      right: 10px;
+      gap: 1rem;
+    }
+    
+    .engagement-btn svg {
+      width: 35px;
+      height: 35px;
+      padding: 0.6rem;
+    }
+    
+    .product-carousel {
+      padding: 0.5rem;
+    }
+    
+    .product-card {
+      flex: 0 0 220px;
+      padding: 0.5rem;
+    }
+    
+    .comments-section {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .carousel-header {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    
+    .carousel-container {
+      padding: 0 0.25rem;
+      gap: 0.5rem;
+    }
+    
+    .videos-carousel {
+      gap: 0.75rem;
+    }
+    
+    .video-card {
+      width: 180px;
+      height: 300px;
+    }
+    
+    .nav-btn {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .video-info-overlay {
+      padding: 0.75rem 0.5rem 0.5rem;
+    }
+    
+    .video-info-overlay h3 {
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .video-info-overlay p {
+      font-size: 0.8rem;
+    }
+    
+    .modal-close-btn {
+      top: 1rem;
+      right: 1rem;
+      width: 40px;
+      height: 40px;
+    }
+    
+    .modal-video-info-overlay {
+      max-width: 80%;
+      padding: 0.75rem;
+    }
+    
+    .modal-video-info-overlay h3 {
+      font-size: 1.2rem;
+    }
+    
+    .modal-video-info-overlay p {
+      font-size: 0.9rem;
+    }
+    
+    .engagement-btn svg {
+      width: 30px;
+      height: 30px;
+      padding: 0.5rem;
+    }
+    
+    .engagement-count {
+      font-size: 0.8rem;
+    }
+    
+    .product-card {
+      flex: 0 0 180px;
+    }
+    
+    .product-image {
+      width: 50px;
+      height: 50px;
+    }
+    
+    .product-title {
+      font-size: 0.8rem;
+    }
+    
+    .product-price {
+      font-size: 0.8rem;
+    }
+    
+    .add-to-cart-btn {
+      font-size: 0.7rem;
+      padding: 0.4rem 0.8rem;
+    }
+    
+    .video-product-modal .modal-content {
+      max-width: 95%;
+    }
+    
+    .video-product-image-section {
+      height: 200px;
+    }
+    
+    .video-product-modal-title {
+      font-size: 1.2rem;
+    }
+    
+    .video-discounted-price {
+      font-size: 1.3rem;
+    }
+    
+    .video-original-price {
+      font-size: 1rem;
+    }
+    
+    .video-add-to-cart-btn,
+    .video-more-info-btn {
+      padding: 12px 16px;
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
+<script>
+  // Global variables
+  let allVideos = [];
+  let currentShareVideo = null;
+  let currentCommentsVideo = null;
+  let currentModalIndex = 0;
+  let progressInterval = null;
+  let storeCurrency = 'USD';
+  let userId = null;
   
-  async loadVideos() {
-    this.showLoading();
+  // Carousel variables
+  let currentCarouselPosition = 0;
+  let videosPerView = 4;
+  let cardWidth = 280;
+  
+  // Your CloudFlare URL
+  const CLOUDFLARE_URL = 'https://everything-oriental-mem-cases.trycloudflare.com';
+  
+  // Calculate how many videos to show based on screen width
+  function calculateVideosPerView() {
+    const screenWidth = window.innerWidth;
+    
+    if (screenWidth >= 1200) {
+      videosPerView = 4;
+    } else if (screenWidth >= 900) {
+      videosPerView = 3;
+    } else if (screenWidth >= 600) {
+      videosPerView = 2;
+    } else {
+      videosPerView = 1;
+    }
+    
+    // Update card width based on actual rendered size
+    const videoCard = document.querySelector('.video-card');
+    if (videoCard) {
+      cardWidth = videoCard.offsetWidth + 24;
+    }
+  }
+
+  // Carousel scrolling function
+  function scrollCarousel(direction) {
+    const carousel = document.getElementById('videosCarousel');
+    const viewport = document.querySelector('.carousel-viewport');
+    
+    if (!carousel || !viewport) {
+      console.log('Carousel or viewport not found');
+      return;
+    }
+    
+    const viewportWidth = viewport.offsetWidth;
+    const carouselWidth = carousel.scrollWidth;
+    const maxScroll = Math.max(0, carouselWidth - viewportWidth);
+    
+    // Calculate scroll amount (80% of viewport)
+    const scrollAmount = Math.floor(viewportWidth * 0.8);
+    
+    if (direction === 'left') {
+      currentCarouselPosition = Math.max(currentCarouselPosition - scrollAmount, 0);
+    } else {
+      currentCarouselPosition = Math.min(currentCarouselPosition + scrollAmount, maxScroll);
+    }
+    
+    // Apply smooth transition
+    carousel.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+    carousel.style.transform = `translateX(-${currentCarouselPosition}px)`;
+    
+    // Update buttons after animation
+    setTimeout(() => {
+      updateCarouselNavigation();
+      playVisibleVideos();
+    }, 500);
+  }
+
+  // Update carousel navigation buttons
+  function updateCarouselNavigation() {
+    const carousel = document.getElementById('videosCarousel');
+    const viewport = document.querySelector('.carousel-viewport');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    
+    if (!carousel || !viewport || !prevBtn || !nextBtn) return;
+    
+    const viewportWidth = viewport.offsetWidth;
+    const carouselWidth = carousel.scrollWidth;
+    const maxScroll = Math.max(0, carouselWidth - viewportWidth);
+    
+    // Simple threshold check
+    const isAtStart = currentCarouselPosition <= 10;
+    const isAtEnd = currentCarouselPosition >= (maxScroll - 10) || maxScroll <= 10;
+    
+    // Update button states
+    prevBtn.disabled = isAtStart;
+    nextBtn.disabled = isAtEnd;
+    
+    // Update visual states
+    prevBtn.style.opacity = isAtStart ? '0.3' : '1';
+    nextBtn.style.opacity = isAtEnd ? '0.3' : '1';
+    prevBtn.style.cursor = isAtStart ? 'not-allowed' : 'pointer';
+    nextBtn.style.cursor = isAtEnd ? 'not-allowed' : 'pointer';
+  }
+
+  // Render videos in carousel with product tags
+  function renderCurrentVideos() {
+    const videosCarousel = document.getElementById('videosCarousel');
+    let videosHTML = '';
+    
+    allVideos.forEach((video, index) => {
+      const videoId = video.original_data?.id || video.id;
+      
+      videosHTML += `
+        <div class="video-card" onclick="openModalCarousel(${index})">
+          <div class="video-player-container">
+            <video 
+              class="video-player"
+              src="${video.shopify_file_url}"
+              loop
+              muted
+              playsinline
+              autoplay
+              poster="${video.thumbnail_url || 'https://via.placeholder.com/300x533/333/fff?text=Video'}"
+              data-video-id="${video.id}"
+              preload="metadata"
+            ></video>
+            
+            <!-- Product Tag Button -->
+            <div class="product-tag-button" onclick="openModalCarousel(${index})">
+              <div class="product-tag-preview" id="product-preview-${videoId}" data-video-id="${videoId}">
+                <div class="loading-product-tags">
+                  <div class="small-spinner"></div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Video Info Overlay -->
+            <div class="video-info-overlay">
+              <p>${video.description ? video.description.substring(0, 80) + '...' : ''}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    videosCarousel.innerHTML = videosHTML;
+    
+    // Reset position
+    currentCarouselPosition = 0;
+    videosCarousel.style.transform = 'translateX(0px)';
+    
+    // Calculate videos per view
+    calculateVideosPerView();
+    
+    // Load product previews for each video
+    setTimeout(() => {
+      loadProductPreviewsForAllVideos();
+    }, 100);
+    
+    // Update navigation after a small delay to ensure DOM is rendered
+    setTimeout(() => {
+      updateCarouselNavigation();
+      playVisibleVideos();
+    }, 100);
+  }
+
+  // Load product previews for ALL videos in carousel
+  async function loadProductPreviewsForAllVideos() {
+    console.log('🔄 Loading product previews for all videos...');
+    
+    if (!allVideos || allVideos.length === 0) {
+      console.error('❌ No videos to load products for');
+      return;
+    }
+    
+    // Create an array of promises for all videos
+    const promises = allVideos.map(async (video, index) => {
+      const videoId = video.original_data?.id || video.id;
+      
+      try {
+        // Add a small delay to avoid overwhelming the API
+        await new Promise(resolve => setTimeout(resolve, index * 100));
+        
+        // Load product preview
+        await loadProductPreviewForVideo(videoId, index);
+      } catch (error) {
+        console.error(`❌ Error loading products for video ${videoId}:`, error);
+        showErrorStateForProductPreview(videoId);
+      }
+    });
+    
+    // Execute all promises
+    await Promise.allSettled(promises);
+    console.log('✅ Finished loading all product previews');
+  }
+
+  // Load product preview for a single video
+  async function loadProductPreviewForVideo(videoId, cardIndex) {
+    console.log(`🛍️ Loading product preview for video: ${videoId}`);
+    
+    const productTagElement = document.getElementById(`product-preview-${videoId}`);
+    if (!productTagElement) {
+      console.log(`Element not found for video ${videoId}`);
+      return;
+    }
     
     try {
-      console.log('📡 Fetching from:', this.API_URL);
-      const response = await fetch(this.API_URL);
+      const url = `${CLOUDFLARE_URL}/api/video-products/${videoId}`;
+      console.log(`📡 Fetching from: ${url}`);
+      
+      const response = await fetch(url);
       
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        throw new Error(`API returned ${response.status}`);
       }
       
       const data = await response.json();
-      console.log('✅ API Response:', data);
+      console.log(`📦 API Response for video ${videoId}:`, data);
       
-      if (data.success && data.videos && data.videos.length > 0) {
-        this.videos = data.videos;
-        this.renderVideos();
-        this.showVideos();
+      if (data.success && data.products && data.products.length > 0) {
+        console.log(`✅ Found ${data.products.length} products for video ${videoId}`);
+        renderProductPreview(data.products, videoId);
+        
+        // Store products data in the video object for later use in modal
+        if (allVideos[cardIndex]) {
+          allVideos[cardIndex].products = data.products;
+        }
       } else {
-        this.showEmptyState();
+        // No products - hide tag products button
+        console.log(`ℹ️ No products found for video ${videoId}`);
+        showNoProductsState(videoId);
       }
       
     } catch (error) {
-      console.error('❌ Error:', error);
-      this.showError(error.message);
+      console.error(`❌ Error loading product preview for ${videoId}:`, error);
+      throw error;
     }
   }
+
+  // Render product preview on video card
+  function renderProductPreview(products, videoId) {
+    const productTagElement = document.getElementById(`product-preview-${videoId}`);
+    if (!productTagElement) return;
+    
+    const productsToShow = products.slice(0, 3);
+    const hasMoreProducts = products.length > 3;
+    
+    let previewHTML = `
+      <div class="product-tag-images">
+    `;
+    
+    productsToShow.forEach((product, index) => {
+      const imageUrl = product.image_url || product.image || product.thumbnail || '';
+      previewHTML += `
+        <div class="product-tag-image ${index > 0 ? 'overlapping' : ''}" style="z-index: ${10 - index}">
+          ${imageUrl ? 
+            `<img src="${imageUrl}" alt="${product.title || 'Product'}" 
+                  onerror="this.onerror=null; this.src='https://via.placeholder.com/20x20/333/fff?text=P';" />` : 
+            `<div class="product-tag-placeholder">P</div>`
+          }
+        </div>
+      `;
+    });
+    
+    if (hasMoreProducts) {
+      previewHTML += `
+        <div class="product-tag-count">
+          +${products.length - 3}
+        </div>
+      `;
+    }
+    
+    previewHTML += `</div>`;
+    
+    productTagElement.innerHTML = previewHTML;
+    
+    // Add title with product names on hover
+    const productNames = products.map(p => p.title || 'Product').join(', ');
+    productTagElement.title = productNames;
+  }
+
+  // Show error state for product preview
+  function showErrorStateForProductPreview(videoId) {
+    const productTagElement = document.getElementById(`product-preview-${videoId}`);
+    if (!productTagElement) return;
+    
+    productTagElement.innerHTML = `
+      <div class="error-product-tag" title="Failed to load products">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+    `;
+  }
+
+  // Show "no products" state
+  function showNoProductsState(videoId) {
+    const productTagElement = document.getElementById(`product-preview-${videoId}`);
+    if (!productTagElement) return;
+    
+    // Instead of showing "Tag" text, hide the entire product tag button
+    const productTagButton = productTagElement.closest('.product-tag-button');
+    if (productTagButton) {
+      productTagButton.style.display = 'none';
+    }
+  }
+
+  // Auto-play videos in viewport
+  function playVisibleVideos() {
+    const videos = document.querySelectorAll('.video-player');
+    const viewport = document.querySelector('.carousel-viewport');
+    
+    if (!viewport) return;
+    
+    const viewportRect = viewport.getBoundingClientRect();
+    
+    videos.forEach(video => {
+      const videoRect = video.getBoundingClientRect();
+      
+      // If video is at least 50% visible in viewport
+      if (
+        videoRect.left < viewportRect.right - (videoRect.width / 2) &&
+        videoRect.right > viewportRect.left + (videoRect.width / 2)
+      ) {
+        if (video.paused) {
+          video.play().catch(e => {
+            console.log('Autoplay blocked for grid video:', e);
+          });
+        }
+      } else {
+        if (!video.paused) {
+          video.pause();
+          video.currentTime = 0;
+        }
+      }
+    });
+  }
+
+  // Initialize the carousel
+  async function loadVideos() {
+    const shop = document.querySelector('.video-carousel').dataset.shop;
+    const loadingState = document.getElementById('loadingState');
+    const carouselContainer = document.getElementById('carouselContainer');
+    const emptyState = document.getElementById('emptyState');
+    const errorState = document.getElementById('errorState');
+
+    // Show loading, hide others
+    loadingState.style.display = 'flex';
+    carouselContainer.style.display = 'none';
+    emptyState.style.display = 'none';
+    errorState.style.display = 'none';
+
+    try {
+      console.log('🔄 Fetching videos...');
+      
+      // Get user ID
+      userId = getUserId();
+      console.log('👤 User ID:', userId);
+      
+      // Build API URL
+      const url = `${CLOUDFLARE_URL}/api/videos?shop=${encodeURIComponent(shop)}`;
+      console.log('📡 Calling API:', url);
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('📦 API Response:', data);
+
+      if (data.success && data.videos && data.videos.length > 0) {
+        // Transform your API response - ensure we have the video ID
+        allVideos = data.videos.map(video => ({
+          id: video.id,
+          description: video.description,
+          shopify_file_url: video.shopify_file_id 
+            ? `${CLOUDFLARE_URL}/api/video-proxy/${encodeURIComponent(video.shopify_file_id)}`
+            : video.video_url || video.shopify_file_url || '',
+          thumbnail_url: video.thumbnail_url,
+          duration: video.duration,
+          created_at: video.created_at,
+          like_count: video.like_count || 0,
+          comment_count: video.comment_count || 0,
+          save_count: video.save_count || 0,
+          share_count: video.share_count || 0,
+          download_count: video.download_count || 0,
+          user_has_liked: video.user_has_liked || false,
+          user_has_saved: video.user_has_saved || false,
+          original_data: video
+        }));
+        
+        console.log(`✅ Loaded ${allVideos.length} videos`);
+        console.log('📹 Sample video data:', allVideos[0]);
+        
+        storeCurrency = data.store_currency || 'USD';
+        renderCurrentVideos();
+        carouselContainer.style.display = 'flex';
+        
+        // Auto-play visible videos
+        setTimeout(() => {
+          playVisibleVideos();
+        }, 500);
+      } else {
+        emptyState.style.display = 'flex';
+      }
+
+    } catch (error) {
+      console.error('❌ Error loading videos:', error);
+      document.getElementById('errorMessage').textContent = error.message;
+      errorState.style.display = 'flex';
+    } finally {
+      loadingState.style.display = 'none';
+    }
+  }
+
+  // Modal Carousel Functions
+  function openModalCarousel(startIndex) {
+    currentModalIndex = startIndex;
+    const modal = document.getElementById('modalCarousel');
+    
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    loadModalVideo(currentModalIndex);
+  }
+
+  function closeModalCarousel() {
+    const modal = document.getElementById('modalCarousel');
+    const videoPlayer = document.getElementById('modalVideoPlayer');
+    
+    if (videoPlayer) {
+      videoPlayer.pause();
+      videoPlayer.src = '';
+      videoPlayer.removeEventListener('ended', handleVideoEnded);
+      videoPlayer.removeEventListener('timeupdate', updateProgressBar);
+    }
+    
+    // Clear progress interval
+    if (progressInterval) {
+      clearInterval(progressInterval);
+      progressInterval = null;
+    }
+    
+    // Reset progress bar
+    const progressFill = document.getElementById('videoProgressFill');
+    if (progressFill) {
+      progressFill.style.width = '0%';
+    }
+    
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    closeComments();
+    
+    // Resume playing grid videos
+    setTimeout(playVisibleVideos, 100);
+  }
   
-  renderVideos() {
-    const videosGrid = document.getElementById('videosGrid');
-    if (!videosGrid) return;
+  // Load modal video
+  async function loadModalVideo(index) {
+    if (index < 0 || index >= allVideos.length) return;
     
-    videosGrid.innerHTML = '';
+    const video = allVideos[index];
+    const videoPlayer = document.getElementById('modalVideoPlayer');
     
-    // Show only first 4 videos for performance
-    const videosToShow = this.videos.slice(0, 4);
+    console.log('🎬 Loading modal for video:', video.title);
     
-    videosToShow.forEach((video, index) => {
-      const videoCard = document.createElement('div');
-      videoCard.className = 'shopify-video-card';
+    // Clear previous progress interval
+    if (progressInterval) {
+      clearInterval(progressInterval);
+      progressInterval = null;
+    }
+    
+    // Reset progress bar
+    const progressFill = document.getElementById('videoProgressFill');
+    if (progressFill) {
+      progressFill.style.width = '0%';
+    }
+    
+    // Update video source
+    videoPlayer.src = video.shopify_file_url;
+    videoPlayer.muted = true;
+    
+    // Remove loop to allow 'ended' event
+    videoPlayer.removeAttribute('loop');
+    
+    // Add event listeners
+    videoPlayer.addEventListener('ended', handleVideoEnded, { once: true });
+    videoPlayer.addEventListener('timeupdate', updateProgressBar);
+    
+    // Update video info
+    document.getElementById('modalVideoDescription').textContent = video.description || '';
+    
+    // Update engagement counts
+    document.getElementById('modalLikeCount').textContent = video.like_count || 0;
+    document.getElementById('modalCommentCount').textContent = video.comment_count || 0;
+    document.getElementById('modalSaveCount').textContent = video.save_count || 0;
+    document.getElementById('modalShareCount').textContent = video.share_count || 0;
+    
+    // Update engagement button states
+    const likeBtn = document.getElementById('modalLikeBtn');
+    const saveBtn = document.getElementById('modalSaveBtn');
+    
+    if (video.user_has_liked) {
+      likeBtn.classList.add('active');
+    } else {
+      likeBtn.classList.remove('active');
+    }
+    
+    if (video.user_has_saved) {
+      saveBtn.classList.add('saved');
+    } else {
+      saveBtn.classList.remove('saved');
+    }
+    
+    // Load preview videos
+    loadPreviewVideos(index);
+    
+    // Get the correct video ID and load products
+    const videoId = video.original_data?.id || video.id;
+    console.log('🎯 Loading products for video ID:', videoId);
+    
+    // Check if products are already cached
+    if (video.products && video.products.length > 0) {
+      console.log('📦 Using cached products for modal:', video.products.length);
+      renderProducts(video.products);
+    } else {
+      await loadProductsForVideo(videoId);
+    }
+    
+    // Play video with autoplay
+    videoPlayer.play().catch(e => {
+      console.log('Modal autoplay blocked:', e);
+    });
+  }
+
+  // Load products for video
+  async function loadProductsForVideo(videoId) {
+    console.log('🛍️ loadProductsForVideo called with ID:', videoId);
+    
+    const productCarousel = document.getElementById('modalProductCarousel');
+    if (!productCarousel) {
+      console.error('❌ Product carousel element not found!');
+      return;
+    }
+    
+    try {
+      console.log('🛍️ Loading products for video ID:', videoId);
       
-      // Get the best MP4 source
-      const mp4Source = video.sources?.find(s => s.format === 'mp4');
-      const videoUrl = mp4Source?.url || '';
+      // Show loading state
+      productCarousel.innerHTML = `
+        <div style="color: white; text-align: center; padding: 1rem; background: rgba(0,0,0,0.5); border-radius: 8px;">
+          <div style="display: inline-block; width: 20px; height: 20px; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 0.5rem;"></div>
+          <div>Loading products...</div>
+        </div>
+      `;
       
-      // Get thumbnail
-      const thumbnailUrl = video.thumbnail_url || video.previewImage?.url || 
-                          'https://placehold.co/400x300/1e40af/ffffff?text=Video';
+      const url = `${CLOUDFLARE_URL}/api/video-products/${videoId}`;
+      console.log('📡 Fetching from URL:', url);
       
-      videoCard.innerHTML = `
-        <div class="video-card-inner">
-          <!-- Shopify Video Element -->
-          <div class="video-wrapper">
-            ${videoUrl ? `
-              <shopify-video 
-                data-video-sources='${JSON.stringify(video.sources || [])}'
-                data-preview-image='${JSON.stringify(video.previewImage || {})}'
-                data-autoplay="${index === 0 ? 'true' : 'false'}"
-                data-loop="true"
-                data-muted="true"
-                data-controls="true"
-                data-playsinline="true"
-                data-loading="lazy"
-              >
-                <!-- Fallback for older browsers -->
-                <video
-                  src="${videoUrl}"
-                  poster="${thumbnailUrl}"
-                  loop
-                  muted
-                  playsinline
-                  controls
-                  preload="metadata"
-                  loading="lazy"
-                  style="width: 100%; height: 100%; object-fit: cover;"
-                >
-                  ${video.sources?.map(source => `
-                    <source src="${source.url}" type="${source.mimeType}">
-                  `).join('') || ''}
-                  Your browser does not support the video tag.
-                </video>
-              </shopify-video>
-            ` : `
-              <div class="no-video">
-                <img 
-                  src="${thumbnailUrl}" 
-                  alt="${video.title}"
-                  loading="lazy"
-                  style="width: 100%; height: 100%; object-fit: cover;"
-                />
-              </div>
-            `}
-            
-            <!-- Play button overlay -->
-            ${videoUrl ? `
-              <div class="video-overlay">
-                <button class="shopify-play-btn" aria-label="Play video">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                </button>
-              </div>
-            ` : ''}
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('📦 API Response:', data);
+      
+      if (data.success && data.products && data.products.length > 0) {
+        console.log(`✅ Found ${data.products.length} products`);
+        renderProducts(data.products);
+      } else {
+        console.log('ℹ️ No products found for this video');
+        productCarousel.innerHTML = `
+          <div style="color: white; text-align: center; padding: 1rem; background: rgba(0,0,0,0.5); border-radius: 8px;">
+            No products associated with this video
+          </div>
+        `;
+      }
+      
+    } catch (error) {
+      console.error('❌ Error loading products:', error);
+      
+      productCarousel.innerHTML = `
+        <div style="color: white; text-align: center; padding: 1rem; background: rgba(255,0,0,0.3); border-radius: 8px;">
+          <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">⚠️</div>
+          <div>Failed to load products</div>
+          <small style="opacity: 0.8;">${error.message}</small>
+        </div>
+      `;
+    }
+  }
+
+  // Render products
+  function renderProducts(products) {
+    const productCarousel = document.getElementById('modalProductCarousel');
+    let productsHTML = '';
+    
+    console.log('🎨 Rendering products:', products);
+    
+    if (!products || products.length === 0) {
+      productCarousel.innerHTML = '<div style="color: white; text-align: center; padding: 1rem; background: rgba(0,0,0,0.5); border-radius: 8px;">No products available</div>';
+      return;
+    }
+    
+    products.forEach(product => {
+      console.log('📦 Processing product:', product);
+      
+      // Handle different possible field names
+      const variantId = product.shopify_variant_id || product.variant_id;
+      const productId = product.shopify_product_id || product.product_id || product.id;
+      const title = product.title || 'Product';
+      const price = product.price || '0.00';
+      const comparePrice = product.compare_at_price || product.compare_price || null;
+      const currencyCode = product.currency_code || storeCurrency;
+      const imageUrl = product.image_url || product.image || 'https://via.placeholder.com/60x60/333/fff?text=Image';
+      const productHandle = product.handle || null;
+      
+      // Escape special characters
+      const safeTitle = escapeString(title);
+      const safeImageUrl = escapeString(imageUrl);
+      
+      // Format prices
+      const formattedPrice = formatPrice(price, currencyCode);
+      const formattedComparePrice = comparePrice ? formatPrice(comparePrice, currencyCode) : '';
+      const discountPercentage = comparePrice ? calculateDiscount(price, comparePrice) : 0;
+      
+      // Create product object for modal
+      const productData = {
+        title: title,
+        price: price,
+        compare_price: comparePrice,
+        currency_code: currencyCode,
+        image_url: imageUrl,
+        shopify_variant_id: variantId,
+        shopify_product_id: productId,
+        handle: productHandle,
+        description: product.description || ''
+      };
+      
+      productsHTML += `
+        <div class="product-card" 
+             data-product-id="${productId}" 
+             data-variant-id="${variantId || ''}">
+          <img src="${imageUrl}" 
+               alt="${title}" 
+               class="product-image"
+               onclick="openVideoProductModal(${JSON.stringify(productData).replace(/"/g, '&quot;')})"
+               onerror="this.onerror=null; this.src='https://via.placeholder.com/60x60/333/fff?text=Image';">
+          <div class="product-info">
+            <h4 class="product-title" title="${title}">${title}</h4>
+            <p class="product-price">${formattedPrice}</p>
+          </div>
+          <button class="add-to-cart-btn" 
+                  onclick="addToCart('${variantId || ''}', '${safeTitle}')"
+                  ${!variantId ? 'disabled' : ''}>
+            ${variantId ? 'Add to Cart' : 'No Variant'}
+          </button>
+        </div>
+      `;
+    });
+    
+    productCarousel.innerHTML = productsHTML;
+    console.log('✅ Products rendered successfully');
+  }
+
+  // Video Product Image Modal Functions
+  function openVideoProductModal(product) {
+    console.log('🛍️ Opening video product modal for:', product);
+    
+    // Create modal if it doesn't exist
+    let productModal = document.getElementById('videoProductModal');
+    
+    if (!productModal) {
+      productModal = document.createElement('div');
+      productModal.id = 'videoProductModal';
+      productModal.className = 'video-product-modal';
+      document.body.appendChild(productModal);
+    }
+    
+    // Get product details
+    const imageUrl = product.image_url || product.image || 'https://via.placeholder.com/300x300/333/fff?text=Product+Image';
+    const title = product.title || 'Product';
+    const price = product.price || '0.00';
+    const comparePrice = product.compare_price || product.compare_at_price || null;
+    const currency = product.currency_code || storeCurrency;
+    const variantId = product.shopify_variant_id || product.variant_id || '';
+    const productHandle = product.handle || null;
+    
+    // Format prices
+    const formattedPrice = formatPrice(price, currency);
+    const formattedComparePrice = comparePrice ? formatPrice(comparePrice, currency) : '';
+    const discountPercentage = comparePrice ? calculateDiscount(price, comparePrice) : 0;
+    
+    // Create modal content
+    productModal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-body">
+          <!-- Product Image Section -->
+          <div class="video-product-image-section">
+            <img src="${imageUrl}" 
+                 alt="${title}" 
+                 class="video-main-product-image"
+                 onerror="this.onerror=null; this.src='https://via.placeholder.com/300x300/333/fff?text=Product+Image';">
           </div>
           
-          <!-- Video Info -->
-          <div class="video-info">
-            <h3 class="video-title">${video.title}</h3>
-            ${video.description ? `<p class="video-description">${video.description}</p>` : ''}
-            ${video.duration && video.duration !== '0:00' ? `
-              <div class="video-meta">
-                <span class="duration">${video.duration}</span>
+          <!-- Product Details Section -->
+          <div class="video-product-details-section">
+            <!-- Title -->
+            <h3 class="video-product-modal-title">${title}</h3>
+            
+            <!-- Price Section -->
+            <div class="video-product-price-container">
+              ${comparePrice ? 
+                `<span class="video-original-price">${formattedComparePrice}</span>
+                 <span class="video-discounted-price">${formattedPrice}</span>
+                 <span class="video-discount-percentage">${discountPercentage}% OFF</span>` : 
+                `<span class="video-discounted-price">${formattedPrice}</span>`
+              }
+            </div>
+            
+            <!-- Buttons Section -->
+            <div class="video-product-buttons">
+              <button class="video-add-to-cart-btn" 
+                      onclick="addToCartVideoModal('${variantId}', '${escapeString(title)}')"
+                      ${!variantId ? 'disabled' : ''}>
+                ${variantId ? 'ADD TO CART' : 'UNAVAILABLE'}
+              </button>
+              
+              <button class="video-more-info-btn" 
+                      onclick="goToProductPageVideoModal('${product.shopify_product_id || ''}', '${productHandle || ''}')">
+                MORE INFO →
+              </button>
+            </div>
+            
+            <!-- Description (optional) -->
+            ${product.description ? `
+              <div class="video-product-description">
+                <p>${product.description.substring(0, 150)}${product.description.length > 150 ? '...' : ''}</p>
               </div>
             ` : ''}
           </div>
         </div>
-      `;
-      
-      videosGrid.appendChild(videoCard);
-      
-      // Initialize Shopify video component
-      if (videoUrl && window.Shopify && window.Shopify.Video) {
-        setTimeout(() => {
-          const shopifyVideo = videoCard.querySelector('shopify-video');
-          if (shopifyVideo) {
-            try {
-              // Initialize Shopify video component
-              new window.Shopify.Video(shopifyVideo);
-            } catch (error) {
-              console.log('Shopify Video component error:', error);
-            }
-          }
-        }, 100);
+      </div>
+    `;
+    
+    // Show modal
+    productModal.style.display = 'flex';
+    productModal.style.zIndex = '2000';
+    
+    // Add click outside to close
+    productModal.onclick = function(e) {
+      if (e.target === productModal) {
+        closeVideoProductModal();
       }
-    });
+    };
     
-    console.log(`✅ Rendered ${videosToShow.length} videos`);
+    // Add animation
+    setTimeout(() => {
+      productModal.classList.add('active');
+    }, 10);
   }
-  
-  showLoading() {
-    document.getElementById('loadingState').style.display = 'flex';
-    document.getElementById('videosContainer').style.display = 'none';
-    document.getElementById('emptyState').style.display = 'none';
-    document.getElementById('errorState').style.display = 'none';
-  }
-  
-  showVideos() {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('videosContainer').style.display = 'block';
-    document.getElementById('emptyState').style.display = 'none';
-    document.getElementById('errorState').style.display = 'none';
-  }
-  
-  showEmptyState() {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('videosContainer').style.display = 'none';
-    document.getElementById('emptyState').style.display = 'flex';
-    document.getElementById('errorState').style.display = 'none';
-  }
-  
-  showError(message) {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('videosContainer').style.display = 'none';
-    document.getElementById('emptyState').style.display = 'none';
-    document.getElementById('errorState').style.display = 'flex';
-    
-    const errorMessage = document.querySelector('.error-message');
-    if (errorMessage) errorMessage.textContent = message;
-    
-    // Setup retry button
-    const retryBtn = document.querySelector('.retry-btn');
-    if (retryBtn) {
-      retryBtn.onclick = () => this.loadVideos();
+
+  function closeVideoProductModal() {
+    const productModal = document.getElementById('videoProductModal');
+    if (productModal) {
+      productModal.classList.remove('active');
+      setTimeout(() => {
+        productModal.style.display = 'none';
+      }, 300);
     }
   }
-}
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  // Load Shopify Video component if available
-  if (typeof Shopify === 'undefined') {
-    // Load Shopify theme scripts
-    const script = document.createElement('script');
-    script.src = '//cdn.shopify.com/shopifycloud/shopify-common.js';
-    script.onload = () => {
-      new ShopifyVideoCarousel();
-    };
-    document.head.appendChild(script);
-  } else {
-    new ShopifyVideoCarousel();
+  // Helper function to escape strings for onclick attributes
+  function escapeString(str) {
+    if (!str) return '';
+    return str
+      .replace(/'/g, "\\'")
+      .replace(/"/g, '\\"')
+      .replace(/\n/g, ' ')
+      .trim();
   }
-});
+
+  // Calculate discount percentage
+  function calculateDiscount(currentPrice, comparePrice) {
+    const current = parseFloat(currentPrice);
+    const compare = parseFloat(comparePrice);
+    
+    if (isNaN(current) || isNaN(compare) || compare <= current) {
+      return 0;
+    }
+    
+    const discount = ((compare - current) / compare) * 100;
+    return Math.round(discount);
+  }
+
+  // Add to cart from video modal
+  function addToCartVideoModal(variantId, productTitle) {
+    addToCart(variantId, productTitle);
+    closeVideoProductModal();
+  }
+
+  // Go to product page from video modal
+  function goToProductPageVideoModal(productId, productHandle = null) {
+    if (!productId && !productHandle) {
+      showErrorToast('Product page not available');
+      return;
+    }
+    
+    // If we have a product handle, use it directly
+    if (productHandle) {
+      const productUrl = `/products/${productHandle}`;
+      console.log('📱 Redirecting to product page:', productUrl);
+      window.open(productUrl, '_blank');
+      return;
+    }
+    
+    // If we only have product ID
+    const productUrl = `/products/${productId}`;
+    console.log('📱 Attempting to redirect to:', productUrl);
+    window.open(productUrl, '_blank');
+  }
+
+  function updateProgressBar() {
+    const videoPlayer = document.getElementById('modalVideoPlayer');
+    const progressFill = document.getElementById('videoProgressFill');
+    
+    if (videoPlayer && progressFill && videoPlayer.duration) {
+      const progress = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+      progressFill.style.width = `${progress}%`;
+    }
+  }
+
+  function loadPreviewVideos(currentIndex) {
+    // Previous video
+    const prevIndex = (currentIndex - 1 + allVideos.length) % allVideos.length;
+    const prevVideo = allVideos[prevIndex];
+    const prevPreview = document.getElementById('prevVideoPreview');
+    if (prevPreview) {
+      const prevVideoElement = prevPreview.querySelector('.preview-video');
+      if (prevVideoElement) {
+        prevVideoElement.src = prevVideo.shopify_file_url;
+        prevVideoElement.play().catch(e => console.log('Preview autoplay blocked'));
+      }
+    }
+    
+    // Next video
+    const nextIndex = (currentIndex + 1) % allVideos.length;
+    const nextVideo = allVideos[nextIndex];
+    const nextPreview = document.getElementById('nextVideoPreview');
+    if (nextPreview) {
+      const nextVideoElement = nextPreview.querySelector('.preview-video');
+      if (nextVideoElement) {
+        nextVideoElement.src = nextVideo.shopify_file_url;
+        nextVideoElement.play().catch(e => console.log('Preview autoplay blocked'));
+      }
+    }
+  }
+
+  function handleVideoEnded() {
+    showNextModalVideo();
+  }
+
+  function showNextModalVideo() {
+    currentModalIndex = (currentModalIndex + 1) % allVideos.length;
+    loadModalVideo(currentModalIndex);
+  }
+
+  function showPrevModalVideo() {
+    currentModalIndex = (currentModalIndex - 1 + allVideos.length) % allVideos.length;
+    loadModalVideo(currentModalIndex);
+  }
+
+  // Modal Video Controls
+  function toggleModalVideoPlayPause(video) {
+    if (video.paused) {
+      video.play();
+    } else {
+      video.pause();
+    }
+  }
+
+  function toggleModalMute(button) {
+    const video = document.getElementById('modalVideoPlayer');
+    const volumeHigh = button.querySelector('.volume-high');
+    const volumeMute = button.querySelector('.volume-mute');
+    
+    video.muted = !video.muted;
+    
+    if (video.muted) {
+      volumeHigh.style.display = 'none';
+      volumeMute.style.display = 'block';
+    } else {
+      volumeHigh.style.display = 'block';
+      volumeMute.style.display = 'none';
+    }
+  }
+
+  // Engagement Functions
+  async function toggleModalLike() {
+    const video = allVideos[currentModalIndex];
+    const likeBtn = document.getElementById('modalLikeBtn');
+    const likeCount = document.getElementById('modalLikeCount');
+    const isLiked = likeBtn.classList.contains('active');
+    let currentCount = parseInt(likeCount.textContent) || 0;
+    
+    if (isLiked) {
+      likeBtn.classList.remove('active');
+      likeCount.textContent = Math.max(0, currentCount - 1);
+      video.user_has_liked = false;
+      video.like_count = Math.max(0, (video.like_count || 1) - 1);
+    } else {
+      likeBtn.classList.add('active');
+      likeCount.textContent = currentCount + 1;
+      video.user_has_liked = true;
+      video.like_count = (video.like_count || 0) + 1;
+    }
+  }
+
+  async function toggleModalSave() {
+    const video = allVideos[currentModalIndex];
+    const saveBtn = document.getElementById('modalSaveBtn');
+    const saveCount = document.getElementById('modalSaveCount');
+    const isSaved = saveBtn.classList.contains('saved');
+    let currentCount = parseInt(saveCount.textContent) || 0;
+    
+    if (isSaved) {
+      saveBtn.classList.remove('saved');
+      saveCount.textContent = Math.max(0, currentCount - 1);
+      video.user_has_saved = false;
+      video.save_count = Math.max(0, (video.save_count || 1) - 1);
+    } else {
+      saveBtn.classList.add('saved');
+      saveCount.textContent = currentCount + 1;
+      video.user_has_saved = true;
+      video.save_count = (video.save_count || 0) + 1;
+    }
+  }
+
+  async function shareModalVideo() {
+    const video = allVideos[currentModalIndex];
+    const shareCount = document.getElementById('modalShareCount');
+    let currentCount = parseInt(shareCount.textContent) || 0;
+    
+    shareCount.textContent = currentCount + 1;
+    video.share_count = (video.share_count || 0) + 1;
+    openShareModal(video.id);
+  }
+
+  // Download Function
+  async function downloadModalVideo() {
+    const video = allVideos[currentModalIndex];
+    
+    try {
+      console.log('📥 Starting download for video:', video.title);
+      
+      // Show downloading state
+      showDownloadingMessage();
+      
+      // Create a temporary anchor element to trigger download
+      const link = document.createElement('a');
+      link.href = video.shopify_file_url;
+      
+      // Extract filename
+      const filename = getFilenameFromUrl(video.shopify_file_url) || 
+                      `${video.title || 'video'}.mp4`;
+      
+      link.download = filename;
+      document.body.appendChild(link);
+      
+      // Trigger the download
+      link.click();
+      
+      // Clean up
+      document.body.removeChild(link);
+      
+      // Update download count
+      video.download_count = (video.download_count || 0) + 1;
+      
+      // Show success message
+      showDownloadSuccessMessage(filename);
+      
+      console.log('✅ Download completed successfully');
+      
+    } catch (error) {
+      console.error('❌ Download error:', error);
+      showErrorToast('Failed to download video. Please try again.');
+    }
+  }
+
+  // Helper function to extract filename from URL
+  function getFilenameFromUrl(url) {
+    try {
+      const urlObj = new URL(url);
+      const pathname = urlObj.pathname;
+      const filename = pathname.substring(pathname.lastIndexOf('/') + 1);
+      
+      if (filename && !filename.includes('.')) {
+        return `${filename}.mp4`;
+      }
+      
+      return filename || 'video.mp4';
+    } catch (error) {
+      return 'video.mp4';
+    }
+  }
+
+  // Show downloading progress message
+  function showDownloadingMessage() {
+    // Remove any existing messages
+    const existingMessages = document.querySelectorAll('.download-message');
+    existingMessages.forEach(msg => msg.remove());
+    
+    const downloadingMsg = document.createElement('div');
+    downloadingMsg.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #007bff;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 10000;
+        animation: slideInDown 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      ">
+        <div class="download-spinner" style="
+          width: 16px;
+          height: 16px;
+          border: 2px solid transparent;
+          border-top: 2px solid white;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        "></div>
+        <div>
+          <strong>Preparing Download...</strong>
+          <div style="font-size: 0.9rem; margin-top: 0.25rem;">Your video will download shortly</div>
+        </div>
+      </div>
+    `;
+    
+    downloadingMsg.className = 'download-message';
+    document.body.appendChild(downloadingMsg);
+    
+    setTimeout(() => {
+      if (document.body.contains(downloadingMsg)) {
+        downloadingMsg.remove();
+      }
+    }, 5000);
+  }
+
+  // Show download success message
+  function showDownloadSuccessMessage(filename) {
+    // Remove downloading message
+    const downloadingMsg = document.querySelector('.download-message');
+    if (downloadingMsg) {
+      downloadingMsg.remove();
+    }
+    
+    // Remove any existing success messages
+    const existingMessages = document.querySelectorAll('.download-success-message');
+    existingMessages.forEach(msg => msg.remove());
+    
+    const successMsg = document.createElement('div');
+    successMsg.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #28a745;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 10000;
+        animation: slideInDown 0.3s ease;
+      ">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 13l4 4L19 7"></path>
+          </svg>
+          <div>
+            <strong>Download Complete!</strong>
+            <div style="font-size: 0.9rem; margin-top: 0.25rem;">${filename}</div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    successMsg.className = 'download-success-message';
+    document.body.appendChild(successMsg);
+    
+    setTimeout(() => {
+      if (document.body.contains(successMsg)) {
+        successMsg.remove();
+      }
+    }, 3000);
+  }
+
+  function openModalComments() {
+    const video = allVideos[currentModalIndex];
+    openComments(video.id);
+  }
+
+  // Comments System
+  function openComments(videoId) {
+    currentCommentsVideo = videoId;
+    const commentsSection = document.getElementById('commentsSection');
+    
+    // Simple placeholder comments
+    let commentsHTML = `
+      <div class="comment-item">
+        <div class="comment-header">
+          <span class="comment-author">Sample User</span>
+          <span class="comment-date">${new Date().toLocaleDateString()}</span>
+        </div>
+        <p class="comment-text">Love this video! Great content!</p>
+      </div>
+      <div class="comment-item">
+        <div class="comment-header">
+          <span class="comment-author">Another User</span>
+          <span class="comment-date">${new Date(Date.now() - 86400000).toLocaleDateString()}</span>
+        </div>
+        <p class="comment-text">Awesome products in this video!</p>
+      </div>
+    `;
+    
+    document.getElementById('commentsList').innerHTML = commentsHTML;
+    
+    commentsSection.style.display = 'flex';
+    setTimeout(() => {
+      commentsSection.classList.add('active');
+    }, 10);
+  }
+
+  function closeComments() {
+    const commentsSection = document.getElementById('commentsSection');
+    commentsSection.classList.remove('active');
+    setTimeout(() => {
+      commentsSection.style.display = 'none';
+    }, 300);
+    currentCommentsVideo = null;
+  }
+
+  function postComment() {
+    const commentInput = document.getElementById('commentInput');
+    const comment = commentInput.value.trim();
+    
+    if (!comment || !currentCommentsVideo) {
+      alert('Please enter a comment');
+      return;
+    }
+    
+    try {
+      const commentsList = document.getElementById('commentsList');
+      const newComment = document.createElement('div');
+      newComment.className = 'comment-item';
+      newComment.innerHTML = `
+        <div class="comment-header">
+          <span class="comment-author">You</span>
+          <span class="comment-date">${new Date().toLocaleDateString()}</span>
+        </div>
+        <p class="comment-text">${comment}</p>
+      `;
+      
+      commentsList.insertBefore(newComment, commentsList.firstChild);
+      commentInput.value = '';
+      
+      // Update comment count in modal
+      const commentCount = document.getElementById('modalCommentCount');
+      let currentCount = parseInt(commentCount.textContent) || 0;
+      commentCount.textContent = currentCount + 1;
+      
+      // Update video data
+      const video = allVideos.find(v => v.id === currentCommentsVideo);
+      if (video) {
+        video.comment_count = (video.comment_count || 0) + 1;
+      }
+      
+    } catch (error) {
+      console.error('Error posting comment:', error);
+      alert('Error posting comment. Please try again.');
+    }
+  }
+
+  // Add to cart function
+  async function addToCart(variantId, productTitle = 'Product') {
+    try {
+      console.log('🛒 Adding to cart:', variantId, productTitle);
+      
+      // Clean the variant ID if needed
+      let cleanVariantId = variantId;
+      
+      if (typeof variantId === 'string') {
+        // Remove any non-numeric characters
+        cleanVariantId = variantId.replace(/\D/g, '');
+      }
+      
+      console.log('🛒 Cleaned variantId:', cleanVariantId);
+      
+      if (!cleanVariantId || cleanVariantId.length < 5) {
+        showErrorToast('Invalid product variant. Please try again.');
+        return;
+      }
+      
+      const numericVariantId = parseInt(cleanVariantId);
+      
+      if (isNaN(numericVariantId)) {
+        showErrorToast('Invalid product variant ID format.');
+        return;
+      }
+      
+      console.log('🛒 Final numeric variantId:', numericVariantId);
+      
+      // Show loading state
+      showLoadingMessage('Adding to cart...');
+      
+      const response = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          items: [{ 
+            id: numericVariantId, 
+            quantity: 1 
+          }] 
+        })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('❌ Shopify cart error:', error);
+        
+        let errorMessage = 'Cannot add to cart: ';
+        if (error.description) {
+          errorMessage += error.description;
+        } else if (error.message) {
+          errorMessage += error.message;
+        } else {
+          errorMessage += 'Product unavailable or out of stock';
+        }
+        
+        showErrorToast(errorMessage);
+        return;
+      }
+      
+      const result = await response.json();
+      console.log('✅ Added to cart successfully:', result);
+      
+      showCartSuccessMessage(productTitle);
+      
+      // Optional: Update cart count in header
+      updateCartCount();
+      
+      setTimeout(() => {
+        window.location.href = '/cart';
+      }, 1500);
+      
+    } catch (error) {
+      console.error('❌ Add to cart error:', error);
+      showErrorToast('Network error. Please check your connection and try again.');
+    }
+  }
+
+  // Helper function to format price
+  function formatPrice(price, currencyCode) {
+    const numericPrice = parseFloat(price);
+    if (isNaN(numericPrice)) {
+      return `${currencyCode} 0.00`;
+    }
+    
+    // Format based on currency
+    if (currencyCode === 'USD' || currencyCode === 'CAD') {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currencyCode,
+        minimumFractionDigits: 2
+      }).format(numericPrice);
+    } else if (currencyCode === 'EUR') {
+      return new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: currencyCode,
+        minimumFractionDigits: 2
+      }).format(numericPrice);
+    } else if (currencyCode === 'GBP') {
+      return new Intl.NumberFormat('en-GB', {
+        style: 'currency',
+        currency: currencyCode,
+        minimumFractionDigits: 2
+      }).format(numericPrice);
+    }
+    
+    // Default formatting
+    return `${currencyCode} ${numericPrice.toFixed(2)}`;
+  }
+
+  // Helper function to show loading message
+  function showLoadingMessage(message) {
+    const loadingMsg = document.createElement('div');
+    loadingMsg.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 1.5rem 2rem;
+        border-radius: 8px;
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      ">
+        <div class="loading-spinner" style="
+          width: 20px;
+          height: 20px;
+          border: 2px solid transparent;
+          border-top: 2px solid white;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        "></div>
+        <span>${message}</span>
+      </div>
+    `;
+    
+    loadingMsg.id = 'cart-loading-message';
+    document.body.appendChild(loadingMsg);
+    
+    // Remove after 5 seconds (safety)
+    setTimeout(() => {
+      const msg = document.getElementById('cart-loading-message');
+      if (msg) msg.remove();
+    }, 5000);
+  }
+
+  // Helper function to show error toast
+  function showErrorToast(message) {
+    const toast = document.createElement('div');
+    toast.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #dc3545;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease;
+      ">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <div>${message}</div>
+        </div>
+      </div>
+    `;
+    
+    toast.id = 'error-toast';
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      if (document.body.contains(toast)) {
+        toast.remove();
+      }
+    }, 5000);
+  }
+
+  // Helper function to show cart success message
+  function showCartSuccessMessage(productTitle) {
+    const successMsg = document.createElement('div');
+    successMsg.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease;
+      ">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 13l4 4L19 7"></path>
+          </svg>
+          <div>
+            <strong>Added to Cart!</strong>
+            <div style="font-size: 0.9rem; margin-top: 0.25rem;">${productTitle}</div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    successMsg.id = 'cart-success-message';
+    document.body.appendChild(successMsg);
+    
+    setTimeout(() => {
+      if (document.body.contains(successMsg)) {
+        successMsg.remove();
+      }
+    }, 3000);
+  }
+
+  // Share Modal Functions
+  function openShareModal(videoId) {
+    currentShareVideo = videoId;
+    const modal = document.getElementById('shareModal');
+    const shareUrlInput = document.getElementById('shareUrlInput');
+    const video = allVideos.find(v => v.id === videoId);
+    
+    if (video) {
+      shareUrlInput.value = `${window.location.origin}#video-${video.id}`;
+    } else {
+      shareUrlInput.value = window.location.href;
+    }
+    
+    modal.style.display = 'flex';
+    setTimeout(() => {
+      modal.classList.add('active');
+    }, 10);
+  }
+
+  function closeShareModal() {
+    const modal = document.getElementById('shareModal');
+    modal.classList.remove('active');
+    setTimeout(() => {
+      modal.style.display = 'none';
+    }, 300);
+    currentShareVideo = null;
+  }
+
+  function copyShareUrl() {
+    const shareUrlInput = document.getElementById('shareUrlInput');
+    shareUrlInput.select();
+    shareUrlInput.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(shareUrlInput.value)
+      .then(() => {
+        const copyButton = document.querySelector('.copy-button');
+        const originalText = copyButton.textContent;
+        copyButton.textContent = 'Copied!';
+        copyButton.style.background = '#28a745';
+        copyButton.style.color = 'white';
+        
+        setTimeout(() => {
+          copyButton.textContent = originalText;
+          copyButton.style.background = '';
+          copyButton.style.color = '';
+        }, 2000);
+      })
+      .catch(() => {
+        document.execCommand('copy');
+        alert('URL copied to clipboard!');
+      });
+  }
+
+  // Share functions
+  function shareToFacebook() {
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(document.getElementById('shareUrlInput').value)}`;
+    window.open(url, '_blank');
+  }
+
+  function shareToTwitter() {
+    const url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(document.getElementById('shareUrlInput').value)}&text=Check out this video!`;
+    window.open(url, '_blank');
+  }
+
+  function shareToWhatsApp() {
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this video: ${document.getElementById('shareUrlInput').value}`)}`;
+    window.open(url, '_blank');
+  }
+
+  function shareToLinkedIn() {
+    const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(document.getElementById('shareUrlInput').value)}`;
+    window.open(url, '_blank');
+  }
+
+  // Helper Functions
+  function getUserId() {
+    {% if customer %}
+      return {{ customer.id | json }};
+    {% endif %}
+    return null;
+  }
+
+  // Update cart count
+  function updateCartCount() {
+    // You can implement this based on your theme
+  }
+
+  // Handle window resize
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      calculateVideosPerView();
+      updateCarouselNavigation();
+      playVisibleVideos();
+    }, 250);
+  });
+
+  // Keyboard Navigation
+  document.addEventListener('keydown', (e) => {
+    const modal = document.getElementById('modalCarousel');
+    if (modal.style.display === 'flex') {
+      if (e.key === 'ArrowLeft') {
+        showPrevModalVideo();
+      } else if (e.key === 'ArrowRight') {
+        showNextModalVideo();
+      } else if (e.key === 'Escape') {
+        closeModalCarousel();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        const videoPlayer = document.getElementById('modalVideoPlayer');
+        toggleModalVideoPlayPause(videoPlayer);
+      }
+    }
+  });
+
+  // Initialize when page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Initializing video carousel...');
+    loadVideos();
+    
+    // Add scroll event listener for auto-play
+    const carouselViewport = document.querySelector('.carousel-viewport');
+    if (carouselViewport) {
+      carouselViewport.addEventListener('scroll', playVisibleVideos);
+    }
+    
+    // Add click event listeners for better UX
+    document.addEventListener('click', (e) => {
+      // Check if click is on disabled button
+      if (e.target.closest('.nav-btn:disabled')) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+  });
+
+  // Close modals when clicking outside
+  document.addEventListener('click', (e) => {
+    const shareModal = document.getElementById('shareModal');
+    
+    if (shareModal.style.display === 'flex' && e.target === shareModal.querySelector('.modal-background')) {
+      closeShareModal();
+    }
+  });
 </script>
-
-<style>
-/* Shopify Video Carousel Styles */
-.shopify-video-carousel {
-  width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 3rem 1.5rem;
-  background: #000;
-}
-
-.carousel-title {
-  text-align: center;
-  color: white;
-  font-size: 2.5rem;
-  margin-bottom: 3rem;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
-
-/* Loading State */
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  color: white;
-  text-align: center;
-}
-
-.spinner {
-  margin-bottom: 1.5rem;
-}
-
-.spinner circle {
-  stroke-linecap: round;
-}
-
-.loading-state p {
-  font-size: 1.125rem;
-  opacity: 0.8;
-}
-
-/* Empty State */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  color: #9ca3af;
-  text-align: center;
-  padding: 2rem;
-}
-
-.empty-state svg {
-  margin-bottom: 1.5rem;
-  opacity: 0.5;
-}
-
-.empty-state p {
-  font-size: 1.25rem;
-  margin-bottom: 0.5rem;
-}
-
-.empty-state .subtitle {
-  font-size: 1rem;
-  opacity: 0.7;
-}
-
-/* Error State */
-.error-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  color: white;
-  text-align: center;
-  padding: 2rem;
-  background: rgba(239, 68, 68, 0.1);
-  border-radius: 12px;
-}
-
-.error-state svg {
-  margin-bottom: 1.5rem;
-}
-
-.error-state p {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #fca5a5;
-}
-
-.error-message {
-  font-size: 0.875rem;
-  opacity: 0.8;
-  margin-bottom: 1.5rem;
-  max-width: 400px;
-}
-
-.retry-btn {
-  background: #3b82f6;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.retry-btn:hover {
-  background: #2563eb;
-  transform: translateY(-2px);
-}
-
-/* Videos Grid */
-.videos-grid-container {
-  width: 100%;
-}
-
-.shopify-videos-grid {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 2rem;
-  padding: 1rem 0;
-}
-
-@media (min-width: 640px) {
-  .shopify-videos-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .shopify-videos-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-/* Shopify Video Card */
-.shopify-video-card {
-  background: #111;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.shopify-video-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-}
-
-.video-card-inner {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-/* Video Wrapper */
-.video-wrapper {
-  position: relative;
-  width: 100%;
-  height: 250px;
-  overflow: hidden;
-  background: #000;
-}
-
-shopify-video {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-shopify-video video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.no-video {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #1a1a1a;
-}
-
-.no-video img {
-  opacity: 0.5;
-}
-
-/* Video Overlay */
-.video-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.2);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.shopify-video-card:hover .video-overlay {
-  opacity: 1;
-}
-
-.shopify-play-btn {
-  background: rgba(0, 0, 0, 0.8);
-  border: none;
-  border-radius: 50%;
-  width: 56px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s;
-  backdrop-filter: blur(4px);
-}
-
-.shopify-play-btn:hover {
-  background: rgba(59, 130, 246, 0.9);
-  transform: scale(1.1);
-}
-
-.shopify-play-btn svg {
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-}
-
-/* Video Info */
-.video-info {
-  padding: 1.5rem;
-  color: white;
-  flex-grow: 1;
-}
-
-.video-title {
-  font-size: 1.125rem;
-  font-weight: 700;
-  margin: 0 0 0.75rem 0;
-  line-height: 1.3;
-  color: #fff;
-}
-
-.video-description {
-  font-size: 0.875rem;
-  color: #ccc;
-  margin: 0 0 1rem 0;
-  line-height: 1.5;
-}
-
-.video-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.duration {
-  display: inline-block;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-/* Mobile Responsive */
-@media (max-width: 639px) {
-  .shopify-video-carousel {
-    padding: 2rem 1rem;
-  }
-  
-  .carousel-title {
-    font-size: 1.75rem;
-    margin-bottom: 2rem;
-  }
-  
-  .shopify-videos-grid {
-    gap: 1.5rem;
-  }
-  
-  .video-wrapper {
-    height: 200px;
-  }
-  
-  .video-info {
-    padding: 1.25rem;
-  }
-}
-
-/* Performance optimizations */
-shopify-video {
-  contain: content;
-}
-
-.video-wrapper {
-  content-visibility: auto;
-  contain-intrinsic-size: 250px;
-}
-
-.shopify-video-card {
-  will-change: transform;
-}
-</style>
 
 {% schema %}
 {
-  "name": "Shopify Video Carousel",
+  "name": "Video Carousel Grid",
   "target": "section",
-  "settings": [
-    {
-      "type": "text",
-      "id": "title",
-      "label": "Carousel Title",
-      "default": "Shop Videos"
-    },
-    {
-      "type": "range",
-      "id": "max_videos",
-      "label": "Maximum Videos",
-      "min": 2,
-      "max": 8,
-      "step": 2,
-      "default": 4
-    }
-  ]
+  "settings": [],
+  "enabled_on": {
+    "templates": ["*"],
+    "groups": ["*"]
+  }
 }
 {% endschema %}
