@@ -76,8 +76,8 @@
       <div class="video-preview prev-video" id="prevVideoPreview" onclick="showPrevModalVideo()">
         <div class="preview-overlay"></div>
         <video class="preview-video" muted playsinline loop></video>
-        <div class="preview-arrow">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+        <div class="preview-arrow1">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2">
             <path d="M15 18L9 12L15 6"/>
           </svg>
         </div>
@@ -174,8 +174,8 @@
       <div class="video-preview next-video" id="nextVideoPreview" onclick="showNextModalVideo()">
         <div class="preview-overlay"></div>
         <video class="preview-video" muted playsinline loop></video>
-        <div class="preview-arrow">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+        <div class="preview-arrow2">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2">
             <path d="M9 18L15 12L9 6"/>
           </svg>
         </div>
@@ -517,7 +517,7 @@
 
   /* Video Preview Styles */
   .video-preview {
-    width: 25%;
+    width: 300px;
     height: 70vh;
     position: relative;
     border-radius: 12px;
@@ -542,7 +542,7 @@
   }
 
   .preview-video {
-    width: 100%;
+    width: 300px;
     height: 100%;
     object-fit: cover;
     border-radius: 12px;
@@ -558,12 +558,26 @@
     border-radius: 12px;
   }
 
-  .preview-arrow {
+  .preview-arrow1 {
     position: absolute;
     top: 50%;
-    left: 50%;
+    left: 10%;
     transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.6);
+    background: white;
+    border-radius: 50%;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+  }
+  .preview-arrow2 {
+    position: absolute;
+    top: 50%;
+    left: 90%;
+    transform: translate(-50%, -50%);
+    background: white;
     border-radius: 50%;
     padding: 1rem;
     display: flex;
@@ -580,14 +594,13 @@
     justify-content: center;
     align-items: center;
     height: 100%;
-    width: 50%;
     order: 2;
     flex-shrink: 0;
   }
 
   .modal-video-wrapper {
     position: relative;
-    width: 100%;
+    width: 300px;
     height: 80vh;
     background: none;
     display: flex;
@@ -599,9 +612,9 @@
   }
 
   .modal-video-player {
-    width: 100%;
+    width: 300px;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     cursor: pointer;
     border-radius: 16px;
   }
@@ -997,176 +1010,200 @@
   }
 
   /* Product Image Modal Styles - Clean Version */
-  .video-product-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 2000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.8);
-  }
+  /* Product Image Modal Styles - Inside Video Player */
+.video-product-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+}
 
-  .video-product-modal.active {
-    display: flex;
-  }
+.video-product-modal.active {
+  display: flex;
+}
 
-  .video-product-modal .modal-content {
-    position: relative;
-    width: 100%;
-    max-width: 400px;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    z-index: 2001;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-    animation: modalSlideUp 0.3s ease;
-  }
+.video-product-modal .modal-content {
+  position: relative;
+  width: 90%;
+  max-width: 400px;
+  max-height: 50vh; /* 50% of video player height */
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  overflow-y: auto;
+  z-index: 101;
+  animation: modalSlideUp 0.3s ease;
+}
 
-  @keyframes modalSlideUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px) scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
   }
-
-  .video-product-modal .modal-body {
-    display: flex;
-    flex-direction: column;
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
+}
 
-  .video-product-image-section {
-    width: 100%;
-    height: 250px;
-    background: #f8f8f8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    border-bottom: 1px solid #eee;
-  }
+.video-product-modal .modal-body {
+  display: flex;
+  flex-direction: column;
+}
 
-  .video-main-product-image {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    border-radius: 8px;
-  }
+.video-product-image-section {
+  width: 100%;
+  height: 150px; /* Reduced height for 50% modal */
+  background: #f8f8f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
 
-  .video-product-details-section {
-    padding: 20px;
-  }
+.video-main-product-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+}
 
-  .video-product-modal-title {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #000;
-    margin: 0 0 15px 0;
-    line-height: 1.4;
-  }
+.video-product-details-section {
+  padding: 15px;
+}
 
-  .video-product-price-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 25px;
-  }
+.video-product-modal-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
 
-  .video-original-price {
-    font-size: 1.1rem;
-    color: #666;
-    text-decoration: line-through;
-  }
+.video-product-price-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
 
-  .video-discounted-price {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #ff0050;
-  }
+.video-original-price {
+  font-size: 1rem;
+  color: #666;
+  text-decoration: line-through;
+}
 
-  .video-discount-percentage {
-    background: #ff0050;
-    color: white;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
+.video-discounted-price {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #ff0050;
+}
 
-  .video-product-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
+.video-discount-percentage {
+  background: #ff0050;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
 
-  .video-add-to-cart-btn,
-  .video-more-info-btn {
-    padding: 14px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
-    width: 100%;
-  }
+.video-product-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
 
-  .video-add-to-cart-btn {
-    background: #000;
-    color: white;
-    font-weight: 700;
-  }
+.video-add-to-cart-btn,
+.video-more-info-btn {
+  padding: 12px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  width: 100%;
+}
 
-  .video-add-to-cart-btn:hover:not(:disabled) {
-    background: #333;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  }
+.video-add-to-cart-btn {
+  background: #000;
+  color: white;
+  font-weight: 700;
+}
 
-  .video-add-to-cart-btn:disabled {
-    background: #ccc;
-    color: #666;
-    cursor: not-allowed;
-    transform: none;
-  }
+.video-add-to-cart-btn:hover:not(:disabled) {
+  background: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
 
-  .video-more-info-btn {
-    background: transparent;
-    color: #000;
-    border: 2px solid #000;
-    font-weight: 700;
-  }
+.video-add-to-cart-btn:disabled {
+  background: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  transform: none;
+}
 
-  .video-more-info-btn:hover {
-    background: #000;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  }
+.video-more-info-btn {
+  background: transparent;
+  color: #000;
+  border: 2px solid #000;
+  font-weight: 700;
+}
 
-  .video-product-description {
-    padding-top: 15px;
-    border-top: 1px solid #eee;
-  }
+.video-more-info-btn:hover {
+  background: #000;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
 
-  .video-product-description p {
-    font-size: 0.9rem;
-    line-height: 1.5;
-    color: #666;
-    margin: 0;
-  }
+.video-product-description {
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
 
+.video-product-description p {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #666;
+  margin: 0;
+}
+
+/* Close button for modal inside video player */
+.video-product-modal .modal-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  border: none;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 102;
+  transition: all 0.3s ease;
+}
+
+.video-product-modal .modal-close-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+}
   /* Comments Section */
   .comments-section {
     position: fixed;
@@ -1458,7 +1495,7 @@
     }
     
     .video-preview {
-      width: 30%;
+      width: 300px;
       height: 65vh;
     }
     
@@ -1684,7 +1721,7 @@
   let cardWidth = 280;
   
   // Your CloudFlare URL
-  const CLOUDFLARE_URL = 'https://everything-oriental-mem-cases.trycloudflare.com';
+  const CLOUDFLARE_URL = 'https://hereby-alphabetical-chairman-electricity.trycloudflare.com';
   
   // Calculate how many videos to show based on screen width
   function calculateVideosPerView() {
@@ -2309,26 +2346,26 @@
         description: product.description || ''
       };
       
-      productsHTML += `
-        <div class="product-card" 
-             data-product-id="${productId}" 
-             data-variant-id="${variantId || ''}">
-          <img src="${imageUrl}" 
-               alt="${title}" 
-               class="product-image"
-               onclick="openVideoProductModal(${JSON.stringify(productData).replace(/"/g, '&quot;')})"
-               onerror="this.onerror=null; this.src='https://via.placeholder.com/60x60/333/fff?text=Image';">
-          <div class="product-info">
-            <h4 class="product-title" title="${title}">${title}</h4>
-            <p class="product-price">${formattedPrice}</p>
-          </div>
-          <button class="add-to-cart-btn" 
-                  onclick="addToCart('${variantId || ''}', '${safeTitle}')"
-                  ${!variantId ? 'disabled' : ''}>
-            ${variantId ? 'Add to Cart' : 'No Variant'}
-          </button>
-        </div>
-      `;
+productsHTML += `
+  <div class="product-card" 
+       data-product-id="${productId}" 
+       data-variant-id="${variantId || ''}">
+    <img src="${imageUrl}" 
+         alt="${title}" 
+         class="product-image"
+         onclick="event.stopPropagation(); openVideoProductModal(${JSON.stringify(productData).replace(/"/g, '&quot;')})"
+         onerror="this.onerror=null; this.src='https://via.placeholder.com/60x60/333/fff?text=Image';">
+    <div class="product-info">
+      <h4 class="product-title" title="${title}">${title}</h4>
+      <p class="product-price">${formattedPrice}</p>
+    </div>
+    <button class="add-to-cart-btn" 
+            onclick="event.stopPropagation(); addToCart('${variantId || ''}', '${safeTitle}')"
+            ${!variantId ? 'disabled' : ''}>
+      ${variantId ? 'Add to Cart' : 'No Variant'}
+    </button>
+  </div>
+`;
     });
     
     productCarousel.innerHTML = productsHTML;
@@ -2336,111 +2373,137 @@
   }
 
   // Video Product Image Modal Functions
-  function openVideoProductModal(product) {
-    console.log('🛍️ Opening video product modal for:', product);
-    
-    // Create modal if it doesn't exist
-    let productModal = document.getElementById('videoProductModal');
-    
-    if (!productModal) {
-      productModal = document.createElement('div');
-      productModal.id = 'videoProductModal';
-      productModal.className = 'video-product-modal';
-      document.body.appendChild(productModal);
-    }
-    
-    // Get product details
-    const imageUrl = product.image_url || product.image || 'https://via.placeholder.com/300x300/333/fff?text=Product+Image';
-    const title = product.title || 'Product';
-    const price = product.price || '0.00';
-    const comparePrice = product.compare_price || product.compare_at_price || null;
-    const currency = product.currency_code || storeCurrency;
-    const variantId = product.shopify_variant_id || product.variant_id || '';
-    const productHandle = product.handle || null;
-    
-    // Format prices
-    const formattedPrice = formatPrice(price, currency);
-    const formattedComparePrice = comparePrice ? formatPrice(comparePrice, currency) : '';
-    const discountPercentage = comparePrice ? calculateDiscount(price, comparePrice) : 0;
-    
-    // Create modal content
-    productModal.innerHTML = `
-      <div class="modal-content">
-        <div class="modal-body">
-          <!-- Product Image Section -->
-          <div class="video-product-image-section">
-            <img src="${imageUrl}" 
-                 alt="${title}" 
-                 class="video-main-product-image"
-                 onerror="this.onerror=null; this.src='https://via.placeholder.com/300x300/333/fff?text=Product+Image';">
+// Video Product Image Modal Functions
+function openVideoProductModal(product) {
+  console.log('🛍️ Opening video product modal for:', product);
+  
+  // Get the main video player container
+  const videoPlayerContainer = document.querySelector('.modal-video-wrapper');
+  if (!videoPlayerContainer) {
+    console.error('❌ Video player container not found');
+    return;
+  }
+  
+  // Create modal if it doesn't exist
+  let productModal = document.getElementById('videoProductModal');
+  
+  if (productModal) {
+    // Remove existing modal
+    productModal.remove();
+  }
+  
+  productModal = document.createElement('div');
+  productModal.id = 'videoProductModal';
+  productModal.className = 'video-product-modal';
+  
+  // Get product details
+  const imageUrl = product.image_url || product.image || 'https://via.placeholder.com/300x300/333/fff?text=Product+Image';
+  const title = product.title || 'Product';
+  const price = product.price || '0.00';
+  const comparePrice = product.compare_price || product.compare_at_price || null;
+  const currency = product.currency_code || storeCurrency;
+  const variantId = product.shopify_variant_id || product.variant_id || '';
+  const productHandle = product.handle || null;
+  
+  // Format prices
+  const formattedPrice = formatPrice(price, currency);
+  const formattedComparePrice = comparePrice ? formatPrice(comparePrice, currency) : '';
+  const discountPercentage = comparePrice ? calculateDiscount(price, comparePrice) : 0;
+  
+  // Create modal content
+  productModal.innerHTML = `
+    <div class="modal-content">
+      <button class="modal-close-btn" onclick="closeVideoProductModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div class="modal-body">
+        <!-- Product Image Section -->
+        <div class="video-product-image-section">
+          <img src="${imageUrl}" 
+               alt="${title}" 
+               class="video-main-product-image"
+               onerror="this.onerror=null; this.src='https://via.placeholder.com/300x300/333/fff?text=Product+Image';">
+        </div>
+        
+        <!-- Product Details Section -->
+        <div class="video-product-details-section">
+          <!-- Title -->
+          <h3 class="video-product-modal-title">${title}</h3>
+          
+          <!-- Price Section -->
+          <div class="video-product-price-container">
+            ${comparePrice ? 
+              `<span class="video-original-price">${formattedComparePrice}</span>
+               <span class="video-discounted-price">${formattedPrice}</span>
+               <span class="video-discount-percentage">${discountPercentage}% OFF</span>` : 
+              `<span class="video-discounted-price">${formattedPrice}</span>`
+            }
           </div>
           
-          <!-- Product Details Section -->
-          <div class="video-product-details-section">
-            <!-- Title -->
-            <h3 class="video-product-modal-title">${title}</h3>
+          <!-- Buttons Section -->
+          <div class="video-product-buttons">
+            <button class="video-add-to-cart-btn" 
+                    onclick="addToCartVideoModal('${variantId}', '${escapeString(title)}')"
+                    ${!variantId ? 'disabled' : ''}>
+              ${variantId ? 'ADD TO CART' : 'UNAVAILABLE'}
+            </button>
             
-            <!-- Price Section -->
-            <div class="video-product-price-container">
-              ${comparePrice ? 
-                `<span class="video-original-price">${formattedComparePrice}</span>
-                 <span class="video-discounted-price">${formattedPrice}</span>
-                 <span class="video-discount-percentage">${discountPercentage}% OFF</span>` : 
-                `<span class="video-discounted-price">${formattedPrice}</span>`
-              }
-            </div>
-            
-            <!-- Buttons Section -->
-            <div class="video-product-buttons">
-              <button class="video-add-to-cart-btn" 
-                      onclick="addToCartVideoModal('${variantId}', '${escapeString(title)}')"
-                      ${!variantId ? 'disabled' : ''}>
-                ${variantId ? 'ADD TO CART' : 'UNAVAILABLE'}
-              </button>
-              
-              <button class="video-more-info-btn" 
-                      onclick="goToProductPageVideoModal('${product.shopify_product_id || ''}', '${productHandle || ''}')">
-                MORE INFO →
-              </button>
-            </div>
-            
-            <!-- Description (optional) -->
-            ${product.description ? `
-              <div class="video-product-description">
-                <p>${product.description.substring(0, 150)}${product.description.length > 150 ? '...' : ''}</p>
-              </div>
-            ` : ''}
+            <button class="video-more-info-btn" 
+                    onclick="goToProductPageVideoModal('${product.shopify_product_id || ''}', '${productHandle || ''}')">
+              MORE INFO →
+            </button>
           </div>
+          
+          <!-- Description (optional) -->
+          ${product.description ? `
+            <div class="video-product-description">
+              <p>${product.description.substring(0, 120)}${product.description.length > 120 ? '...' : ''}</p>
+            </div>
+          ` : ''}
         </div>
       </div>
-    `;
-    
-    // Show modal
-    productModal.style.display = 'flex';
-    productModal.style.zIndex = '2000';
-    
-    // Add click outside to close
-    productModal.onclick = function(e) {
-      if (e.target === productModal) {
-        closeVideoProductModal();
-      }
-    };
-    
-    // Add animation
-    setTimeout(() => {
-      productModal.classList.add('active');
-    }, 10);
+    </div>
+  `;
+  
+  // Append modal to video player container
+  videoPlayerContainer.appendChild(productModal);
+  
+  // Show modal with animation
+  setTimeout(() => {
+    productModal.classList.add('active');
+  }, 10);
+  
+  // Pause the video when modal opens
+  const videoPlayer = document.getElementById('modalVideoPlayer');
+  if (videoPlayer && !videoPlayer.paused) {
+    videoPlayer.pause();
   }
+}
 
-  function closeVideoProductModal() {
-    const productModal = document.getElementById('videoProductModal');
-    if (productModal) {
-      productModal.classList.remove('active');
-      setTimeout(() => {
-        productModal.style.display = 'none';
-      }, 300);
-    }
+function closeVideoProductModal() {
+  const productModal = document.getElementById('videoProductModal');
+  const videoPlayerContainer = document.querySelector('.modal-video-wrapper');
+  
+  if (productModal && videoPlayerContainer) {
+    productModal.classList.remove('active');
+    
+    // Wait for animation to complete before removing
+    setTimeout(() => {
+      if (productModal.parentNode === videoPlayerContainer) {
+        videoPlayerContainer.removeChild(productModal);
+      }
+      
+      // Resume video if it was playing
+      const videoPlayer = document.getElementById('modalVideoPlayer');
+      if (videoPlayer && videoPlayer.paused) {
+        videoPlayer.play();
+      }
+    }, 300);
   }
+}
 
   // Helper function to escape strings for onclick attributes
   function escapeString(str) {
